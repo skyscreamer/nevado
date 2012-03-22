@@ -1,5 +1,6 @@
 package org.skyscreamer.nevado.jms;
 
+
 import javax.jms.*;
 
 /**
@@ -8,26 +9,21 @@ import javax.jms.*;
  * Date: 3/19/12
  * Time: 9:43 AM
  */
-public class SQSConnection implements QueueConnection {
+public class NevadoConnection implements Connection, QueueConnection, TopicConnection {
+    private String _awsAccessKey;
+    private String _awsSecretKey;
+    private String _clientID;
 
-    public QueueSession createQueueSession(boolean b, int i) throws JMSException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public QueueSession createQueueSession(boolean transacted, int acknowledgeMode) throws JMSException {
+        return new NevadoSession(_awsAccessKey, _awsSecretKey, transacted, acknowledgeMode);
     }
 
     public ConnectionConsumer createConnectionConsumer(Queue queue, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public Session createSession(boolean b, int i) throws JMSException {
+    public Session createSession(boolean transacted, int acknowledgeMode) throws JMSException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public String getClientID() throws JMSException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public void setClientID(String s) throws JMSException {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public ConnectionMetaData getMetaData() throws JMSException {
@@ -58,7 +54,32 @@ public class SQSConnection implements QueueConnection {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    public TopicSession createTopicSession(boolean b, int i) throws JMSException {
+        throw new UnsupportedOperationException("Topics are not yet supported"); // TODO
+    }
+
+    public ConnectionConsumer createConnectionConsumer(Topic topic, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
+        throw new UnsupportedOperationException("Topics are not yet supported"); // TODO
+    }
+
     public ConnectionConsumer createDurableConnectionConsumer(Topic topic, String s, String s1, ServerSessionPool serverSessionPool, int i) throws JMSException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException("Topics are not yet supported"); // TODO
+    }
+
+    // Getters & Setters
+    public void setAwsAccessKey(String awsAccessKey) {
+        _awsAccessKey = awsAccessKey;
+    }
+
+    public void setAwsSecretKey(String awsSecretKey) {
+        _awsSecretKey = awsSecretKey;
+    }
+
+    public String getClientID() {
+        return _clientID;
+    }
+
+    public void setClientID(String _clientID) {
+        _clientID = _clientID;
     }
 }
