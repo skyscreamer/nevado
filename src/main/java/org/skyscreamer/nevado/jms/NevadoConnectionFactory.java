@@ -42,4 +42,13 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
         connection.setAwsSecretKey(awsSecretKey);
         return connection;
     }
+
+    // Getters & Setters
+    public void setAwsAccessKey(String _awsAccessKey) {
+        this._awsAccessKey = _awsAccessKey;
+    }
+
+    public void setAwsSecretKey(String _awsSecretKey) {
+        this._awsSecretKey = _awsSecretKey;
+    }
 }

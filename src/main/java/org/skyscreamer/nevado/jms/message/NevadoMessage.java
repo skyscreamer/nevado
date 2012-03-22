@@ -1,4 +1,4 @@
-package org.skyscreamer.nevado.jms;
+package org.skyscreamer.nevado.jms.message;
 
 import org.apache.commons.codec.binary.StringUtils;
 import org.skyscreamer.nevado.jms.util.ConvertUtil;
@@ -228,6 +228,15 @@ public class NevadoMessage implements Message {
         _readOnlyBody = false;
     }
 
+    protected String getBody() {
+        return _body;
+    }
+
+    protected void setBody(String _body) {
+        this._body = _body;
+    }
+
+
     private void checkValidObject(Object value) throws MessageFormatException {
         if (!(value instanceof Boolean || value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long
                 || value instanceof Float || value instanceof Double || value instanceof Character || value instanceof String || value == null)) {
@@ -241,7 +250,7 @@ public class NevadoMessage implements Message {
         }
     }
 
-    private void checkReadOnlyBody() throws MessageNotWriteableException {
+    protected void checkReadOnlyBody() throws MessageNotWriteableException {
         if (_readOnlyBody) {
             throw new MessageNotWriteableException("Message body is read-only");
         }

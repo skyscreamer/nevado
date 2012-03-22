@@ -9,11 +9,20 @@
     <context:annotation-config/>
     <context:component-scan base-package="org.skyscreamer.nevado"/>
 
-    <bean id="connectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory"
+    <bean id="connectionFactory" class="org.skyscreamer.nevado.jms.NevadoConnectionFactory">
+        <property name="awsAccessKey" value="${awsAccessKey}" />
+        <property name="awsSecretKey" value="${awsSecretKey}" />
+    </bean>
+
+    <!--
+    <bean id="destination" class="org.skyscreamer.nevado.jms.SQSQueue">
+        <property name="queueName" value="testQueue" />
+    </bean>
 
     <bean id="jmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
         <property name="connectionFactory" ref="connectionFactory"/>
         <property name="destination" ref="destination"/>
         <property name="messageListener" ref="testMessageListener" />
     </bean>
+    -->
 </beans>

@@ -1,4 +1,4 @@
-package org.skyscreamer.nevado;
+package org.skyscreamer.nevado.jms;
 
 import javax.jms.*;
 
@@ -17,7 +17,7 @@ import java.util.Random;
  * Date: 3/18/12
  * Time: 7:51 PM
  */
-public class TestSendMessage {
+public class SendMessageTest {
     private JmsTemplate _jmsTemplate; // Configured via setter
     @Autowired private Queue _queue;
     @Autowired @Qualifier("testMessageListener") private TestMessageListener testMessageListener;
@@ -30,7 +30,7 @@ public class TestSendMessage {
                 return session.createTextMessage(key);
             }
         });
-        Thread.sleep(1000); // Need this long?
+        Thread.sleep(100); // Need this long?
         Assert.assertTrue("Looking for key " + key, testMessageListener.getMessages().contains(key));
     }
 

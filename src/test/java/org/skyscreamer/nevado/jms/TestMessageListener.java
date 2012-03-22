@@ -1,4 +1,4 @@
-package org.skyscreamer.nevado;
+package org.skyscreamer.nevado.jms;
 
 import org.springframework.stereotype.Component;
 

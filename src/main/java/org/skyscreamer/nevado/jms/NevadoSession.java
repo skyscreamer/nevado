@@ -1,5 +1,7 @@
 package org.skyscreamer.nevado.jms;
 
+import org.skyscreamer.nevado.jms.message.NevadoTextMessage;
+
 import javax.jms.*;
 import java.io.Serializable;
 
@@ -48,11 +50,13 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     public TextMessage createTextMessage() throws JMSException {
-        return null;  // TODO
+        return new NevadoTextMessage();
     }
 
-    public TextMessage createTextMessage(String s) throws JMSException {
-        return null;  // TODO
+    public TextMessage createTextMessage(String text) throws JMSException {
+        TextMessage message = new NevadoTextMessage();
+        message.setText(text);
+        return message;
     }
 
     public boolean getTransacted() throws JMSException {
