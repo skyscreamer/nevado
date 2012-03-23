@@ -13,6 +13,12 @@ import javax.jms.MessageProducer;
  * To change this template use File | Settings | File Templates.
  */
 public class NevadoMessageProducer implements MessageProducer {
+    private Destination _destination;
+
+    public NevadoMessageProducer(Destination destination) {
+        _destination = destination;
+    }
+
     public void setDisableMessageID(boolean b) throws JMSException {
         //To change body of implemented methods use File | Settings | File Templates.
     }

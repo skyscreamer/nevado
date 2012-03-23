@@ -96,11 +96,11 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     public MessageProducer createProducer(Destination destination) throws JMSException {
-        return null;  // TODO
+        return new NevadoMessageProducer(destination);
     }
 
     public MessageConsumer createConsumer(Destination destination) throws JMSException {
-        return null;  // TODO
+        return new NevadoMessageConsumer(destination);
     }
 
     public MessageConsumer createConsumer(Destination destination, String s) throws JMSException {

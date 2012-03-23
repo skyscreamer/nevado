@@ -1,9 +1,6 @@
 package org.skyscreamer.nevado.jms;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
+import javax.jms.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,6 +10,12 @@ import javax.jms.MessageListener;
  * To change this template use File | Settings | File Templates.
  */
 public class NevadoMessageConsumer implements MessageConsumer {
+    private Destination _destination;
+
+    public NevadoMessageConsumer(Destination destination) {
+        _destination = destination;
+    }
+
     public String getMessageSelector() throws JMSException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }

@@ -23,7 +23,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
     }
 
     public Session createSession(boolean transacted, int acknowledgeMode) throws JMSException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return createQueueSession(transacted, acknowledgeMode);
     }
 
     public ConnectionMetaData getMetaData() throws JMSException {
