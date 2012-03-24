@@ -9,14 +9,12 @@ import javax.jms.Queue;
  * Date: 3/22/12
  * Time: 3:35 AM
  */
-public class NevadoQueue implements Queue {
-    private final String _name;
-
+public class NevadoQueue extends NevadoDestination implements Queue {
     public NevadoQueue(String name) {
-        _name = name;
+        super(name);
     }
 
     public String getQueueName() throws JMSException {
-        return _name;
+        return super.getName();
     }
 }

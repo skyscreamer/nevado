@@ -24,6 +24,8 @@ public class TextMessageTest extends AbstractJMSTest {
         msg.setText(text);
         getSession().createProducer(getTestQueue()).send(msg);
         Message msgOut = getSession().createConsumer(getTestQueue()).receive();
+        Assert.assertNotNull("Got null message back", msgOut);
+        msgOut.acknowledge();
         Assert.assertTrue("Should be a text message", msgOut instanceof TextMessage);
         Assert.assertEquals("Text should match", text, ((TextMessage)msgOut).getText());
     }
@@ -34,6 +36,7 @@ public class TextMessageTest extends AbstractJMSTest {
         TextMessage msg = getSession().createTextMessage(text);
         getSession().createProducer(getTestQueue()).send(msg);
         Message msgOut = getSession().createConsumer(getTestQueue()).receive();
+        msgOut.acknowledge();
         Assert.assertTrue("Should be a text message", msgOut instanceof TextMessage);
         Assert.assertEquals("Text should match", text, ((TextMessage)msgOut).getText());
     }

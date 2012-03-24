@@ -1,8 +1,17 @@
 package org.skyscreamer.nevado.jms;
 
+import com.xerox.amazonws.sqs2.MessageQueue;
+import com.xerox.amazonws.sqs2.SQSException;
+import com.xerox.amazonws.sqs2.SQSUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.skyscreamer.nevado.jms.message.NevadoMessage;
 import org.skyscreamer.nevado.jms.message.NevadoTextMessage;
+import org.skyscreamer.nevado.jms.util.SQSConnector;
+import org.skyscreamer.nevado.jms.util.SerializeStringUtil;
 
 import javax.jms.*;
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -13,14 +22,12 @@ import java.io.Serializable;
  * To change this template use File | Settings | File Templates.
  */
 public class NevadoSession implements Session, QueueSession, TopicSession {
-    private String _awsAccessKey;
-    private String _awsSecretKey;
+    private final SQSConnector _sqsConnector;
     private boolean _transacted;
     private int _acknowledgeMode;
 
     protected NevadoSession(String awsAccessKey, String awsSecretKey, boolean transacted, int acknowledgeMode) {
-        _awsAccessKey = awsAccessKey;
-        _awsSecretKey = awsSecretKey;
+        _sqsConnector = new SQSConnector(awsAccessKey, awsSecretKey);
         _transacted = transacted;
         _acknowledgeMode = acknowledgeMode;
     }
@@ -49,12 +56,14 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
         return null;  // TODO
     }
 
-    public TextMessage createTextMessage() throws JMSException {
-        return new NevadoTextMessage();
+    public NevadoTextMessage createTextMessage() throws JMSException {
+        NevadoTextMessage message = new NevadoTextMessage();
+        message.setNevadoSession(this);
+        return message;
     }
 
     public TextMessage createTextMessage(String text) throws JMSException {
-        TextMessage message = new NevadoTextMessage();
+        NevadoTextMessage message = createTextMessage();
         message.setText(text);
         return message;
     }
@@ -96,11 +105,11 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     public MessageProducer createProducer(Destination destination) throws JMSException {
-        return new NevadoMessageProducer(destination);
+        return new NevadoMessageProducer(this, NevadoDestination.getInstance(destination));
     }
 
     public MessageConsumer createConsumer(Destination destination) throws JMSException {
-        return new NevadoMessageConsumer(destination);
+        return new NevadoMessageConsumer(this, NevadoDestination.getInstance(destination));
     }
 
     public MessageConsumer createConsumer(Destination destination, String s) throws JMSException {
@@ -169,5 +178,22 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
 
     public void unsubscribe(String s) throws JMSException {
         // TODO
+    }
+
+    public void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException {
+        _sqsConnector.sendMessage(destination, message);
+    }
+
+    public Message receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException {
+        NevadoMessage message = _sqsConnector.receiveMessage(destination, timeoutMs);
+        if (message != null) {
+            message.setNevadoSession(this);
+            message.setNevadoDestination(destination);
+        }
+        return message;
+    }
+    
+    public void deleteMessage(NevadoMessage message) throws JMSException {
+        _sqsConnector.deleteMessage(message);
     }
 }

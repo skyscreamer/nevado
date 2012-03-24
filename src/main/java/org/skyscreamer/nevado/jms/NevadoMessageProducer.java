@@ -1,5 +1,8 @@
 package org.skyscreamer.nevado.jms;
 
+import org.skyscreamer.nevado.jms.message.NevadoMessage;
+import org.skyscreamer.nevado.jms.util.SQSConnector;
+
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -13,9 +16,11 @@ import javax.jms.MessageProducer;
  * To change this template use File | Settings | File Templates.
  */
 public class NevadoMessageProducer implements MessageProducer {
-    private Destination _destination;
+    private NevadoSession _session;
+    private NevadoDestination _destination;
 
-    public NevadoMessageProducer(Destination destination) {
+    public NevadoMessageProducer(NevadoSession session, NevadoDestination destination) throws JMSException {
+        _session = session;
         _destination = destination;
     }
 
@@ -68,7 +73,8 @@ public class NevadoMessageProducer implements MessageProducer {
     }
 
     public void send(Message message) throws JMSException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        NevadoMessage nevadoMessage = NevadoMessage.getInstance(message);
+        _session.sendMessage(_destination, nevadoMessage);
     }
 
     public void send(Message message, int i, int i1, long l) throws JMSException {

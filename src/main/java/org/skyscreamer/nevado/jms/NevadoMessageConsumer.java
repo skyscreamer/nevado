@@ -1,18 +1,19 @@
 package org.skyscreamer.nevado.jms;
 
-import javax.jms.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-/**
- * Created by IntelliJ IDEA.
- * User: cpage
- * Date: 3/21/12
- * Time: 7:17 PM
- * To change this template use File | Settings | File Templates.
- */
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+
 public class NevadoMessageConsumer implements MessageConsumer {
-    private Destination _destination;
+    private NevadoSession _session;
+    private NevadoDestination _destination;
 
-    public NevadoMessageConsumer(Destination destination) {
+    public NevadoMessageConsumer(NevadoSession session, NevadoDestination destination) throws JMSException {
+        _session = session;
         _destination = destination;
     }
 
@@ -29,15 +30,15 @@ public class NevadoMessageConsumer implements MessageConsumer {
     }
 
     public Message receive() throws JMSException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return _session.receiveMessage(_destination, -1);
     }
 
-    public Message receive(long l) throws JMSException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public Message receive(long timeoutMs) throws JMSException {
+        return _session.receiveMessage(_destination, timeoutMs);
     }
 
     public Message receiveNoWait() throws JMSException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return _session.receiveMessage(_destination, 0);
     }
 
     public void close() throws JMSException {
