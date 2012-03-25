@@ -14,8 +14,6 @@ import javax.jms.Message;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class NevadoMessage extends AbstractMessage implements Message {
-    private String _body;
-
     private transient NevadoSession _nevadoSession;
     private transient NevadoDestination _nevadoDestination;
 
@@ -45,19 +43,6 @@ public abstract class NevadoMessage extends AbstractMessage implements Message {
 
     public void acknowledge() throws JMSException {
         _nevadoSession.deleteMessage(this);
-    }
-
-    @Override
-    public void internalClearBody() throws JMSException {
-        _body = null;
-    }
-
-    protected String getBody() {
-        return _body;
-    }
-
-    protected void setBody(String _body) {
-        this._body = _body;
     }
 
     public static NevadoMessage getInstance(Message message) {

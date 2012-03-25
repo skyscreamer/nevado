@@ -6,12 +6,19 @@ import javax.jms.JMSException;
 import javax.jms.TextMessage;
 
 public class NevadoTextMessage extends NevadoMessage implements TextMessage {
+    private String _body;
+
     public void setText(String text) throws JMSException {
         checkReadOnlyBody();
-        setBody(text);
+        _body = text;
     }
 
     public String getText() throws JMSException {
-        return getBody();
+        return _body;
+    }
+
+    @Override
+    public void internalClearBody() throws JMSException {
+        _body = null;
     }
 }

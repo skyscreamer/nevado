@@ -1,5 +1,6 @@
 package org.skyscreamer.nevado.jms.message;
 
+import javax.jms.JMSException;
 import java.io.IOException;
 
 /**
@@ -18,5 +19,10 @@ public class InvalidMessage extends NevadoMessage {
 
     public Exception getException() {
         return _exception;
+    }
+
+    @Override
+    public void internalClearBody() throws JMSException {
+        // Nothing to do
     }
 }
