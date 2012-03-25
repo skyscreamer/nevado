@@ -5,7 +5,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.skyscreamer.nevado.jms.NevadoDestination;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
-import org.skyscreamer.nevado.jms.message.NevadoNullMessage;
+import org.skyscreamer.nevado.jms.message.InvalidMessage;
 import org.skyscreamer.nevado.jms.message.NevadoProperty;
 
 import javax.jms.JMSException;
@@ -54,8 +54,7 @@ public class SQSConnector {
         if (sqsMessage != null) {
             _log.info("Received message " + sqsMessage.getMessageId());
         }
-        NevadoMessage message = convertSqsMessage(sqsMessage);
-        return message;
+        return sqsMessage != null ? convertSqsMessage(sqsMessage) : null;
     }
 
     public void deleteMessage(NevadoMessage message) throws JMSException {
@@ -84,13 +83,11 @@ public class SQSConnector {
 
 
     private NevadoMessage convertSqsMessage(Message sqsMessage) throws JMSException {
-        if (sqsMessage == null) {
-            return null;
-        }
-
-        NevadoMessage message = deserializeMessage(sqsMessage.getMessageBody());
-        if (message == null) {
-            message = new NevadoNullMessage();
+        NevadoMessage message;
+        try {
+            message = deserializeMessage(sqsMessage.getMessageBody());
+        } catch (JMSException e) {
+            message = new InvalidMessage(e);
         }
 
         message.setJMSMessageID("ID:" + sqsMessage.getMessageId());
@@ -128,7 +125,14 @@ public class SQSConnector {
         }
     }
 
-    private String serializeMessage(NevadoMessage message) throws JMSException {
+    /**
+     * Serialize a NevadoMessage object into the body of an SQS message into a bae64 string.
+     *
+     * @param message A NevadoMessage object
+     * @return A string-serialized encoding of the message
+     * @throws JMSException Unable to serialize the message
+     */
+    protected String serializeMessage(NevadoMessage message) throws JMSException {
         String serializedMessage;
         try {
             serializedMessage = SerializeStringUtil.serialize(message);
@@ -140,7 +144,14 @@ public class SQSConnector {
         return serializedMessage;
     }
 
-    private NevadoMessage deserializeMessage(String serializedMessage) throws JMSException {
+    /**
+     * Deserializes the body of an SQS message into a NevadoMessage object.
+     *
+     * @param serializedMessage String-serialized NevadoMessage
+     * @return A deserialized NevadoMessage object
+     * @throws JMSException Unable to deserialize a single NevadoMessage object from the source
+     */
+    protected NevadoMessage deserializeMessage(String serializedMessage) throws JMSException {
         Object[] deserializedObjects;
         try {
             deserializedObjects = SerializeStringUtil.deserialize(serializedMessage);
@@ -150,10 +161,10 @@ public class SQSConnector {
             throw new JMSException(exMessage);
         }
         if (deserializedObjects.length != 1) {
-            throw new JMSException("Expected 1 serialized object, got: " + deserializedObjects.length);
+            throw new JMSException("Expected 1 deserialized object, got: " + deserializedObjects.length);
         }
         if (deserializedObjects[0] == null) {
-            return null;
+            throw new JMSException("Deserialized object is null");
         }
         if (!(deserializedObjects[0] instanceof NevadoMessage)) {
             throw new JMSException("Expected object of type NevadoMessage, got: "
