@@ -217,7 +217,7 @@ public abstract class AbstractMessage implements Message, Serializable {
     }
 
     public void setObjectProperty(String name, Object value) throws JMSException {
-        checkReadOnlyProperties();
+        // checkReadOnlyProperties(); - TODO
         if (name == null || name.trim().equals("")) {
             throw new IllegalArgumentException("Property name cannot be empty or null");
         }
@@ -239,5 +239,17 @@ public abstract class AbstractMessage implements Message, Serializable {
         if (_readOnlyBody) {
             throw new MessageNotWriteableException("Message body is read-only");
         }
+    }
+
+    // This is only used by StreamMessage, where readOnly and writeOnly are mutually exclusive.
+    protected void checkWriteOnlyBody() throws MessageNotReadableException {
+        if (!_readOnlyBody) {
+            throw new MessageNotReadableException("Message body is write-only");
+        }
+    }
+
+    public void onSend() {
+        _readOnlyProperties = true;
+        _readOnlyBody = true;
     }
 }

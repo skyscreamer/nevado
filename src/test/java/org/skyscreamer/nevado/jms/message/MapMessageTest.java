@@ -16,7 +16,7 @@ import java.util.Arrays;
  */
 public class MapMessageTest extends AbstractJMSTest {
     @Test
-    public void testTextMessage1() throws JMSException {
+    public void testMapMessage() throws JMSException {
         // Initialize MapMessage
         TestValues testValues = new TestValues();
         MapMessage msg = getSession().createMapMessage();

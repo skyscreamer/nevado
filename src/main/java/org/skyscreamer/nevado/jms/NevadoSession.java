@@ -5,10 +5,7 @@ import com.xerox.amazonws.sqs2.SQSException;
 import com.xerox.amazonws.sqs2.SQSUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.skyscreamer.nevado.jms.message.NevadoMapMessage;
-import org.skyscreamer.nevado.jms.message.NevadoMessage;
-import org.skyscreamer.nevado.jms.message.NevadoObjectMessage;
-import org.skyscreamer.nevado.jms.message.NevadoTextMessage;
+import org.skyscreamer.nevado.jms.message.*;
 import org.skyscreamer.nevado.jms.util.SQSConnector;
 import org.skyscreamer.nevado.jms.util.SerializeStringUtil;
 
@@ -61,7 +58,9 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     public StreamMessage createStreamMessage() throws JMSException {
-        return null;  // TODO
+        NevadoStreamMessage message = new NevadoStreamMessage();
+        message.setNevadoSession(this);
+        return message;
     }
 
     public NevadoTextMessage createTextMessage() throws JMSException {
@@ -189,6 +188,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     public void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException {
+        message.onSend();
         _sqsConnector.sendMessage(destination, message);
     }
 
