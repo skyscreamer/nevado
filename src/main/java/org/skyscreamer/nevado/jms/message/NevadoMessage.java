@@ -5,6 +5,7 @@ import org.skyscreamer.nevado.jms.NevadoSession;
 
 import javax.jms.*;
 import javax.jms.Message;
+import java.util.Enumeration;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,6 +17,26 @@ import javax.jms.Message;
 public abstract class NevadoMessage extends AbstractMessage implements Message {
     private transient NevadoSession _nevadoSession;
     private transient NevadoDestination _nevadoDestination;
+
+    public NevadoMessage() {}
+
+    protected NevadoMessage(Message message) throws JMSException {
+        setJMSMessageID(message.getJMSMessageID());
+        setJMSCorrelationID(message.getJMSCorrelationID());
+        setJMSReplyTo(NevadoDestination.getInstance(message.getJMSReplyTo()));
+        setJMSDestination(NevadoDestination.getInstance(message.getJMSDestination()));
+        setJMSDeliveryMode(message.getJMSDeliveryMode());
+        setJMSRedelivered(message.getJMSRedelivered());
+        setJMSType(message.getJMSType());
+        setJMSExpiration(message.getJMSExpiration());
+        setJMSPriority(message.getJMSPriority());
+        setJMSTimestamp(message.getJMSTimestamp());
+        for (Enumeration propertyNames = message.getPropertyNames(); propertyNames.hasMoreElements();) {
+            String name = propertyNames.nextElement().toString();
+            Object obj = message.getObjectProperty(name);
+            setObjectProperty(name, obj);
+        }
+    }
 
     public NevadoSession getNevadoSession() {
         return _nevadoSession;
@@ -45,7 +66,7 @@ public abstract class NevadoMessage extends AbstractMessage implements Message {
         _nevadoSession.deleteMessage(this);
     }
 
-    public static NevadoMessage getInstance(Message message) {
+    public static NevadoMessage getInstance(Message message) throws JMSException {
         NevadoMessage nevadoMessage = null;
 
         if (message != null) {
@@ -57,16 +78,16 @@ public abstract class NevadoMessage extends AbstractMessage implements Message {
                     // Create new NevadoStreamMessage - TODO
                 }
                 else if (message instanceof MapMessage) {
-                    // Create new NevadoMapMessage - TODO
+                    nevadoMessage = new NevadoMapMessage((MapMessage)message);
                 }
                 else if (message instanceof TextMessage) {
-                    // Create new NevadoTextMessage - TODO
+                    nevadoMessage = new NevadoTextMessage((TextMessage)message);
                 }
                 else if (message instanceof ObjectMessage) {
-                    // Create new NevadoTopic - TODO
+                    nevadoMessage = new NevadoObjectMessage((ObjectMessage)message);
                 }
                 else if (message instanceof BytesMessage) {
-                    // Create new NevadoTopic - TODO
+                    // Create new NevadoBytesMessage - TODO
                 }
                 else {
                     throw new UnsupportedOperationException("Unable to parse message of type: " + message.getClass().getName());

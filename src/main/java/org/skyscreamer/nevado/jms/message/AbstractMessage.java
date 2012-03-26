@@ -1,7 +1,7 @@
 package org.skyscreamer.nevado.jms.message;
 
 import org.apache.commons.codec.binary.StringUtils;
-import org.skyscreamer.nevado.jms.util.ConvertUtil;
+import org.skyscreamer.nevado.jms.util.PropertyConvertUtil;
 
 import javax.jms.*;
 import java.io.Serializable;
@@ -142,35 +142,35 @@ public abstract class AbstractMessage implements Message, Serializable {
     }
 
     public boolean getBooleanProperty(String name) throws JMSException {
-        return ConvertUtil.convertToBoolean("property " + name, getObjectProperty(name));
+        return PropertyConvertUtil.convertToBoolean("property " + name, getObjectProperty(name));
     }
 
     public byte getByteProperty(String name) throws JMSException {
-        return ConvertUtil.convertToByte("property " + name, getObjectProperty(name));
+        return PropertyConvertUtil.convertToByte("property " + name, getObjectProperty(name));
     }
 
     public short getShortProperty(String name) throws JMSException {
-        return ConvertUtil.convertToShort("property " + name, getObjectProperty(name));
+        return PropertyConvertUtil.convertToShort("property " + name, getObjectProperty(name));
     }
 
     public int getIntProperty(String name) throws JMSException {
-        return ConvertUtil.convertToInt("property " + name, getObjectProperty(name));
+        return PropertyConvertUtil.convertToInt("property " + name, getObjectProperty(name));
     }
 
     public long getLongProperty(String name) throws JMSException {
-        return ConvertUtil.convertToLong("property " + name, getObjectProperty(name));
+        return PropertyConvertUtil.convertToLong("property " + name, getObjectProperty(name));
     }
 
     public float getFloatProperty(String name) throws JMSException {
-        return ConvertUtil.convertToFloat("property " + name, getObjectProperty(name));
+        return PropertyConvertUtil.convertToFloat("property " + name, getObjectProperty(name));
     }
 
     public double getDoubleProperty(String name) throws JMSException {
-        return ConvertUtil.convertToDouble("property " + name, getObjectProperty(name));
+        return PropertyConvertUtil.convertToDouble("property " + name, getObjectProperty(name));
     }
 
     public String getStringProperty(String name) throws JMSException {
-        return ConvertUtil.convertToString("property " + name, getObjectProperty(name));
+        return PropertyConvertUtil.convertToString("property " + name, getObjectProperty(name));
     }
 
     public Object getObjectProperty(String name) throws JMSException {
@@ -218,23 +218,16 @@ public abstract class AbstractMessage implements Message, Serializable {
 
     public void setObjectProperty(String name, Object value) throws JMSException {
         checkReadOnlyProperties();
-        if (name == null || name.equals("")) {
+        if (name == null || name.trim().equals("")) {
             throw new IllegalArgumentException("Property name cannot be empty or null");
         }
-        checkValidObject(value);
+        PropertyConvertUtil.checkValidObject(value);
         _properties.put(name, value);
 
         // TODO - ActiveMQMessage uses the idea of property setter to enforce the data type for defined properties.  May be overkill.
     }
 
     public abstract void acknowledge() throws JMSException;
-
-    private void checkValidObject(Object value) throws MessageFormatException {
-        if (!(value instanceof Boolean || value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long
-                || value instanceof Float || value instanceof Double || value instanceof Character || value instanceof String || value == null)) {
-            throw new MessageFormatException("Invalid of type " + value.getClass().getName());
-        }
-    }
 
     private void checkReadOnlyProperties() throws MessageNotWriteableException {
         if (_readOnlyProperties) {

@@ -8,6 +8,13 @@ import javax.jms.TextMessage;
 public class NevadoTextMessage extends NevadoMessage implements TextMessage {
     private String _body;
 
+    public NevadoTextMessage() {}
+
+    protected NevadoTextMessage(TextMessage message) throws JMSException {
+        super(message);
+        _body = message.getText();
+    }
+
     public void setText(String text) throws JMSException {
         checkReadOnlyBody();
         _body = text;

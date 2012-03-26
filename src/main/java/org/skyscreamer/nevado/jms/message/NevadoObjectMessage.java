@@ -13,6 +13,13 @@ import java.io.Serializable;
 public class NevadoObjectMessage extends NevadoMessage implements ObjectMessage {
     private Serializable _body;
 
+    public NevadoObjectMessage() {}
+
+    protected NevadoObjectMessage(ObjectMessage message) throws JMSException {
+        super(message);
+        _body = message.getObject();
+    }
+
     public void setObject(Serializable object) throws JMSException {
         checkReadOnlyBody();
         _body = object;

@@ -16,11 +16,10 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.jms.*;
+import javax.jms.Queue;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.MissingResourceException;
-import java.util.Properties;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -78,15 +77,7 @@ public abstract class AbstractJMSTest {
 
     @After
     public void tearDown() throws JMSException {
-        removePhysicalQueue(TEST_QUEUE_NAME);
-    }
-
-    private void createPhysicalQueue(String queueName) {
-        // TODO
-    }
-
-    private void removePhysicalQueue(String queueName) {
-        // TODO
+        // Do nothing
     }
 
     protected Session getSession() {
@@ -95,5 +86,13 @@ public abstract class AbstractJMSTest {
     
     protected Queue getTestQueue() {
         return _testQueue;
+    }
+    
+    public int getRandomInt() {
+        return (new Random()).nextInt();
+    }
+    
+    public String getRandomString() {
+        return UUID.randomUUID().toString();
     }
 }

@@ -3,6 +3,7 @@ package org.skyscreamer.nevado.jms.message;
 import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
+import org.skyscreamer.nevado.jms.RandomData;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -20,10 +21,22 @@ import java.util.*;
  */
 public class ObjectMessageTest extends AbstractJMSTest {
     @Test
-    public void testObjectMessage() throws JMSException {
+    public void testObjectMessage1() throws JMSException {
         TestObject testObject = new TestObject();
         ObjectMessage msg = getSession().createObjectMessage();
         msg.setObject(testObject);
+        getSession().createProducer(getTestQueue()).send(msg);
+        Message msgOut = getSession().createConsumer(getTestQueue()).receive();
+        Assert.assertNotNull("Got null message back", msgOut);
+        msgOut.acknowledge();
+        Assert.assertTrue("Should be an object message", msgOut instanceof ObjectMessage);
+        Assert.assertEquals("Object should be equal", testObject, ((ObjectMessage)msgOut).getObject());
+    }
+
+    @Test
+    public void testObjectMessage2() throws JMSException {
+        TestObject testObject = new TestObject();
+        ObjectMessage msg = getSession().createObjectMessage(testObject);
         getSession().createProducer(getTestQueue()).send(msg);
         Message msgOut = getSession().createConsumer(getTestQueue()).receive();
         Assert.assertNotNull("Got null message back", msgOut);
@@ -50,22 +63,22 @@ public class ObjectMessageTest extends AbstractJMSTest {
     private static class TestObject implements Serializable {
         private final String _string = UUID.randomUUID().toString();
         private final int _int = (new Random()).nextInt();
-        private final HashMap _map = new HashMap();
-        private final List _list = new ArrayList();
+        private final Map<String, Object> _map = new HashMap<String, Object>();
+        private final List<Object> _list = new ArrayList<Object>();
 
         private TestObject() {
-            _map.put("a", UUID.randomUUID().toString());
-            _map.put("b", UUID.randomUUID().toString());
-            Map subMap = new HashMap();
-            subMap.put("d", UUID.randomUUID().toString());
-            subMap.put("e", UUID.randomUUID().toString());
+            _map.put("a", RandomData.readString());
+            _map.put("b", RandomData.readString());
+            Map<String, Object> subMap = new HashMap<String, Object>();
+            subMap.put("d", RandomData.readString());
+            subMap.put("e", RandomData.readString());
             _map.put("c", subMap);
             
-            _list.add(UUID.randomUUID().toString());
-            _list.add(UUID.randomUUID().toString());
-            List subList = new ArrayList();
-            subList.add(UUID.randomUUID().toString());
-            subList.add(UUID.randomUUID().toString());
+            _list.add(RandomData.readString());
+            _list.add(RandomData.readInt());
+            List<Object> subList = new ArrayList<Object>();
+            subList.add(RandomData.readInt());
+            subList.add(RandomData.readString());
             _list.add(subList);
         }
 

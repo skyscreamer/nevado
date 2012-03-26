@@ -3,6 +3,7 @@ package org.skyscreamer.nevado.jms.message;
 import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
+import org.skyscreamer.nevado.jms.RandomData;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.jms.JMSException;
@@ -19,7 +20,7 @@ import java.util.Random;
 public class TextMessageTest extends AbstractJMSTest {
     @Test
     public void testTextMessage1() throws JMSException {
-        String text = "How much wood could a woodchuck chuck?  " + Math.abs((new Random()).nextInt()) + " logs!";
+        String text = "How much wood could a woodchuck chuck?  " + RandomData.readInt() + " logs!";
         TextMessage msg = getSession().createTextMessage();
         msg.setText(text);
         getSession().createProducer(getTestQueue()).send(msg);
@@ -32,7 +33,7 @@ public class TextMessageTest extends AbstractJMSTest {
 
     @Test
     public void testTextMessage2() throws JMSException {
-        String text = "How much wood could a woodchuck chuck?  " + Math.abs((new Random()).nextInt()) + " logs!";
+        String text = "How much wood could a woodchuck chuck?  " + RandomData.readInt() + " logs!";
         TextMessage msg = getSession().createTextMessage(text);
         getSession().createProducer(getTestQueue()).send(msg);
         Message msgOut = getSession().createConsumer(getTestQueue()).receive();

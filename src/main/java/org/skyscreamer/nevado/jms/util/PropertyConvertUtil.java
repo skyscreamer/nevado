@@ -1,7 +1,5 @@
 package org.skyscreamer.nevado.jms.util;
 
-import com.sun.xml.internal.fastinfoset.algorithm.BooleanEncodingAlgorithm;
-
 import javax.jms.MessageFormatException;
 
 /**
@@ -11,7 +9,7 @@ import javax.jms.MessageFormatException;
  * Time: 9:10 PM
  * To change this template use File | Settings | File Templates.
  */
-public class ConvertUtil {
+public class PropertyConvertUtil {
     public static boolean convertToBoolean(String name, Object value) throws MessageFormatException {
         if (value instanceof Boolean) {
             return (Boolean)value;
@@ -37,7 +35,7 @@ public class ConvertUtil {
             return (Short)value;
         }
         if (value instanceof Byte) {
-            return Short.valueOf((Short)value);
+            return ((Byte) value).byteValue();
         }
         if (value instanceof String) {
             return Short.valueOf((String)value);
@@ -102,7 +100,15 @@ public class ConvertUtil {
         throw new MessageFormatException(createExceptionMessage(name, value, "string"));
     }
 
-    private static String createExceptionMessage(String name, Object value, String destType) {
+    public static void checkValidObject(Object value) throws MessageFormatException {
+        if (!(value instanceof Boolean || value instanceof Byte || value instanceof Short || value instanceof Integer
+                || value instanceof Long || value instanceof Float || value instanceof Double || value instanceof String
+                || value == null)) {
+            throw new MessageFormatException("Invalid value of type " + value.getClass().getName());
+        }
+    }
+
+    protected static String createExceptionMessage(String name, Object value, String destType) {
         return "Cannot convert " + name + " from a " + value.getClass().getName() + " to a " + destType + ".";
     }
 }
