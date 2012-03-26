@@ -13,13 +13,16 @@ class ByteArray implements Serializable {
     private final byte[] _value;
 
     private transient int hash = 0; // Cache
+    private final long _size;
 
     public ByteArray() {
         _value = new byte[0];
+        _size = 0;
     }
 
     public ByteArray(byte[] value) {
         _value = Arrays.copyOf(value, value.length);
+        _size = value.length;
     }
 
     public ByteArray(byte[] value, int offset, int length) {
@@ -33,10 +36,15 @@ class ByteArray implements Serializable {
             throw new IndexOutOfBoundsException("Index of of range: " + (offset + length));
         }
         _value = Arrays.copyOfRange(value, offset, offset + length);
+        _size = length;
     }
 
     public byte[] toByteArray() {
         return Arrays.copyOf(_value, _value.length);
+    }
+
+    public long size() {
+        return _size;
     }
 
     @Override

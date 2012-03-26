@@ -47,7 +47,9 @@ public abstract class AbstractJMSTest {
     public void setUp() throws JMSException, IOException {
         initializeAWSCredentials();
         _session = connectionFactory.createConnection(_awsAccessKey, _awsSecretKey).createSession(false, Session.AUTO_ACKNOWLEDGE);
-        
+    }
+
+    protected void clearTestQueue() throws JMSException {
         // Clear out the test queue
         int msgCount = 0;
         MessageConsumer consumer = _session.createConsumer(new NevadoQueue(TEST_QUEUE_NAME));

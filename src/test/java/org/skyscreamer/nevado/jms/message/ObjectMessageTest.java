@@ -22,6 +22,8 @@ import java.util.*;
 public class ObjectMessageTest extends AbstractJMSTest {
     @Test
     public void testObjectMessage1() throws JMSException {
+        clearTestQueue();
+
         TestObject testObject = new TestObject();
         ObjectMessage msg = getSession().createObjectMessage();
         msg.setObject(testObject);
@@ -35,6 +37,8 @@ public class ObjectMessageTest extends AbstractJMSTest {
 
     @Test
     public void testObjectMessage2() throws JMSException {
+        clearTestQueue();
+
         TestObject testObject = new TestObject();
         ObjectMessage msg = getSession().createObjectMessage(testObject);
         getSession().createProducer(getTestQueue()).send(msg);
@@ -47,6 +51,8 @@ public class ObjectMessageTest extends AbstractJMSTest {
 
     @Test
     public void testBadObjectMessage() throws JMSException {
+        clearTestQueue();
+
         TestObject testObject = new TestObject();
         ObjectMessage msg = getSession().createObjectMessage();
         msg.setObject(testObject);

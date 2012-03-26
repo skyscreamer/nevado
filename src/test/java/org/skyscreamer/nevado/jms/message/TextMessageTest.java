@@ -20,6 +20,8 @@ import java.util.Random;
 public class TextMessageTest extends AbstractJMSTest {
     @Test
     public void testTextMessage1() throws JMSException {
+        clearTestQueue();
+
         String text = "How much wood could a woodchuck chuck?  " + RandomData.readInt() + " logs!";
         TextMessage msg = getSession().createTextMessage();
         msg.setText(text);
@@ -33,6 +35,8 @@ public class TextMessageTest extends AbstractJMSTest {
 
     @Test
     public void testTextMessage2() throws JMSException {
+        clearTestQueue();
+
         String text = "How much wood could a woodchuck chuck?  " + RandomData.readInt() + " logs!";
         TextMessage msg = getSession().createTextMessage(text);
         getSession().createProducer(getTestQueue()).send(msg);

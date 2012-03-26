@@ -2,7 +2,7 @@ package org.skyscreamer.nevado.jms.util;
 
 /**
  * This class taken directly from org.apache.activemq.util.MarshallingSupport,
- * with great appreciation from its creators.  It is also licensed under Apache 2.0.
+ * with great appreciation for its creators.  It is also licensed under Apache 2.0.
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with

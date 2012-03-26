@@ -17,6 +17,8 @@ import java.util.Arrays;
 public class MapMessageTest extends AbstractJMSTest {
     @Test
     public void testMapMessage() throws JMSException {
+        clearTestQueue();
+
         // Initialize MapMessage
         TestValues testValues = new TestValues();
         MapMessage msg = getSession().createMapMessage();
@@ -59,7 +61,7 @@ public class MapMessageTest extends AbstractJMSTest {
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         Assert.assertTrue("Should be a map message", msgOut instanceof MapMessage);
-        
+
         // Verify
         Assert.assertEquals("MapMessage.getBoolean failed (conversion bb)", testValues.bb, msg.getBoolean("bb"));
         Assert.assertEquals("MapMessage.getBoolean failed (conversion sb)", testValues.sb, String.valueOf(msg.getBoolean("sb")));

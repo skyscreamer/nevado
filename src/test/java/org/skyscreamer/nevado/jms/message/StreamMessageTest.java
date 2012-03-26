@@ -17,6 +17,8 @@ import java.util.Arrays;
 public class StreamMessageTest extends AbstractJMSTest {
     @Test
     public void testStreamMessage() throws JMSException {
+        clearTestQueue();
+
         // Initialize MapMessage
         TestValues testValues = new TestValues();
         StreamMessage msg = getSession().createStreamMessage();
@@ -310,7 +312,6 @@ public class StreamMessageTest extends AbstractJMSTest {
 
     @Test(expected = MessageFormatException.class)
     public void szFail() throws JMSException { initStream(RandomData.readString()).readBytes(new byte[10]); }
-
 
     private StreamMessage initStream(Object o) throws JMSException {
         StreamMessage streamMessage = getSession().createStreamMessage();

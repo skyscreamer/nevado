@@ -32,7 +32,9 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     public BytesMessage createBytesMessage() throws JMSException {
-        return null;  // TODO
+        NevadoBytesMessage message = new NevadoBytesMessage();
+        message.setNevadoSession(this);
+        return message;
     }
 
     public MapMessage createMapMessage() throws JMSException {
