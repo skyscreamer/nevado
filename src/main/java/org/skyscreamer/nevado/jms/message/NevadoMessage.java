@@ -54,12 +54,24 @@ public abstract class NevadoMessage extends AbstractMessage implements Message {
         _nevadoDestination = nevadoDestination;
     }
 
+    public boolean nevadoPropertyExists(NevadoProperty property) throws JMSException {
+        return super.propertyExists(property + "");
+    }
+
     public String getNevadoStringProperty(NevadoProperty property) throws JMSException {
         return super.getStringProperty(property + "");
     }
 
     public void setNevadoStringProperty(NevadoProperty nevadoProperty, String value) throws JMSException {
         super.setStringProperty(nevadoProperty + "", value);
+    }
+
+    public boolean getNevadoBooleanProperty(NevadoProperty nevadoProperty) throws JMSException {
+        return super.getBooleanProperty(nevadoProperty + "");
+    }
+
+    public void setNevadoBooleanProperty(NevadoProperty nevadoProperty, boolean value) throws JMSException {
+        super.setBooleanProperty(nevadoProperty + "", value);
     }
 
     public void acknowledge() throws JMSException {

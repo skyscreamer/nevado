@@ -39,11 +39,16 @@ public class SQSConnector {
         _receiveCheckIntervalMs = receiveCheckIntervalMs;
     }
 
-    public void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException {
+    public void sendMessage(NevadoDestination destination, NevadoMessage message, boolean disableMessageID) throws JMSException {
         MessageQueue sqsQueue = getSQSQueue(destination);
         String serializedMessage = serializeMessage(message);
         String sqsMessageId = sendSQSMessage(destination, sqsQueue, serializedMessage);
-        message.setJMSMessageID("ID:" + sqsMessageId);
+        if (!disableMessageID) {
+            message.setJMSMessageID("ID:" + sqsMessageId);
+        }
+        else {
+            message.setNevadoBooleanProperty(NevadoProperty.DisableMessageID, true);
+        }
         _log.info("Sent message " + sqsMessageId);
     }
 
@@ -90,7 +95,11 @@ public class SQSConnector {
             message = new InvalidMessage(e);
         }
 
-        message.setJMSMessageID("ID:" + sqsMessage.getMessageId());
+        if (!message.nevadoPropertyExists(NevadoProperty.DisableMessageID)
+                || !message.getNevadoBooleanProperty(NevadoProperty.DisableMessageID))
+        {
+            message.setJMSMessageID("ID:" + sqsMessage.getMessageId());
+        }
         message.setNevadoStringProperty(NevadoProperty.SQSReceiptHandle, sqsMessage.getReceiptHandle());
 
         return message;

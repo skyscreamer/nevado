@@ -56,10 +56,7 @@ public class MapMessageTest extends AbstractJMSTest {
         msg.setBytes("zz", testValues.zz);
 
         // Send/Receive
-        getSession().createProducer(getTestQueue()).send(msg);
-        Message msgOut = getSession().createConsumer(getTestQueue()).receive();
-        Assert.assertNotNull("Got null message back", msgOut);
-        msgOut.acknowledge();
+        Message msgOut = sendAndReceive(msg);
         Assert.assertTrue("Should be a map message", msgOut instanceof MapMessage);
 
         // Verify

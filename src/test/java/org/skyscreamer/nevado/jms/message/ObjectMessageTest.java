@@ -27,10 +27,7 @@ public class ObjectMessageTest extends AbstractJMSTest {
         TestObject testObject = new TestObject();
         ObjectMessage msg = getSession().createObjectMessage();
         msg.setObject(testObject);
-        getSession().createProducer(getTestQueue()).send(msg);
-        Message msgOut = getSession().createConsumer(getTestQueue()).receive();
-        Assert.assertNotNull("Got null message back", msgOut);
-        msgOut.acknowledge();
+        Message msgOut = sendAndReceive(msg);
         Assert.assertTrue("Should be an object message", msgOut instanceof ObjectMessage);
         Assert.assertEquals("Object should be equal", testObject, ((ObjectMessage)msgOut).getObject());
     }
@@ -41,10 +38,7 @@ public class ObjectMessageTest extends AbstractJMSTest {
 
         TestObject testObject = new TestObject();
         ObjectMessage msg = getSession().createObjectMessage(testObject);
-        getSession().createProducer(getTestQueue()).send(msg);
-        Message msgOut = getSession().createConsumer(getTestQueue()).receive();
-        Assert.assertNotNull("Got null message back", msgOut);
-        msgOut.acknowledge();
+        Message msgOut = sendAndReceive(msg);
         Assert.assertTrue("Should be an object message", msgOut instanceof ObjectMessage);
         Assert.assertEquals("Object should be equal", testObject, ((ObjectMessage)msgOut).getObject());
     }
@@ -56,10 +50,7 @@ public class ObjectMessageTest extends AbstractJMSTest {
         TestObject testObject = new TestObject();
         ObjectMessage msg = getSession().createObjectMessage();
         msg.setObject(testObject);
-        getSession().createProducer(getTestQueue()).send(msg);
-        Message msgOut = getSession().createConsumer(getTestQueue()).receive();
-        Assert.assertNotNull("Got null message back", msgOut);
-        msgOut.acknowledge();
+        Message msgOut = sendAndReceive(msg);
         Assert.assertTrue("Should be an object message", msgOut instanceof ObjectMessage);
         // To be paranoid, let's check pulling something out and see that it fails
         ((Map)testObject._map.get("c")).remove("d");

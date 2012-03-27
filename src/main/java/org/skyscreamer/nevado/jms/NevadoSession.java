@@ -44,7 +44,9 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     public Message createMessage() throws JMSException {
-        return null;  // TODO
+        NevadoMessage message = new NevadoBlankMessage();
+        message.setNevadoSession(this);
+        return message;
     }
 
     public NevadoObjectMessage createObjectMessage() throws JMSException {
@@ -189,9 +191,9 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
         // TODO
     }
 
-    public void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException {
+    public void sendMessage(NevadoDestination destination, NevadoMessage message, boolean disableMessageID) throws JMSException {
         message.onSend();
-        _sqsConnector.sendMessage(destination, message);
+        _sqsConnector.sendMessage(destination, message, disableMessageID);
     }
 
     public Message receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException {

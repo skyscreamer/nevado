@@ -3,6 +3,7 @@ package org.skyscreamer.nevado.jms;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,14 @@ public abstract class AbstractJMSTest {
             message.acknowledge();
         }
         _log.info("Cleared out " + msgCount + " messages");
+    }
+
+    protected Message sendAndReceive(Message msg) throws JMSException {
+        getSession().createProducer(getTestQueue()).send(msg);
+        Message msgOut = getSession().createConsumer(getTestQueue()).receive();
+        Assert.assertNotNull("Got null message back", msgOut);
+        msgOut.acknowledge();
+        return msgOut;
     }
 
     private void initializeAWSCredentials() throws IOException {
