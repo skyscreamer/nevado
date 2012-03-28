@@ -1,16 +1,8 @@
 package org.skyscreamer.nevado.jms;
 
-import com.xerox.amazonws.sqs2.MessageQueue;
-import com.xerox.amazonws.sqs2.SQSException;
-import com.xerox.amazonws.sqs2.SQSUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.skyscreamer.nevado.jms.message.*;
-import org.skyscreamer.nevado.jms.util.SQSConnector;
-import org.skyscreamer.nevado.jms.util.SerializeStringUtil;
 
 import javax.jms.*;
-import java.io.IOException;
 import java.io.Serializable;
 
 /**

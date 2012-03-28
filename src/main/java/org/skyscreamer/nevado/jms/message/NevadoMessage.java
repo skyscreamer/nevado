@@ -58,20 +58,16 @@ public abstract class NevadoMessage extends AbstractMessage implements Message {
         return super.propertyExists(property + "");
     }
 
-    public String getNevadoStringProperty(NevadoProperty property) throws JMSException {
-        return super.getStringProperty(property + "");
+    public Object getNevadoProperty(NevadoProperty nevadoProperty ) throws JMSException {
+        return super.getObjectProperty(nevadoProperty + "");
     }
 
-    public void setNevadoStringProperty(NevadoProperty nevadoProperty, String value) throws JMSException {
-        super.setStringProperty(nevadoProperty + "", value);
-    }
-
-    public boolean getNevadoBooleanProperty(NevadoProperty nevadoProperty) throws JMSException {
-        return super.getBooleanProperty(nevadoProperty + "");
-    }
-
-    public void setNevadoBooleanProperty(NevadoProperty nevadoProperty, boolean value) throws JMSException {
-        super.setBooleanProperty(nevadoProperty + "", value);
+    public void setNevadoProperty(NevadoProperty nevadoProperty, Object value) throws JMSException {
+        if (!nevadoProperty.getPropertyType().isAssignableFrom(value.getClass())) {
+            throw new MessageFormatException("Invalid property type for " + nevadoProperty + " ("
+                    + nevadoProperty.getClass().getName() + ": " + value.getClass().getName());
+        }
+        super.internalSetObjectProperty(nevadoProperty + "", value);
     }
 
     public void acknowledge() throws JMSException {
@@ -87,7 +83,7 @@ public abstract class NevadoMessage extends AbstractMessage implements Message {
             }
             else {
                 if (message instanceof StreamMessage) {
-                    // Create new NevadoStreamMessage - TODO
+                    nevadoMessage = new NevadoStreamMessage((StreamMessage)message);
                 }
                 else if (message instanceof MapMessage) {
                     nevadoMessage = new NevadoMapMessage((MapMessage)message);
@@ -99,7 +95,7 @@ public abstract class NevadoMessage extends AbstractMessage implements Message {
                     nevadoMessage = new NevadoObjectMessage((ObjectMessage)message);
                 }
                 else if (message instanceof BytesMessage) {
-                    // Create new NevadoBytesMessage - TODO
+                    nevadoMessage = new NevadoBytesMessage((BytesMessage)message);
                 }
                 else {
                     throw new UnsupportedOperationException("Unable to parse message of type: " + message.getClass().getName());

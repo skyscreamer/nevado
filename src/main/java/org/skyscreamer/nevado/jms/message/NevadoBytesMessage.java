@@ -30,6 +30,18 @@ public class NevadoBytesMessage extends NevadoMessage implements BytesMessage {
 
     private ByteArray _body;
 
+    public NevadoBytesMessage() {}
+
+    public NevadoBytesMessage(BytesMessage message) throws JMSException {
+        super(message);
+        for(int count = 0 ; count < message.getBodyLength() ; ) {
+            byte[] buffer = new byte[10240];
+            int numRead = message.readBytes(buffer);
+            writeBytes(buffer, 0, numRead);
+            count += numRead;
+        }
+    }
+
     @Override
     public void internalClearBody() throws JMSException {
         _body = null;

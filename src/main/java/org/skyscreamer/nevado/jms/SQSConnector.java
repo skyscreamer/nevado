@@ -1,12 +1,12 @@
-package org.skyscreamer.nevado.jms.util;
+package org.skyscreamer.nevado.jms;
 
 import com.xerox.amazonws.sqs2.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.skyscreamer.nevado.jms.NevadoDestination;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
 import org.skyscreamer.nevado.jms.message.InvalidMessage;
 import org.skyscreamer.nevado.jms.message.NevadoProperty;
+import org.skyscreamer.nevado.jms.util.SerializeStringUtil;
 
 import javax.jms.JMSException;
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class SQSConnector {
             message.setJMSMessageID("ID:" + sqsMessageId);
         }
         else {
-            message.setNevadoBooleanProperty(NevadoProperty.DisableMessageID, true);
+            message.setNevadoProperty(NevadoProperty.DisableMessageID, true);
         }
         _log.info("Sent message " + sqsMessageId);
     }
@@ -79,7 +79,7 @@ public class SQSConnector {
     }
 
     private String getSQSReceiptHandle(NevadoMessage message) throws JMSException {
-        String sqsReceiptHandle = message.getNevadoStringProperty(NevadoProperty.SQSReceiptHandle);
+        String sqsReceiptHandle = (String)message.getNevadoProperty(NevadoProperty.SQSReceiptHandle);
         if (sqsReceiptHandle == null) {
             throw new JMSException("Invalid null SQS receipt handle");
         }
@@ -96,11 +96,11 @@ public class SQSConnector {
         }
 
         if (!message.nevadoPropertyExists(NevadoProperty.DisableMessageID)
-                || !message.getNevadoBooleanProperty(NevadoProperty.DisableMessageID))
+                || !(Boolean)message.getNevadoProperty(NevadoProperty.DisableMessageID))
         {
             message.setJMSMessageID("ID:" + sqsMessage.getMessageId());
         }
-        message.setNevadoStringProperty(NevadoProperty.SQSReceiptHandle, sqsMessage.getReceiptHandle());
+        message.setNevadoProperty(NevadoProperty.SQSReceiptHandle, sqsMessage.getReceiptHandle());
 
         return message;
     }

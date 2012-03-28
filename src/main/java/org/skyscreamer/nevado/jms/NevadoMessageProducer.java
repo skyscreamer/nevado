@@ -1,7 +1,6 @@
 package org.skyscreamer.nevado.jms;
 
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
-import org.skyscreamer.nevado.jms.util.SQSConnector;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;

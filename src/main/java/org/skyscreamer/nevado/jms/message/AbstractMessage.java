@@ -217,16 +217,19 @@ public abstract class AbstractMessage implements Message, Serializable {
     }
 
     public void setObjectProperty(String name, Object value) throws JMSException {
-        // checkReadOnlyProperties(); - TODO
+        checkReadOnlyProperties();
+        internalSetObjectProperty(name, value);
+        // TODO - ActiveMQMessage uses the idea of property setter to enforce the data type for defined properties.  May be overkill.
+    }
+
+    protected void internalSetObjectProperty(String name, Object value) throws JMSException {
         if (name == null || name.trim().equals("")) {
             throw new IllegalArgumentException("Property name cannot be empty or null");
         }
         PropertyConvertUtil.checkValidObject(value);
         _properties.put(name, value);
-
-        // TODO - ActiveMQMessage uses the idea of property setter to enforce the data type for defined properties.  May be overkill.
     }
-
+            
     public abstract void acknowledge() throws JMSException;
 
     private void checkReadOnlyProperties() throws MessageNotWriteableException {

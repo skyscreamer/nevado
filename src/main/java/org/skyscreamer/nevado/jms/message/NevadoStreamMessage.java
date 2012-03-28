@@ -35,6 +35,21 @@ public class NevadoStreamMessage extends NevadoMessage implements StreamMessage 
 
     private ByteArray _body;
 
+    public NevadoStreamMessage() {}
+
+    public NevadoStreamMessage(StreamMessage message) throws JMSException {
+        super(message);
+        while(true) {
+            try {
+                writeObject(message.readObject());
+            }
+            catch (MessageEOFException e) {
+                break;
+            }
+        }
+        storeContent();
+    }
+
     @Override
     public void internalClearBody() throws JMSException {
         _body = null;
