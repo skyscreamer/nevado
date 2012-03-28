@@ -74,19 +74,27 @@ public class NevadoMessageProducer implements MessageProducer {
     }
 
     public void send(Message message) throws JMSException {
-        NevadoMessage nevadoMessage = NevadoMessage.getInstance(message);
-        _session.sendMessage(_destination, nevadoMessage, _disableMessageID, _disableTimestamp);
+        send(_destination, message);
     }
 
-    public void send(Message message, int i, int i1, long l) throws JMSException {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void send(Message message, int deliveryMode, int priority, long ttl) throws JMSException {
+        send(_destination, message, deliveryMode, priority, ttl);
     }
 
     public void send(Destination destination, Message message) throws JMSException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        send(destination, message, Message.DEFAULT_DELIVERY_MODE, Message.DEFAULT_PRIORITY,
+                Message.DEFAULT_TIME_TO_LIVE);
     }
 
-    public void send(Destination destination, Message message, int i, int i1, long l) throws JMSException {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void send(Destination destination, Message message, int deliveryMode, int priority, long ttl)
+            throws JMSException
+    {
+        message.setJMSDeliveryMode(deliveryMode);
+        message.setJMSPriority(priority);
+        message.setJMSExpiration(ttl > 0 ? System.currentTimeMillis() + ttl : 0);
+        NevadoDestination nevadoDestination = NevadoDestination.getInstance(destination);
+        NevadoMessage nevadoMessage = NevadoMessage.getInstance(message);
+        _session.sendMessage(NevadoDestination.getInstance(destination), nevadoMessage,
+                _disableMessageID, _disableTimestamp);
     }
 }

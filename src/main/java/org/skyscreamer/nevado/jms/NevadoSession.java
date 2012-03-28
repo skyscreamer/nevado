@@ -191,6 +191,15 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
 
     public Message receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException {
         NevadoMessage message = _sqsConnector.receiveMessage(destination, timeoutMs);
+
+        // Skip expired messages
+        while(message != null && message.getJMSExpiration() > 0
+                && System.currentTimeMillis() > message.getJMSExpiration())
+        {
+            message = _sqsConnector.receiveMessage(destination, timeoutMs);
+        }
+
+        // Set session and destination
         if (message != null) {
             message.setNevadoSession(this);
             message.setNevadoDestination(destination);
