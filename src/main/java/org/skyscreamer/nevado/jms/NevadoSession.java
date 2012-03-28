@@ -1,5 +1,7 @@
 package org.skyscreamer.nevado.jms;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.skyscreamer.nevado.jms.message.*;
 
 import javax.jms.*;
@@ -13,6 +15,8 @@ import java.io.Serializable;
  * To change this template use File | Settings | File Templates.
  */
 public class NevadoSession implements Session, QueueSession, TopicSession {
+    private final Log _log = LogFactory.getLog(getClass());
+
     private final SQSConnector _sqsConnector;
     private boolean _transacted;
     private int _acknowledgeMode;
@@ -190,23 +194,31 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     public Message receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException {
-        NevadoMessage message = _sqsConnector.receiveMessage(destination, timeoutMs);
+        NevadoMessage message = getUnfilteredMessage(destination, timeoutMs);
 
-        // Skip expired messages
+        // Filter expired messages
         while(message != null && message.getJMSExpiration() > 0
                 && System.currentTimeMillis() > message.getJMSExpiration())
         {
-            message = _sqsConnector.receiveMessage(destination, timeoutMs);
+            message.expire();
+            _log.info("Skipped expired message (" + message.getJMSMessageID() + ")");
+
+            message = getUnfilteredMessage(destination, timeoutMs);
         }
 
         // Set session and destination
+        return message;
+    }
+
+    private NevadoMessage getUnfilteredMessage(NevadoDestination destination, long timeoutMs) throws JMSException {
+        NevadoMessage message = _sqsConnector.receiveMessage(destination, timeoutMs);
         if (message != null) {
             message.setNevadoSession(this);
             message.setNevadoDestination(destination);
         }
         return message;
     }
-    
+
     public void deleteMessage(NevadoMessage message) throws JMSException {
         _sqsConnector.deleteMessage(message);
     }

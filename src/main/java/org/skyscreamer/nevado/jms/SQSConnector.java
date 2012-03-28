@@ -22,7 +22,7 @@ import java.util.Date;
  *       configured on a per-destination basis.
  */
 public class SQSConnector {
-    private final Log _log = LogFactory.getLog(SQSConnector.class);
+    private final Log _log = LogFactory.getLog(getClass());
 
     private final QueueService _queueService;
     private final long _receiveCheckIntervalMs;

@@ -74,6 +74,10 @@ public abstract class NevadoMessage extends AbstractMessage implements Message {
         _nevadoSession.deleteMessage(this);
     }
 
+    public void expire() throws JMSException {
+        _nevadoSession.deleteMessage(this);
+    }
+
     public static NevadoMessage getInstance(Message message) throws JMSException {
         NevadoMessage nevadoMessage = null;
 
