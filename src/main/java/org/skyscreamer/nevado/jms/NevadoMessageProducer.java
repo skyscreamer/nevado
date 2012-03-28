@@ -18,6 +18,7 @@ public class NevadoMessageProducer implements MessageProducer {
     private NevadoSession _session;
     private NevadoDestination _destination;
     private boolean _disableMessageID = false;
+    private boolean _disableTimestamp = false;
 
     public NevadoMessageProducer(NevadoSession session, NevadoDestination destination) throws JMSException {
         _session = session;
@@ -32,12 +33,12 @@ public class NevadoMessageProducer implements MessageProducer {
         return _disableMessageID;
     }
 
-    public void setDisableMessageTimestamp(boolean b) throws JMSException {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void setDisableMessageTimestamp(boolean disableTimestamp) throws JMSException {
+        _disableTimestamp = disableTimestamp;
     }
 
     public boolean getDisableMessageTimestamp() throws JMSException {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return _disableTimestamp;
     }
 
     public void setDeliveryMode(int i) throws JMSException {
@@ -74,7 +75,7 @@ public class NevadoMessageProducer implements MessageProducer {
 
     public void send(Message message) throws JMSException {
         NevadoMessage nevadoMessage = NevadoMessage.getInstance(message);
-        _session.sendMessage(_destination, nevadoMessage, _disableMessageID);
+        _session.sendMessage(_destination, nevadoMessage, _disableMessageID, _disableTimestamp);
     }
 
     public void send(Message message, int i, int i1, long l) throws JMSException {

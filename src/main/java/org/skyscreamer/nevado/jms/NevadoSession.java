@@ -183,9 +183,10 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
         // TODO
     }
 
-    public void sendMessage(NevadoDestination destination, NevadoMessage message, boolean disableMessageID) throws JMSException {
+    public void sendMessage(NevadoDestination destination, NevadoMessage message, boolean disableMessageID,
+                            boolean disableTimestamp) throws JMSException {
         message.onSend();
-        _sqsConnector.sendMessage(destination, message, disableMessageID);
+        _sqsConnector.sendMessage(destination, message, disableMessageID, disableTimestamp);
     }
 
     public Message receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException {
