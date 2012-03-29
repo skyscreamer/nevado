@@ -2,6 +2,7 @@ package org.skyscreamer.nevado.jms;
 
 import javax.jms.JMSException;
 import javax.jms.Queue;
+import java.io.Serializable;
 
 /**
  * Created by IntelliJ IDEA.
@@ -9,7 +10,8 @@ import javax.jms.Queue;
  * Date: 3/22/12
  * Time: 3:35 AM
  */
-public class NevadoQueue extends NevadoDestination implements Queue {
+public class NevadoQueue extends NevadoDestination implements Queue, Serializable {
+    private String x;
     public NevadoQueue(String name) {
         super(name);
     }

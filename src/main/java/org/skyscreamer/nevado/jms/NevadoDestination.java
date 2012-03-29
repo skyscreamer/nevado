@@ -52,4 +52,21 @@ public abstract class NevadoDestination implements Destination {
     public String toString() {
         return _name;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NevadoDestination that = (NevadoDestination) o;
+
+        if (_name != null ? !_name.equals(that._name) : that._name != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return _name != null ? _name.hashCode() : 0;
+    }
 }

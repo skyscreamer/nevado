@@ -89,6 +89,7 @@ public class NevadoMessageProducer implements MessageProducer {
     public void send(Destination destination, Message message, int deliveryMode, int priority, long ttl)
             throws JMSException
     {
+        message.setJMSDestination(destination);
         message.setJMSDeliveryMode(deliveryMode);
         message.setJMSPriority(priority);
         message.setJMSExpiration(ttl > 0 ? System.currentTimeMillis() + ttl : 0);
