@@ -99,11 +99,11 @@ public abstract class AbstractJMSTest {
         return _testQueue;
     }
     
-    public int getRandomInt() {
-        return (new Random()).nextInt();
+    protected String getAwsAccessKey() {
+        return _awsAccessKey;
     }
-    
-    public String getRandomString() {
-        return UUID.randomUUID().toString();
+
+    protected String getAwsSecretKey() {
+        return _awsSecretKey;
     }
 }

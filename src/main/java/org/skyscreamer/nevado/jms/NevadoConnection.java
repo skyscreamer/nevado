@@ -13,9 +13,16 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
     private String _awsAccessKey;
     private String _awsSecretKey;
     private String _clientID;
+    private Integer _jmsDeliveryMode;
+    private Long _jmsTTL;
+    private Integer _jmsPriority;
 
     public QueueSession createQueueSession(boolean transacted, int acknowledgeMode) throws JMSException {
-        return new NevadoSession(_awsAccessKey, _awsSecretKey, transacted, acknowledgeMode);
+        NevadoSession nevadoSession = new NevadoSession(_awsAccessKey, _awsSecretKey, transacted, acknowledgeMode);
+        nevadoSession.setOverrideJMSDeliveryMode(_jmsDeliveryMode);
+        nevadoSession.setOverrideJMSTTL(_jmsTTL);
+        nevadoSession.setOverrideJMSPriority(_jmsPriority);
+        return nevadoSession;
     }
 
     public ConnectionConsumer createConnectionConsumer(Queue queue, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
@@ -81,5 +88,17 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
 
     public void setClientID(String _clientID) {
         _clientID = _clientID;
+    }
+
+    public void setOverrideJMSDeliveryMode(Integer jmsDeliveryMode) {
+        _jmsDeliveryMode = jmsDeliveryMode;
+    }
+
+    public void setOverrideJMSPriority(Integer jmsPriority) {
+        _jmsPriority = jmsPriority;
+    }
+
+    public void setOverrideJMSTTL(Long jmsTTL) {
+        _jmsTTL = jmsTTL;
     }
 }

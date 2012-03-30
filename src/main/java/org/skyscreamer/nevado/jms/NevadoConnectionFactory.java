@@ -11,6 +11,16 @@ import javax.jms.*;
 public class NevadoConnectionFactory implements ConnectionFactory, QueueConnectionFactory, TopicConnectionFactory {
     private String _awsAccessKey;
     private String _awsSecretKey;
+    private Integer _jmsDeliveryMode;
+    private Long _jmsTTL;
+    private Integer _jmsPriority;
+
+    public NevadoConnectionFactory() {}
+
+    public NevadoConnectionFactory(String awsAccessKey, String awsSecretKey) {
+        this._awsAccessKey = awsAccessKey;
+        this._awsSecretKey = awsSecretKey;
+    }
 
     public QueueConnection createQueueConnection() throws JMSException {
         return createNevadoConnection(_awsAccessKey, _awsSecretKey);
@@ -40,15 +50,30 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
         NevadoConnection connection = new NevadoConnection();
         connection.setAwsAccessKey(awsAccessKey);
         connection.setAwsSecretKey(awsSecretKey);
+        connection.setOverrideJMSDeliveryMode(_jmsDeliveryMode);
+        connection.setOverrideJMSPriority(_jmsPriority);
+        connection.setOverrideJMSTTL(_jmsTTL);
         return connection;
     }
 
     // Getters & Setters
-    public void setAwsAccessKey(String _awsAccessKey) {
-        this._awsAccessKey = _awsAccessKey;
+    public void setAwsAccessKey(String awsAccessKey) {
+        _awsAccessKey = awsAccessKey;
     }
 
-    public void setAwsSecretKey(String _awsSecretKey) {
-        this._awsSecretKey = _awsSecretKey;
+    public void setAwsSecretKey(String awsSecretKey) {
+        _awsSecretKey = awsSecretKey;
+    }
+
+    public void setOverrideJMSDeliveryMode(Integer jmsDeliveryMode) {
+        _jmsDeliveryMode = jmsDeliveryMode;
+    }
+
+    public void setOverrideJMSTTL(Long jmsTTL) {
+        _jmsTTL = jmsTTL;
+    }
+
+    public void setOverrideJMSPriority(Integer jmsPriority) {
+        _jmsPriority = jmsPriority;
     }
 }

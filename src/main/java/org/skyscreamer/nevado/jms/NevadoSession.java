@@ -20,6 +20,9 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     private final SQSConnector _sqsConnector;
     private boolean _transacted;
     private int _acknowledgeMode;
+    private Integer _overrideJMSDeliveryMode;
+    private Long _overrideJMSTTL;
+    private Integer _overrideJMSPriority;
 
     protected NevadoSession(String awsAccessKey, String awsSecretKey, boolean transacted, int acknowledgeMode) {
         _sqsConnector = new SQSConnector(awsAccessKey, awsSecretKey);
@@ -189,6 +192,15 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
 
     public void sendMessage(NevadoDestination destination, NevadoMessage message, boolean disableMessageID,
                             boolean disableTimestamp) throws JMSException {
+        if (_overrideJMSDeliveryMode != null) {
+            message.setJMSDeliveryMode(_overrideJMSDeliveryMode);
+        }
+        if (_overrideJMSPriority != null) {
+            message.setJMSPriority(_overrideJMSPriority);
+        }
+        if (_overrideJMSTTL != null) {
+            message.setJMSExpiration(_overrideJMSTTL > 0 ? System.currentTimeMillis() + _overrideJMSTTL : 0);
+        }
         message.onSend();
         _sqsConnector.sendMessage(destination, message, disableMessageID, disableTimestamp);
     }
@@ -221,5 +233,17 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
 
     public void deleteMessage(NevadoMessage message) throws JMSException {
         _sqsConnector.deleteMessage(message);
+    }
+
+    public void setOverrideJMSDeliveryMode(Integer jmsDeliveryMode) {
+        _overrideJMSDeliveryMode = jmsDeliveryMode;
+    }
+
+    public void setOverrideJMSTTL(Long jmsTTL) {
+        _overrideJMSTTL = jmsTTL;
+    }
+
+    public void setOverrideJMSPriority(Integer jmsPriority) {
+        _overrideJMSPriority = jmsPriority;
     }
 }

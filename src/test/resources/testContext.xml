@@ -9,10 +9,7 @@
     <context:annotation-config/>
     <context:component-scan base-package="org.skyscreamer.nevado"/>
 
-    <bean id="connectionFactory" class="org.skyscreamer.nevado.jms.NevadoConnectionFactory">
-        <property name="awsAccessKey" value="${awsAccessKey}" />
-        <property name="awsSecretKey" value="${awsSecretKey}" />
-    </bean>
+    <bean id="connectionFactory" class="org.skyscreamer.nevado.jms.NevadoConnectionFactory" />
 
     <!--
     <bean id="destination" class="org.skyscreamer.nevado.jms.SQSQueue">
