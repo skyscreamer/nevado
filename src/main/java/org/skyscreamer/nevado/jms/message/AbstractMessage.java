@@ -5,10 +5,7 @@ import org.skyscreamer.nevado.jms.util.PropertyConvertUtil;
 
 import javax.jms.*;
 import java.io.Serializable;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Generic non-Nevado-specific abstract message.  Designed specific to the generic specification.  Could
@@ -20,6 +17,10 @@ import java.util.Vector;
  * @author Carter Page
  */
 public abstract class AbstractMessage implements Message, Serializable {
+    public static final String WHITESPACE_CHARS = " \t\r\n";
+    public static final String[] RESERVED_PROPERTY_NAMES = { "NULL", "TRUE", "FALSE", "NOT", "AND", "OR", "BETWEEN",
+            "LIKE", "IN", "IS", "ESCAPE" };
+
     private final Map<String, Object> _properties = new HashMap<String, Object>();
     private String _messageID;
     private long _timestamp = 0;
@@ -218,6 +219,7 @@ public abstract class AbstractMessage implements Message, Serializable {
 
     public void setObjectProperty(String name, Object value) throws JMSException {
         checkReadOnlyProperties();
+        checkValidPropertyName(name);
         internalSetObjectProperty(name, value);
         // TODO - ActiveMQMessage uses the idea of property setter to enforce the data type for defined properties.  May be overkill.
     }
@@ -248,6 +250,23 @@ public abstract class AbstractMessage implements Message, Serializable {
     protected void checkWriteOnlyBody() throws MessageNotReadableException {
         if (!_readOnlyBody) {
             throw new MessageNotReadableException("Message body is write-only");
+        }
+    }
+
+    private void checkValidPropertyName(String name) {
+        if (name == null || name.trim().length() == 0) {
+            throw new IllegalArgumentException("Property name cannot be empty");
+        }
+        if (!Character.isJavaIdentifierStart(name.charAt(0))) {
+            throw new IllegalArgumentException("Invalid first character: " + name.charAt(0));
+        }
+        if (Arrays.asList(RESERVED_PROPERTY_NAMES).contains(name)) {
+            throw new IllegalArgumentException("Property name cannot be reserved word '" + name + "'");
+        }
+        for(char c : WHITESPACE_CHARS.toCharArray()) {
+            if (name.indexOf(c) > -1) {
+                throw new IllegalArgumentException("Property name cannot contain whitespace: '" + name + "'");
+            }
         }
     }
 
