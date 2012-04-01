@@ -93,7 +93,10 @@ public class PropertyConvertUtil {
     }
 
     public static String convertToString(String name, Object value) throws MessageFormatException {
-        if (value instanceof String || value instanceof Boolean || value instanceof Byte || value instanceof Short
+        if (value == null) {
+            return null;
+        }
+        else if (value instanceof String || value instanceof Boolean || value instanceof Byte || value instanceof Short
             || value instanceof Integer || value instanceof Long || value instanceof Float || value instanceof Double) {
             return value.toString();
         }
