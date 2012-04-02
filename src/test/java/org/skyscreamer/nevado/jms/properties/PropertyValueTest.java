@@ -12,10 +12,9 @@ import java.util.HashMap;
 import java.util.Properties;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Carter Page
- * Date: 4/1/12
- * Time: 3:50 PM
+ * Test for section 3.5.2 of the JMS 1.1 Specification.
+ *
+ * @author Carter Page <carter@skyscreamer.org>
  */
 public class PropertyValueTest extends AbstractJMSTest {
     private static final Object[] INVALID_VALUE_OBJECTS = {new Object(), new HashMap(), new NevadoQueue("X")};

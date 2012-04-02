@@ -109,4 +109,16 @@ public abstract class NevadoMessage extends AbstractMessage implements Message {
 
         return nevadoMessage;
     }
+
+    public void setJMSXProperty(JMSXProperty property, Object value) throws JMSException {
+        if (!property.getType().isAssignableFrom(value.getClass())) {
+            throw new MessageFormatException("Invalid property type for " + property + " ("
+                    + property.getClass().getName() + ": " + value.getClass().getName());
+        }
+        super.internalSetObjectProperty(property + "", value);
+    }
+
+    public Object getJMSXProperty(JMSXProperty property) throws JMSException {
+        return super.getObjectProperty(property + "");
+    }
 }

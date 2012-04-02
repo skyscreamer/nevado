@@ -8,10 +8,9 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Carter Page
- * Date: 4/1/12
- * Time: 3:23 PM
+ * Test for section 3.5.1 of the JMS 1.1 Specification.
+ *
+ * @author Carter Page <carter@skyscreamer.org>
  */
 public class PropertyNameTest extends AbstractJMSTest {
     private static final String VALID_FIRST_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_$";

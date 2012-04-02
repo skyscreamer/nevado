@@ -34,7 +34,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
     }
 
     public ConnectionMetaData getMetaData() throws JMSException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return NevadoConnectionMetaData.getInstance();
     }
 
     public ExceptionListener getExceptionListener() throws JMSException {

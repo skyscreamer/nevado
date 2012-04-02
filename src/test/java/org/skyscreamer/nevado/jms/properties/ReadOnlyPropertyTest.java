@@ -8,10 +8,9 @@ import javax.jms.Message;
 import javax.jms.MessageNotWriteableException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Carter Page
- * Date: 4/1/12
- * Time: 4:03 PM
+ * Test for section 3.5.3 of the JMS 1.1 Specification.
+ *
+ * @author Carter Page <carter@skyscreamer.org>
  */
 public class ReadOnlyPropertyTest extends AbstractJMSTest {
     @Test(expected = MessageNotWriteableException.class)

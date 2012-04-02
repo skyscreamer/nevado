@@ -12,10 +12,9 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Carter Page
- * Date: 4/1/12
- * Time: 9:03 PM
+ * Test for section 3.5.6 of the JMS 1.1 Specification.
+ *
+ * @author Carter Page <carter@skyscreamer.org>
  */
 public class PropertyIteratorTest extends AbstractJMSTest {
     @Test

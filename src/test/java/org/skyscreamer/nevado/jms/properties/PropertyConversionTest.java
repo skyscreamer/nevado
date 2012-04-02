@@ -10,10 +10,9 @@ import javax.jms.*;
 import java.util.Arrays;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Carter Page
- * Date: 4/1/12
- * Time: 4:29 PM
+ * Test for section 3.5.4 of the JMS 1.1 Specification.
+ *
+ * @author Carter Page <carter@skyscreamer.org>
  */
 public class PropertyConversionTest extends AbstractJMSTest {
     @Test

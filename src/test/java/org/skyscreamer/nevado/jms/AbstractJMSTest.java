@@ -41,19 +41,19 @@ public abstract class AbstractJMSTest {
     private String _awsSecretKey;
 
     @Autowired private ConnectionFactory connectionFactory;
-    private Session _session;
+    private Connection _connection;
     private Queue _testQueue = new NevadoQueue(TEST_QUEUE_NAME);
 
     @Before
     public void setUp() throws JMSException, IOException {
         initializeAWSCredentials();
-        _session = connectionFactory.createConnection(_awsAccessKey, _awsSecretKey).createSession(false, Session.AUTO_ACKNOWLEDGE);
+        _connection = connectionFactory.createConnection(_awsAccessKey, _awsSecretKey);
     }
 
     protected void clearTestQueue() throws JMSException {
         // Clear out the test queue
         int msgCount = 0;
-        MessageConsumer consumer = _session.createConsumer(new NevadoQueue(TEST_QUEUE_NAME));
+        MessageConsumer consumer = getSession().createConsumer(new NevadoQueue(TEST_QUEUE_NAME));
         Message message;
         while((message = consumer.receiveNoWait()) != null) {
             ++msgCount;
@@ -96,8 +96,12 @@ public abstract class AbstractJMSTest {
         // Do nothing
     }
 
-    protected Session getSession() {
-        return _session;
+    protected Connection getConnection() {
+        return _connection;
+    }
+
+    protected Session getSession() throws JMSException {
+        return _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
     }
     
     protected Queue getTestQueue() {
