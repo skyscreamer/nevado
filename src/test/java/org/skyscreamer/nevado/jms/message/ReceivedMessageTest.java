@@ -9,7 +9,7 @@ import javax.jms.MessageNotWriteableException;
 import javax.jms.TextMessage;
 
 /**
- * Test for section 3.5.6 of the JMS 1.1 Specification.
+ * Test for section 3.10, 3.11.1, and 3.11.2 of the JMS 1.1 Specification.
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
@@ -52,5 +52,15 @@ public class ReceivedMessageTest extends AbstractJMSTest {
         msgOut.clearBody();
         msgOut.setText("new text");
         Assert.assertEquals("new text", msgOut.getText());
+    }
+
+    @Test
+    public void testClearBodyDoesNotClearProperties() throws JMSException {
+        TextMessage msg = getSession().createTextMessage();
+        msg.setStringProperty("a", "b");
+        msg.setText("test");
+        TextMessage msgOut = (TextMessage)sendAndReceive(msg);
+        msgOut.clearBody();
+        Assert.assertEquals("b", msgOut.getStringProperty("a"));
     }
 }
