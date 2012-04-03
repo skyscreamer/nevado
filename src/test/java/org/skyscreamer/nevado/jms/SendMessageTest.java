@@ -22,7 +22,7 @@ public class SendMessageTest {
     @Autowired private Queue _queue;
     @Autowired @Qualifier("testMessageListener") private TestMessageListener testMessageListener;
 
-    @Test
+//    @Test
     public void testRoundTrip() throws Exception {
         final String key = "testkey_" + new Random().nextInt();
         _jmsTemplate.send(_queue, new MessageCreator() {
