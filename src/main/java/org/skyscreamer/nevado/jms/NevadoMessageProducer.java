@@ -89,13 +89,13 @@ public class NevadoMessageProducer implements MessageProducer {
     public void send(Destination destination, Message message, int deliveryMode, int priority, long ttl)
             throws JMSException
     {
-        message.setJMSDestination(destination);
-        message.setJMSDeliveryMode(deliveryMode);
-        message.setJMSPriority(priority);
-        message.setJMSExpiration(ttl > 0 ? System.currentTimeMillis() + ttl : 0);
         NevadoDestination nevadoDestination = NevadoDestination.getInstance(destination);
         NevadoMessage nevadoMessage = NevadoMessage.getInstance(message);
-        _session.sendMessage(NevadoDestination.getInstance(destination), nevadoMessage,
+        nevadoMessage.setJMSDestination(destination);
+        nevadoMessage.setJMSDeliveryMode(deliveryMode);
+        nevadoMessage.setJMSPriority(priority);
+        nevadoMessage.setJMSExpiration(ttl > 0 ? System.currentTimeMillis() + ttl : 0);
+        _session.sendMessage(nevadoDestination, nevadoMessage,
                 _disableMessageID, _disableTimestamp);
     }
 }

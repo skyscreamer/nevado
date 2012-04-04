@@ -1,5 +1,6 @@
 package org.skyscreamer.nevado.jms.message;
 
+import org.activemq.message.ActiveMQMapMessage;
 import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
@@ -17,11 +18,21 @@ import java.util.Arrays;
 public class MapMessageTest extends AbstractJMSTest {
     @Test
     public void testMapMessage() throws JMSException {
+        MapMessage msg = getSession().createMapMessage();
+        testMapMessage(msg);
+    }
+
+    @Test
+    public void testAlienMapMessage() throws JMSException {
+        MapMessage msg = new ActiveMQMapMessage();
+        testMapMessage(msg);
+    }
+
+    private void testMapMessage(MapMessage msg) throws JMSException {
         clearTestQueue();
 
         // Initialize MapMessage
         TestValues testValues = new TestValues();
-        MapMessage msg = getSession().createMapMessage();
         msg.setBoolean("bb", testValues.bb);
         msg.setString("sb", testValues.sb);
         msg.setByte("yy", testValues.yy);
@@ -56,42 +67,42 @@ public class MapMessageTest extends AbstractJMSTest {
         msg.setBytes("zz", testValues.zz);
 
         // Send/Receive
-        Message msgOut = sendAndReceive(msg);
+        MapMessage msgOut = (MapMessage)sendAndReceive(msg);
         Assert.assertTrue("Should be a map message", msgOut instanceof MapMessage);
 
         // Verify
-        Assert.assertEquals("MapMessage.getBoolean failed (conversion bb)", testValues.bb, msg.getBoolean("bb"));
-        Assert.assertEquals("MapMessage.getBoolean failed (conversion sb)", testValues.sb, String.valueOf(msg.getBoolean("sb")));
-        Assert.assertEquals("MapMessage.getByte failed (conversion yy)", testValues.yy, msg.getByte("yy"));
-        Assert.assertEquals("MapMessage.getByte failed (conversion sy)", testValues.sy, String.valueOf(msg.getByte("sy")));
-        Assert.assertEquals("MapMessage.getShort failed (conversion yh)", testValues.yh, msg.getShort("yh"));
-        Assert.assertEquals("MapMessage.getShort failed (conversion hh)", testValues.hh, msg.getShort("hh"));
-        Assert.assertEquals("MapMessage.getShort failed (conversion sh)", testValues.sh, String.valueOf(msg.getShort("sh")));
-        Assert.assertEquals("MapMessage.getShort failed (conversion cc)", testValues.cc, msg.getChar("cc"));
-        Assert.assertEquals("MapMessage.getInt failed (conversion yi)", testValues.yi, msg.getInt("yi"));
-        Assert.assertEquals("MapMessage.getInt failed (conversion hi)", testValues.hi, msg.getInt("hi"));
-        Assert.assertEquals("MapMessage.getInt failed (conversion ii)", testValues.ii, msg.getInt("ii"));
-        Assert.assertEquals("MapMessage.getInt failed (conversion si)", testValues.si, String.valueOf(msg.getInt("si")));
-        Assert.assertEquals("MapMessage.getLong failed (conversion yl)", testValues.yl, msg.getLong("yl"));
-        Assert.assertEquals("MapMessage.getLong failed (conversion hl)", testValues.hl, msg.getLong("hl"));
-        Assert.assertEquals("MapMessage.getLong failed (conversion il)", testValues.il, msg.getLong("il"));
-        Assert.assertEquals("MapMessage.getLong failed (conversion ll)", testValues.ll, msg.getLong("ll"));
-        Assert.assertEquals("MapMessage.getLong failed (conversion sl)", testValues.sl, String.valueOf(msg.getLong("sl")));
-        Assert.assertEquals("MapMessage.getFloat failed (conversion ff)", testValues.ff, msg.getFloat("ff"), 0.0001);
-        Assert.assertEquals("MapMessage.getFloat failed (conversion sf)", testValues.sf, String.valueOf(msg.getFloat("sf")));
-        Assert.assertEquals("MapMessage.getDouble failed (conversion fd)", testValues.fd, msg.getDouble("fd"), 0.0001);
-        Assert.assertEquals("MapMessage.getDouble failed (conversion dd)", testValues.dd, msg.getDouble("dd"), 0.0001);
-        Assert.assertEquals("MapMessage.getDouble failed (conversion sd)", testValues.sd, String.valueOf(msg.getDouble("sd")));
-        Assert.assertEquals("MapMessage.getString failed (conversion bs)", String.valueOf(testValues.bs), msg.getString("bs"));
-        Assert.assertEquals("MapMessage.getString failed (conversion ys)", String.valueOf(testValues.ys), msg.getString("ys"));
-        Assert.assertEquals("MapMessage.getString failed (conversion hs)", String.valueOf(testValues.hs), msg.getString("hs"));
-        Assert.assertEquals("MapMessage.getString failed (conversion cs)", String.valueOf(testValues.cs), msg.getString("cs"));
-        Assert.assertEquals("MapMessage.getString failed (conversion is)", String.valueOf(testValues.is), msg.getString("is"));
-        Assert.assertEquals("MapMessage.getString failed (conversion ls)", String.valueOf(testValues.ls), msg.getString("ls"));
-        Assert.assertEquals("MapMessage.getString failed (conversion fs)", String.valueOf(testValues.fs), msg.getString("fs"));
-        Assert.assertEquals("MapMessage.getString failed (conversion ds)", String.valueOf(testValues.ds), msg.getString("ds"));
-        Assert.assertEquals("MapMessage.getString failed (conversion ss)", String.valueOf(testValues.ss), msg.getString("ss"));
-        Assert.assertTrue("MapMessage.getBytes failed (conversion zz)", Arrays.equals(testValues.zz, msg.getBytes("zz")));
+        Assert.assertEquals("MapMessage.getBoolean failed (conversion bb)", testValues.bb, msgOut.getBoolean("bb"));
+        Assert.assertEquals("MapMessage.getBoolean failed (conversion sb)", testValues.sb, String.valueOf(msgOut.getBoolean("sb")));
+        Assert.assertEquals("MapMessage.getByte failed (conversion yy)", testValues.yy, msgOut.getByte("yy"));
+        Assert.assertEquals("MapMessage.getByte failed (conversion sy)", testValues.sy, String.valueOf(msgOut.getByte("sy")));
+        Assert.assertEquals("MapMessage.getShort failed (conversion yh)", testValues.yh, msgOut.getShort("yh"));
+        Assert.assertEquals("MapMessage.getShort failed (conversion hh)", testValues.hh, msgOut.getShort("hh"));
+        Assert.assertEquals("MapMessage.getShort failed (conversion sh)", testValues.sh, String.valueOf(msgOut.getShort("sh")));
+        Assert.assertEquals("MapMessage.getShort failed (conversion cc)", testValues.cc, msgOut.getChar("cc"));
+        Assert.assertEquals("MapMessage.getInt failed (conversion yi)", testValues.yi, msgOut.getInt("yi"));
+        Assert.assertEquals("MapMessage.getInt failed (conversion hi)", testValues.hi, msgOut.getInt("hi"));
+        Assert.assertEquals("MapMessage.getInt failed (conversion ii)", testValues.ii, msgOut.getInt("ii"));
+        Assert.assertEquals("MapMessage.getInt failed (conversion si)", testValues.si, String.valueOf(msgOut.getInt("si")));
+        Assert.assertEquals("MapMessage.getLong failed (conversion yl)", testValues.yl, msgOut.getLong("yl"));
+        Assert.assertEquals("MapMessage.getLong failed (conversion hl)", testValues.hl, msgOut.getLong("hl"));
+        Assert.assertEquals("MapMessage.getLong failed (conversion il)", testValues.il, msgOut.getLong("il"));
+        Assert.assertEquals("MapMessage.getLong failed (conversion ll)", testValues.ll, msgOut.getLong("ll"));
+        Assert.assertEquals("MapMessage.getLong failed (conversion sl)", testValues.sl, String.valueOf(msgOut.getLong("sl")));
+        Assert.assertEquals("MapMessage.getFloat failed (conversion ff)", testValues.ff, msgOut.getFloat("ff"), 0.0001);
+        Assert.assertEquals("MapMessage.getFloat failed (conversion sf)", testValues.sf, String.valueOf(msgOut.getFloat("sf")));
+        Assert.assertEquals("MapMessage.getDouble failed (conversion fd)", testValues.fd, msgOut.getDouble("fd"), 0.0001);
+        Assert.assertEquals("MapMessage.getDouble failed (conversion dd)", testValues.dd, msgOut.getDouble("dd"), 0.0001);
+        Assert.assertEquals("MapMessage.getDouble failed (conversion sd)", testValues.sd.substring(0, 8), String.valueOf(msgOut.getDouble("sd")).substring(0, 8));
+        Assert.assertEquals("MapMessage.getString failed (conversion bs)", String.valueOf(testValues.bs), msgOut.getString("bs"));
+        Assert.assertEquals("MapMessage.getString failed (conversion ys)", String.valueOf(testValues.ys), msgOut.getString("ys"));
+        Assert.assertEquals("MapMessage.getString failed (conversion hs)", String.valueOf(testValues.hs), msgOut.getString("hs"));
+        Assert.assertEquals("MapMessage.getString failed (conversion cs)", String.valueOf(testValues.cs), msgOut.getString("cs"));
+        Assert.assertEquals("MapMessage.getString failed (conversion is)", String.valueOf(testValues.is), msgOut.getString("is"));
+        Assert.assertEquals("MapMessage.getString failed (conversion ls)", String.valueOf(testValues.ls), msgOut.getString("ls"));
+        Assert.assertEquals("MapMessage.getString failed (conversion fs)", String.valueOf(testValues.fs), msgOut.getString("fs"));
+        Assert.assertEquals("MapMessage.getString failed (conversion ds)", String.valueOf(testValues.ds), msgOut.getString("ds"));
+        Assert.assertEquals("MapMessage.getString failed (conversion ss)", String.valueOf(testValues.ss), msgOut.getString("ss"));
+        Assert.assertTrue("MapMessage.getBytes failed (conversion zz)", Arrays.equals(testValues.zz, msgOut.getBytes("zz")));
     }
 
     @Test(expected = MessageFormatException.class)

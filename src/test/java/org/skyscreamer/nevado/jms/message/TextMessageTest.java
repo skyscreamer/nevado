@@ -1,5 +1,6 @@
 package org.skyscreamer.nevado.jms.message;
 
+import org.activemq.message.ActiveMQTextMessage;
 import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
@@ -30,11 +31,21 @@ import java.util.Random;
  */
 public class TextMessageTest extends AbstractJMSTest {
     @Test
-    public void testTextMessage1() throws JMSException {
+    public void testTextMessage() throws JMSException {
         clearTestQueue();
-
-        String text = "How much wood could a woodchuck chuck?  " + RandomData.readInt() + " logs!";
         TextMessage msg = getSession().createTextMessage();
+        testTextMessage(msg);
+    }
+
+    @Test
+    public void testAlienTextMessage() throws JMSException {
+        clearTestQueue();
+        TextMessage msg = new ActiveMQTextMessage();
+        testTextMessage(msg);
+    }
+
+    private void testTextMessage(TextMessage msg) throws JMSException {
+        String text = "How much wood could a woodchuck chuck?  " + RandomData.readInt() + " logs!";
         msg.setText(text);
         Message msgOut = sendAndReceive(msg);
         Assert.assertTrue("Should be a text message", msgOut instanceof TextMessage);

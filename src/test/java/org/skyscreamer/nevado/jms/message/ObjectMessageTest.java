@@ -1,5 +1,6 @@
 package org.skyscreamer.nevado.jms.message;
 
+import org.activemq.message.ActiveMQObjectMessage;
 import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
@@ -21,11 +22,20 @@ import java.util.*;
  */
 public class ObjectMessageTest extends AbstractJMSTest {
     @Test
-    public void testObjectMessage1() throws JMSException {
-        clearTestQueue();
-
-        TestObject testObject = new TestObject();
+    public void testObjectMessage() throws JMSException {
         ObjectMessage msg = getSession().createObjectMessage();
+        testObjectMessage(msg);
+    }
+
+    @Test
+    public void testAlienObjectMessage() throws JMSException {
+        ObjectMessage msg = new ActiveMQObjectMessage();
+        testObjectMessage(msg);
+    }
+
+    private void testObjectMessage(ObjectMessage msg) throws JMSException {
+        clearTestQueue();
+        TestObject testObject = new TestObject();
         msg.setObject(testObject);
         Message msgOut = sendAndReceive(msg);
         Assert.assertTrue("Should be an object message", msgOut instanceof ObjectMessage);
