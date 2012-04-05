@@ -1,5 +1,7 @@
 package org.skyscreamer.nevado.jms.message;
 
+import org.skyscreamer.nevado.jms.util.CharWrapper;
+
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import java.util.Enumeration;
@@ -22,7 +24,7 @@ public class NevadoMapMessage extends NevadoMessage implements MapMessage {
         super(message);
         for (Enumeration keys = message.getMapNames(); keys.hasMoreElements();) {
             String key = keys.nextElement().toString();
-            Object value = message.getObjectProperty(key);
+            Object value = message.getObject(key);
             setObjectProperty(key, value);
         }
     }
@@ -93,7 +95,7 @@ public class NevadoMapMessage extends NevadoMessage implements MapMessage {
     }
 
     public void setChar(String key, char value) throws JMSException {
-        setObject(key, value);
+        setObject(key, new CharWrapper(value));
     }
 
     public void setInt(String key, int value) throws JMSException {

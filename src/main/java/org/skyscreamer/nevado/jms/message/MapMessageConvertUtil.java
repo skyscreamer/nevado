@@ -1,5 +1,6 @@
 package org.skyscreamer.nevado.jms.message;
 
+import org.skyscreamer.nevado.jms.util.CharWrapper;
 import org.skyscreamer.nevado.jms.util.PropertyConvertUtil;
 
 import javax.jms.MessageFormatException;
@@ -12,8 +13,8 @@ import javax.jms.MessageFormatException;
  */
 public class MapMessageConvertUtil extends PropertyConvertUtil {
     public static char convertToChar(String name, Object value) throws MessageFormatException {
-        if (value instanceof Character) {
-            return (Character)value;
+        if (value instanceof CharWrapper) {
+            return ((CharWrapper) value).charValue();
         }
         throw new MessageFormatException(createExceptionMessage(name, value, "char"));
     }
@@ -28,7 +29,7 @@ public class MapMessageConvertUtil extends PropertyConvertUtil {
     public static String convertToString(String name, Object value) throws MessageFormatException {
         if (value instanceof String || value instanceof Boolean || value instanceof Byte || value instanceof Short
                 || value instanceof Integer || value instanceof Long || value instanceof Float
-                || value instanceof Double || value instanceof Character) {
+                || value instanceof Double || value instanceof CharWrapper) {
             return value.toString();
         }
         throw new MessageFormatException(createExceptionMessage(name, value, "string"));
@@ -37,7 +38,7 @@ public class MapMessageConvertUtil extends PropertyConvertUtil {
     public static void checkValidObject(Object value) throws MessageFormatException {
         if (!(value instanceof Boolean || value instanceof Byte || value instanceof Short || value instanceof Integer
                 || value instanceof Long || value instanceof Float || value instanceof Double || value instanceof String
-                || value instanceof Character || value instanceof ByteArray || value == null)) {
+                || value instanceof CharWrapper || value instanceof ByteArray || value == null)) {
             throw new MessageFormatException("Invalid value of type " + value.getClass().getName());
         }
     }

@@ -21,6 +21,10 @@ public class SerializeStringUtil
         hessian2Output.startMessage();
         hessian2Output.writeInt(serializables.length);
         for(Serializable serializable : serializables) {
+            if (serializable instanceof Character) {
+                // Hessian doesn't properly serialize java.lang.Character
+                serializable = new CharWrapper((Character)serializable);
+            }
             hessian2Output.writeObject( serializable );
         }
         hessian2Output.completeMessage();
@@ -41,7 +45,11 @@ public class SerializeStringUtil
         int length = hessian2Input.readInt();
         Object[] objects = new Object[length];
         for(int i = 0 ; i < length ; ++i) {
-            objects[i] = hessian2Input.readObject();
+            Object o = hessian2Input.readObject();
+            if (o instanceof CharWrapper) {
+                o = ((CharWrapper)o).charValue();
+            }
+            objects[i] = o;
         }
         hessian2Input.completeMessage();
         hessian2Input.close();
