@@ -1,8 +1,5 @@
 package org.skyscreamer.nevado.jms;
 
-import org.activemq.message.ActiveMQQueue;
-import org.activemq.message.ActiveMQTopic;
-
 import javax.jms.*;
 import java.util.Queue;
 

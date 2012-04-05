@@ -34,6 +34,7 @@ public class NevadoBytesMessage extends NevadoMessage implements BytesMessage {
 
     public NevadoBytesMessage(BytesMessage message) throws JMSException {
         super(message);
+        message.reset();
         for(int count = 0 ; count < message.getBodyLength() ; ) {
             byte[] buffer = new byte[10240];
             int numRead = message.readBytes(buffer);

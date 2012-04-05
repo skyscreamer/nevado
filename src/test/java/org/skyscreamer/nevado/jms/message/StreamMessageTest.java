@@ -1,5 +1,6 @@
 package org.skyscreamer.nevado.jms.message;
 
+import org.activemq.message.ActiveMQStreamMessage;
 import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
@@ -17,11 +18,21 @@ import java.util.Arrays;
 public class StreamMessageTest extends AbstractJMSTest {
     @Test
     public void testStreamMessage() throws JMSException {
+        StreamMessage msg = getSession().createStreamMessage();
+        testStreamMessage(msg);
+    }
+
+    @Test
+    public void testAlienStreamMessage() throws JMSException {
+        StreamMessage msg = new ActiveMQStreamMessage();
+        testStreamMessage(msg);
+    }
+
+    private void testStreamMessage(StreamMessage msg) throws JMSException {
         clearTestQueue();
 
         // Initialize MapMessage
         TestValues testValues = new TestValues();
-        StreamMessage msg = getSession().createStreamMessage();
         msg.writeBoolean(testValues.bb);
         msg.writeString(testValues.sb);
         msg.writeByte(testValues.yy);
@@ -54,47 +65,48 @@ public class StreamMessageTest extends AbstractJMSTest {
         msg.writeDouble(testValues.ds);
         msg.writeString(testValues.ss);
         msg.writeBytes(testValues.zz);
+        msg.reset();
 
         // Send/Receive
-        Message msgOut = sendAndReceive(msg);
+        StreamMessage msgOut = (StreamMessage)sendAndReceive(msg);
         Assert.assertTrue("Should be a stream message", msgOut instanceof StreamMessage);
 
         // Verify
-        Assert.assertEquals("StreamMessage.getBoolean failed (conversion bb)", testValues.bb, msg.readBoolean());
-        Assert.assertEquals("StreamMessage.getBoolean failed (conversion sb)", testValues.sb, String.valueOf(msg.readBoolean()));
-        Assert.assertEquals("StreamMessage.getByte failed (conversion yy)", testValues.yy, msg.readByte());
-        Assert.assertEquals("StreamMessage.getByte failed (conversion sy)", testValues.sy, String.valueOf(msg.readByte()));
-        Assert.assertEquals("StreamMessage.getShort failed (conversion yh)", testValues.yh, msg.readShort());
-        Assert.assertEquals("StreamMessage.getShort failed (conversion hh)", testValues.hh, msg.readShort());
-        Assert.assertEquals("StreamMessage.getShort failed (conversion sh)", testValues.sh, String.valueOf(msg.readShort()));
-        Assert.assertEquals("StreamMessage.getShort failed (conversion cc)", testValues.cc, msg.readChar());
-        Assert.assertEquals("StreamMessage.getInt failed (conversion yi)", testValues.yi, msg.readInt());
-        Assert.assertEquals("StreamMessage.getInt failed (conversion hi)", testValues.hi, msg.readInt());
-        Assert.assertEquals("StreamMessage.getInt failed (conversion ii)", testValues.ii, msg.readInt());
-        Assert.assertEquals("StreamMessage.getInt failed (conversion si)", testValues.si, String.valueOf(msg.readInt()));
-        Assert.assertEquals("StreamMessage.getLong failed (conversion yl)", testValues.yl, msg.readLong());
-        Assert.assertEquals("StreamMessage.getLong failed (conversion hl)", testValues.hl, msg.readLong());
-        Assert.assertEquals("StreamMessage.getLong failed (conversion il)", testValues.il, msg.readLong());
-        Assert.assertEquals("StreamMessage.getLong failed (conversion ll)", testValues.ll, msg.readLong());
-        Assert.assertEquals("StreamMessage.getLong failed (conversion sl)", testValues.sl, String.valueOf(msg.readLong()));
-        Assert.assertEquals("StreamMessage.getFloat failed (conversion ff)", testValues.ff, msg.readFloat(), 0.0001);
-        Assert.assertEquals("StreamMessage.getFloat failed (conversion sf)", testValues.sf, String.valueOf(msg.readFloat()));
-        Assert.assertEquals("StreamMessage.getDouble failed (conversion fd)", testValues.fd, msg.readDouble(), 0.0001);
-        Assert.assertEquals("StreamMessage.getDouble failed (conversion dd)", testValues.dd, msg.readDouble(), 0.0001);
-        Assert.assertEquals("StreamMessage.getDouble failed (conversion sd)", testValues.sd, String.valueOf(msg.readDouble()));
-        Assert.assertEquals("StreamMessage.getString failed (conversion bs)", String.valueOf(testValues.bs), msg.readString());
-        Assert.assertEquals("StreamMessage.getString failed (conversion ys)", String.valueOf(testValues.ys), msg.readString());
-        Assert.assertEquals("StreamMessage.getString failed (conversion hs)", String.valueOf(testValues.hs), msg.readString());
-        Assert.assertEquals("StreamMessage.getString failed (conversion cs)", String.valueOf(testValues.cs), msg.readString());
-        Assert.assertEquals("StreamMessage.getString failed (conversion is)", String.valueOf(testValues.is), msg.readString());
-        Assert.assertEquals("StreamMessage.getString failed (conversion ls)", String.valueOf(testValues.ls), msg.readString());
-        Assert.assertEquals("StreamMessage.getString failed (conversion fs)", String.valueOf(testValues.fs), msg.readString());
-        Assert.assertEquals("StreamMessage.getString failed (conversion ds)", String.valueOf(testValues.ds), msg.readString());
-        Assert.assertEquals("StreamMessage.getString failed (conversion ss)", String.valueOf(testValues.ss), msg.readString());
+        Assert.assertEquals("StreamMessage.getBoolean failed (conversion bb)", testValues.bb, msgOut.readBoolean());
+        Assert.assertEquals("StreamMessage.getBoolean failed (conversion sb)", testValues.sb, String.valueOf(msgOut.readBoolean()));
+        Assert.assertEquals("StreamMessage.getByte failed (conversion yy)", testValues.yy, msgOut.readByte());
+        Assert.assertEquals("StreamMessage.getByte failed (conversion sy)", testValues.sy, String.valueOf(msgOut.readByte()));
+        Assert.assertEquals("StreamMessage.getShort failed (conversion yh)", testValues.yh, msgOut.readShort());
+        Assert.assertEquals("StreamMessage.getShort failed (conversion hh)", testValues.hh, msgOut.readShort());
+        Assert.assertEquals("StreamMessage.getShort failed (conversion sh)", testValues.sh, String.valueOf(msgOut.readShort()));
+        Assert.assertEquals("StreamMessage.getShort failed (conversion cc)", testValues.cc, msgOut.readChar());
+        Assert.assertEquals("StreamMessage.getInt failed (conversion yi)", testValues.yi, msgOut.readInt());
+        Assert.assertEquals("StreamMessage.getInt failed (conversion hi)", testValues.hi, msgOut.readInt());
+        Assert.assertEquals("StreamMessage.getInt failed (conversion ii)", testValues.ii, msgOut.readInt());
+        Assert.assertEquals("StreamMessage.getInt failed (conversion si)", testValues.si, String.valueOf(msgOut.readInt()));
+        Assert.assertEquals("StreamMessage.getLong failed (conversion yl)", testValues.yl, msgOut.readLong());
+        Assert.assertEquals("StreamMessage.getLong failed (conversion hl)", testValues.hl, msgOut.readLong());
+        Assert.assertEquals("StreamMessage.getLong failed (conversion il)", testValues.il, msgOut.readLong());
+        Assert.assertEquals("StreamMessage.getLong failed (conversion ll)", testValues.ll, msgOut.readLong());
+        Assert.assertEquals("StreamMessage.getLong failed (conversion sl)", testValues.sl, String.valueOf(msgOut.readLong()));
+        Assert.assertEquals("StreamMessage.getFloat failed (conversion ff)", testValues.ff, msgOut.readFloat(), 0.0001);
+        Assert.assertEquals("StreamMessage.getFloat failed (conversion sf)", testValues.sf, String.valueOf(msgOut.readFloat()));
+        Assert.assertEquals("StreamMessage.getDouble failed (conversion fd)", testValues.fd, msgOut.readDouble(), 0.0001);
+        Assert.assertEquals("StreamMessage.getDouble failed (conversion dd)", testValues.dd, msgOut.readDouble(), 0.0001);
+        Assert.assertEquals("StreamMessage.getDouble failed (conversion sd)", testValues.sd, String.valueOf(msgOut.readDouble()));
+        Assert.assertEquals("StreamMessage.getString failed (conversion bs)", String.valueOf(testValues.bs), msgOut.readString());
+        Assert.assertEquals("StreamMessage.getString failed (conversion ys)", String.valueOf(testValues.ys), msgOut.readString());
+        Assert.assertEquals("StreamMessage.getString failed (conversion hs)", String.valueOf(testValues.hs), msgOut.readString());
+        Assert.assertEquals("StreamMessage.getString failed (conversion cs)", String.valueOf(testValues.cs), msgOut.readString());
+        Assert.assertEquals("StreamMessage.getString failed (conversion is)", String.valueOf(testValues.is), msgOut.readString());
+        Assert.assertEquals("StreamMessage.getString failed (conversion ls)", String.valueOf(testValues.ls), msgOut.readString());
+        Assert.assertEquals("StreamMessage.getString failed (conversion fs)", String.valueOf(testValues.fs), msgOut.readString());
+        Assert.assertEquals("StreamMessage.getString failed (conversion ds)", String.valueOf(testValues.ds), msgOut.readString());
+        Assert.assertEquals("StreamMessage.getString failed (conversion ss)", String.valueOf(testValues.ss), msgOut.readString());
 
         // Testing byte[] takes a little work
         byte[] buffer = new byte[10000];
-        int count = msg.readBytes(buffer);
+        int count = msgOut.readBytes(buffer);
         Assert.assertTrue("Buffer too small", count < buffer.length);
         byte[] value = new byte[count];
         System.arraycopy(buffer, 0, value,  0, count);

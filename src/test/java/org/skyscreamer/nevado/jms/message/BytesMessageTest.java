@@ -1,5 +1,6 @@
 package org.skyscreamer.nevado.jms.message;
 
+import org.activemq.message.ActiveMQBytesMessage;
 import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
@@ -20,11 +21,21 @@ import java.util.Arrays;
 public class BytesMessageTest extends AbstractJMSTest {
     @Test
     public void testBytesMessage() throws JMSException {
+        BytesMessage msg = getSession().createBytesMessage();
+        testBytesMessage(msg);
+    }
+
+    @Test
+    public void testAlienBytesMessage() throws JMSException {
+        BytesMessage msg = new ActiveMQBytesMessage();
+        testBytesMessage(msg);
+    }
+
+    private void testBytesMessage(BytesMessage msg) throws JMSException {
         clearTestQueue();
 
         // Initialize MapMessage
         TestValues testValues = new TestValues();
-        BytesMessage msg = getSession().createBytesMessage();
         msg.writeBoolean(testValues.bb);
         msg.writeByte(testValues.yy);
         msg.writeShort(testValues.hh);
@@ -37,23 +48,23 @@ public class BytesMessageTest extends AbstractJMSTest {
         msg.writeBytes(testValues.zz);
 
         // Send/Receive
-        Message msgOut = sendAndReceive(msg);
+        BytesMessage msgOut = (BytesMessage)sendAndReceive(msg);
         Assert.assertTrue("Should be a stream message", msgOut instanceof BytesMessage);
 
         // Verify
-        Assert.assertEquals("BytesMessage.getBoolean failed (conversion bb)", testValues.bb, msg.readBoolean());
-        Assert.assertEquals("BytesMessage.getByte failed (conversion yy)", testValues.yy, msg.readByte());
-        Assert.assertEquals("BytesMessage.getShort failed (conversion hh)", testValues.hh, msg.readShort());
-        Assert.assertEquals("BytesMessage.getShort failed (conversion cc)", testValues.cc, msg.readChar());
-        Assert.assertEquals("BytesMessage.getInt failed (conversion ii)", testValues.ii, msg.readInt());
-        Assert.assertEquals("BytesMessage.getLong failed (conversion ll)", testValues.ll, msg.readLong());
-        Assert.assertEquals("BytesMessage.getFloat failed (conversion ff)", testValues.ff, msg.readFloat(), 0.0001);
-        Assert.assertEquals("BytesMessage.getDouble failed (conversion dd)", testValues.dd, msg.readDouble(), 0.0001);
-        Assert.assertEquals("BytesMessage.getString failed (conversion ss)", String.valueOf(testValues.ss), msg.readUTF());
+        Assert.assertEquals("BytesMessage.getBoolean failed (conversion bb)", testValues.bb, msgOut.readBoolean());
+        Assert.assertEquals("BytesMessage.getByte failed (conversion yy)", testValues.yy, msgOut.readByte());
+        Assert.assertEquals("BytesMessage.getShort failed (conversion hh)", testValues.hh, msgOut.readShort());
+        Assert.assertEquals("BytesMessage.getShort failed (conversion cc)", testValues.cc, msgOut.readChar());
+        Assert.assertEquals("BytesMessage.getInt failed (conversion ii)", testValues.ii, msgOut.readInt());
+        Assert.assertEquals("BytesMessage.getLong failed (conversion ll)", testValues.ll, msgOut.readLong());
+        Assert.assertEquals("BytesMessage.getFloat failed (conversion ff)", testValues.ff, msgOut.readFloat(), 0.0001);
+        Assert.assertEquals("BytesMessage.getDouble failed (conversion dd)", testValues.dd, msgOut.readDouble(), 0.0001);
+        Assert.assertEquals("BytesMessage.getString failed (conversion ss)", String.valueOf(testValues.ss), msgOut.readUTF());
 
         // Testing byte[] takes a little work
         byte[] buffer = new byte[10000];
-        int count = msg.readBytes(buffer);
+        int count = msgOut.readBytes(buffer);
         Assert.assertTrue("Buffer too small", count < buffer.length);
         byte[] value = new byte[count];
         System.arraycopy(buffer, 0, value,  0, count);

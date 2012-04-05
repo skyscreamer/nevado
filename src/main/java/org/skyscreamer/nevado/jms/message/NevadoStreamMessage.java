@@ -39,9 +39,11 @@ public class NevadoStreamMessage extends NevadoMessage implements StreamMessage 
 
     public NevadoStreamMessage(StreamMessage message) throws JMSException {
         super(message);
+        message.reset();
         while(true) {
             try {
-                writeObject(message.readObject());
+                Object o = message.readObject();
+                writeObject(o);
             }
             catch (MessageEOFException e) {
                 break;
@@ -62,7 +64,7 @@ public class NevadoStreamMessage extends NevadoMessage implements StreamMessage 
     transient protected DataOutputStream dataOut;
     transient protected ByteArrayOutputStream bytesOut;
     transient protected DataInputStream dataIn;
-    transient protected int remainingBytes = -1;
+    protected int remainingBytes = -1;
 
     public void onSend() {
         super.onSend();
@@ -1132,6 +1134,8 @@ public class NevadoStreamMessage extends NevadoMessage implements StreamMessage 
             writeShort(((Short) value).shortValue());
         } else if (value instanceof Integer) {
             writeInt(((Integer) value).intValue());
+        } else if (value instanceof Long) {
+            writeLong(((Long) value).longValue());
         } else if (value instanceof Float) {
             writeFloat(((Float) value).floatValue());
         } else if (value instanceof Double) {
