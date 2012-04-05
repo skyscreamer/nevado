@@ -30,11 +30,11 @@ public class JMSExpirationTest extends AbstractJMSTest {
         MessageProducer msgProducer = getSession().createProducer(getTestQueue());
         msgProducer.setDisableMessageID(true);
         msgProducer.send(msg, Message.DEFAULT_DELIVERY_MODE, Message.DEFAULT_PRIORITY, 60000);
-        Assert.assertEquals(System.currentTimeMillis() + 60000, msg.getJMSExpiration(), 500);
+        Assert.assertEquals(System.currentTimeMillis() + 60000, msg.getJMSExpiration(), 1000);
         Message msgOut = getSession().createConsumer(getTestQueue()).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
-        Assert.assertEquals(System.currentTimeMillis() + 60000, msgOut.getJMSExpiration(), 500);
+        Assert.assertEquals(System.currentTimeMillis() + 60000, msgOut.getJMSExpiration(), 1000);
     }
 
     @Test

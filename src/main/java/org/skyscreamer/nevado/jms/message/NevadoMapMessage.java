@@ -25,7 +25,7 @@ public class NevadoMapMessage extends NevadoMessage implements MapMessage {
         for (Enumeration keys = message.getMapNames(); keys.hasMoreElements();) {
             String key = keys.nextElement().toString();
             Object value = message.getObject(key);
-            setObjectProperty(key, value);
+            setObject(key, value);
         }
     }
 
@@ -75,7 +75,14 @@ public class NevadoMapMessage extends NevadoMessage implements MapMessage {
     }
 
     public Object getObject(String key) throws JMSException {
-        return _map.get(key);
+        Object o = _map.get(key);
+        if (o instanceof CharWrapper) {
+            o = ((CharWrapper)o).charValue();
+        }
+        if (o instanceof ByteArray) {
+            o = ((ByteArray)o).toByteArray();
+        }
+        return o; 
     }
 
     public Enumeration getMapNames() throws JMSException {
@@ -95,7 +102,7 @@ public class NevadoMapMessage extends NevadoMessage implements MapMessage {
     }
 
     public void setChar(String key, char value) throws JMSException {
-        setObject(key, new CharWrapper(value));
+        setObject(key, value);
     }
 
     public void setInt(String key, int value) throws JMSException {
@@ -119,17 +126,23 @@ public class NevadoMapMessage extends NevadoMessage implements MapMessage {
     }
 
     public void setBytes(String key, byte[] value) throws JMSException {
-        setObject(key, value != null ? new ByteArray(value) : null);
+        setObject(key, value);
     }
 
     public void setBytes(String key, byte[] value, int offset, int length) throws JMSException {
-        setObject(key, value != null ? new ByteArray(value, offset, length) : null);
+        setObject(key, value);
     }
 
     public void setObject(String key, Object value) throws JMSException {
         checkReadOnlyBody();
         if (key == null || key.trim().equals("")) {
             throw new IllegalArgumentException("MapMessage key cannot be empty or null");
+        }
+        if (value instanceof byte[]) {
+            value = new ByteArray((byte[])value);
+        }
+        if (value instanceof Character) {
+            value = new CharWrapper((Character)value);
         }
         MapMessageConvertUtil.checkValidObject(value);
         _map.put(key, value);
