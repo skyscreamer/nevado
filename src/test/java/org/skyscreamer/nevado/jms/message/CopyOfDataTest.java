@@ -20,6 +20,9 @@ public class CopyOfDataTest extends AbstractJMSTest {
         testObj.setValue(1);
         objMsg.setObject(testObj);
         testObj.setValue(2);
+        TestObject retrievedObject = (TestObject)objMsg.getObject();
+        Assert.assertEquals(1, retrievedObject.getValue());
+        retrievedObject.setValue(3);
         Assert.assertEquals(1, ((TestObject)objMsg.getObject()).getValue());
     }
 
