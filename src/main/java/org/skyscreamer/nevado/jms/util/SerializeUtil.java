@@ -9,52 +9,51 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
-public class SerializeStringUtil
+public class SerializeUtil
 {
-    public static String serialize( Serializable... serializables ) throws IOException
+    public static String serializeToString( Serializable serializable ) throws IOException
     {
+        byte[] data = serialize(serializable);
+        return new String( Base64.encodeBase64(data) );
+    }
+
+    public static byte[] serialize( Serializable serializable ) throws IOException {
         // Initialize buffer and converter
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         Hessian2Output hessian2Output = new Hessian2Output( byteArrayOutputStream );
 
         // Serialize objects
         hessian2Output.startMessage();
-        hessian2Output.writeInt(serializables.length);
-        for(Serializable serializable : serializables) {
-            if (serializable instanceof Character) {
-                // Hessian doesn't properly serialize java.lang.Character
-                serializable = new CharWrapper((Character)serializable);
-            }
-            hessian2Output.writeObject( serializable );
+        if (serializable instanceof Character) {
+            // Hessian doesn't properly serialize java.lang.Character
+            serializable = new CharWrapper((Character)serializable);
         }
+        hessian2Output.writeObject( serializable );
         hessian2Output.completeMessage();
         hessian2Output.close();
-
-        // Return objects serialized as string
-        return new String( Base64.encodeBase64(byteArrayOutputStream.toByteArray()) );
+        return byteArrayOutputStream.toByteArray();
     }
 
-    public static Object[] deserialize( String s ) throws IOException
+    public static Serializable deserializeFromString(String s) throws IOException
     {
         // Initialize buffer and converter
         byte [] dataBytes = Base64.decodeBase64(s);
+        return deserialize(dataBytes);
+    }
+
+    public static Serializable deserialize(byte[] dataBytes) throws IOException {
         Hessian2Input hessian2Input = new Hessian2Input( new ByteArrayInputStream(  dataBytes ) );
 
         // Convert
         hessian2Input.startMessage();
-        int length = hessian2Input.readInt();
-        Object[] objects = new Object[length];
-        for(int i = 0 ; i < length ; ++i) {
-            Object o = hessian2Input.readObject();
-            if (o instanceof CharWrapper) {
-                o = ((CharWrapper)o).charValue();
-            }
-            objects[i] = o;
+        Serializable serializable = (Serializable)hessian2Input.readObject();
+        if (serializable instanceof CharWrapper) {
+            serializable = ((CharWrapper)serializable).charValue();
         }
         hessian2Input.completeMessage();
         hessian2Input.close();
 
         // Return strings
-        return objects;
+        return serializable;
     }
 }

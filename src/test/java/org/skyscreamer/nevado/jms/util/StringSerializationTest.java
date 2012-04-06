@@ -7,19 +7,17 @@ import org.skyscreamer.nevado.jms.RandomData;
 import java.io.IOException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Carter Page
- * Date: 4/5/12
- * Time: 8:52 AM
+ * Test work-around for serialization.  Hessian turns java.lang.Character into a String.
+ *
+ * @author Carter Page <carter@skyscreamer.org>
  */
 public class StringSerializationTest {
     @Test
     public void testChar() throws IOException {
         Character c = RandomData.readChar();
-        String serialized = SerializeStringUtil.serialize(c);
-        Object[] objects = SerializeStringUtil.deserialize(serialized);
-        Assert.assertEquals(1, objects.length);
-        Assert.assertEquals(Character.class, objects[0].getClass());
-        Assert.assertEquals(c, objects[0]);
+        String serialized = SerializeUtil.serializeToString(c);
+        Object object = SerializeUtil.deserializeFromString(serialized);
+        Assert.assertEquals(Character.class, object.getClass());
+        Assert.assertEquals(c, object);
     }
 }

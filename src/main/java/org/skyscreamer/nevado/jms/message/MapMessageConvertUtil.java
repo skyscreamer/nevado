@@ -20,6 +20,9 @@ public class MapMessageConvertUtil extends PropertyConvertUtil {
     }
 
     public static byte[] convertToBytes(String name, Object value) throws MessageFormatException {
+        if (value == null) {
+            return null;
+        }
         if (value instanceof ByteArray) {
             return ((ByteArray)value).toByteArray();
         }
@@ -27,6 +30,9 @@ public class MapMessageConvertUtil extends PropertyConvertUtil {
     }
 
     public static String convertToString(String name, Object value) throws MessageFormatException {
+        if (value == null) {
+            return null;
+        }
         if (value instanceof String || value instanceof Boolean || value instanceof Byte || value instanceof Short
                 || value instanceof Integer || value instanceof Long || value instanceof Float
                 || value instanceof Double || value instanceof CharWrapper) {
