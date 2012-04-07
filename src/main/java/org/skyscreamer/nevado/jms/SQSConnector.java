@@ -59,10 +59,10 @@ public class SQSConnector {
         _log.info("Sent message " + sqsMessageId);
     }
 
-    public NevadoMessage receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException {
+    public NevadoMessage receiveMessage(NevadoConnection connection, NevadoDestination destination, long timeoutMs) throws JMSException {
         long startTimeMs = new Date().getTime();
         MessageQueue sqsQueue = getSQSQueue(destination);
-        Message sqsMessage = receiveSQSMessage(destination, timeoutMs, startTimeMs, sqsQueue);
+        Message sqsMessage = receiveSQSMessage(connection, destination, timeoutMs, startTimeMs, sqsQueue);
         if (sqsMessage != null) {
             _log.info("Received message " + sqsMessage.getMessageId());
         }
@@ -82,7 +82,7 @@ public class SQSConnector {
         try {
             _queueService.listMessageQueues(null);
         } catch (SQSException e) {
-            _log.error("Connection test failed", e);
+            _log.error("Connection test failed: " + e.getMessage());
             boolean securityException = false;
             if (e.getErrors().size() > 0)
             {
@@ -143,20 +143,32 @@ public class SQSConnector {
         return message;
     }
 
-    private Message receiveSQSMessage(NevadoDestination destination, long timeoutMs, long startTimeMs, MessageQueue sqsQueue) throws JMSException {
+    private Message receiveSQSMessage(NevadoConnection connection, NevadoDestination destination, long timeoutMs, long startTimeMs, MessageQueue sqsQueue) throws JMSException {
         Message sqsMessage;
         while(true) {
-            try {
-                sqsMessage = sqsQueue.receiveMessage();
-            } catch (SQSException e) {
-                String exMessage = "Unable to reveive message from '" + destination + "': " + e.getMessage();
-                _log.error(exMessage, e);
-                throw new JMSException(exMessage);
+            if (connection.isStarted()) {
+                try {
+                    sqsMessage = sqsQueue.receiveMessage();
+                } catch (SQSException e) {
+                    String exMessage = "Unable to reveive message from '" + destination + "': " + e.getMessage();
+                    _log.error(exMessage, e);
+                    throw new JMSException(exMessage);
+                }
+            }
+            else {
+                _log.debug("Not accepting messages.  Connection is paused or not started.");
+                sqsMessage = null;
             }
 
             // Check for message or timeout
             if (sqsMessage != null || (timeoutMs > -1 && (new Date().getTime() - startTimeMs) >= timeoutMs)) {
                 break;
+            }
+
+            try {
+                Thread.sleep(_receiveCheckIntervalMs);
+            } catch (InterruptedException e) {
+                _log.warn("Wait time between receive checks interrupted", e);
             }
         }
         return sqsMessage;

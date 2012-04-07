@@ -113,12 +113,4 @@ public abstract class AbstractJMSTest {
     protected Queue getTestQueue() {
         return _testQueue;
     }
-    
-    protected String getAwsAccessKey() {
-        return _awsAccessKey;
-    }
-
-    protected String getAwsSecretKey() {
-        return _awsSecretKey;
-    }
 }

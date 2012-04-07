@@ -24,8 +24,9 @@ public class JMSHeaderOverrideTest extends AbstractJMSTest {
         _overriddenConnectionFactory.setOverrideJMSDeliveryMode(DeliveryMode.NON_PERSISTENT);
         _overriddenConnectionFactory.setOverrideJMSPriority(9);
         _overriddenConnectionFactory.setOverrideJMSTTL(60000L);
-        _overriddenSession = _overriddenConnectionFactory.createConnection(getAwsAccessKey(), getAwsSecretKey())
-                .createSession(false, Session.AUTO_ACKNOWLEDGE);
+        Connection conn = createConnection(_overriddenConnectionFactory);
+        conn.start();
+        _overriddenSession = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
         clearTestQueue();
         Message msg = _overriddenSession.createMessage();

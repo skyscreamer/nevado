@@ -22,6 +22,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
     private Integer _jmsDeliveryMode;
     private Long _jmsTTL;
     private Integer _jmsPriority;
+    private boolean _started = false;
 
     public NevadoConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
         _sqsConnector = new SQSConnector(awsAccessKey, awsSecretKey);
@@ -48,33 +49,28 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
     }
 
     public ConnectionMetaData getMetaData() throws JMSException {
-        _inUse = true;
         return NevadoConnectionMetaData.getInstance();
     }
 
     public ExceptionListener getExceptionListener() throws JMSException {
-        _inUse = true;
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void setExceptionListener(ExceptionListener exceptionListener) throws JMSException {
-        _inUse = true;
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void start() throws JMSException {
         _inUse = true;
-        //To change body of implemented methods use File | Settings | File Templates.
+        _started = true;
     }
 
     public void stop() throws JMSException {
-        _inUse = true;
-        //To change body of implemented methods use File | Settings | File Templates.
+        _started = false;
     }
 
     public void close() throws JMSException {
-        _inUse = true;
-        //To change body of implemented methods use File | Settings | File Templates.
+        _started = false;
     }
 
     public ConnectionConsumer createConnectionConsumer(Destination destination, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
@@ -126,5 +122,9 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
 
     public void setOverrideJMSTTL(Long jmsTTL) {
         _jmsTTL = jmsTTL;
+    }
+
+    public boolean isStarted() {
+        return _started;
     }
 }

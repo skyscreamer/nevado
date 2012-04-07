@@ -221,7 +221,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     private NevadoMessage getUnfilteredMessage(NevadoDestination destination, long timeoutMs) throws JMSException {
-        NevadoMessage message = _connection.getSQSConnector().receiveMessage(destination, timeoutMs);
+        NevadoMessage message = _connection.getSQSConnector().receiveMessage(_connection, destination, timeoutMs);
         if (message != null) {
             message.setNevadoSession(this);
             message.setNevadoDestination(destination);
