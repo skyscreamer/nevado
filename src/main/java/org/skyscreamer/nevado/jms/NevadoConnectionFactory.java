@@ -1,6 +1,7 @@
 package org.skyscreamer.nevado.jms;
 
 import javax.jms.*;
+import java.io.Serializable;
 
 /**
  * Created by IntelliJ IDEA.
@@ -8,19 +9,15 @@ import javax.jms.*;
  * Date: 3/18/12
  * Time: 8:49 PM
  */
-public class NevadoConnectionFactory implements ConnectionFactory, QueueConnectionFactory, TopicConnectionFactory {
+public class NevadoConnectionFactory implements ConnectionFactory, QueueConnectionFactory, TopicConnectionFactory,
+        Serializable
+{
     private String _awsAccessKey;
     private String _awsSecretKey;
+    private String _clientID;
     private Integer _jmsDeliveryMode;
     private Long _jmsTTL;
     private Integer _jmsPriority;
-
-    public NevadoConnectionFactory() {}
-
-    public NevadoConnectionFactory(String awsAccessKey, String awsSecretKey) {
-        this._awsAccessKey = awsAccessKey;
-        this._awsSecretKey = awsSecretKey;
-    }
 
     public QueueConnection createQueueConnection() throws JMSException {
         return createNevadoConnection(_awsAccessKey, _awsSecretKey);
@@ -46,10 +43,9 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
         return createNevadoConnection(awsAccessKey, awsSecretKey);
     }
 
-    private NevadoConnection createNevadoConnection(String awsAccessKey, String awsSecretKey) {
-        NevadoConnection connection = new NevadoConnection();
-        connection.setAwsAccessKey(awsAccessKey);
-        connection.setAwsSecretKey(awsSecretKey);
+    private NevadoConnection createNevadoConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
+        NevadoConnection connection = new NevadoConnection(awsAccessKey, awsSecretKey);
+        connection.setClientID(_clientID);
         connection.setOverrideJMSDeliveryMode(_jmsDeliveryMode);
         connection.setOverrideJMSPriority(_jmsPriority);
         connection.setOverrideJMSTTL(_jmsTTL);
@@ -63,6 +59,10 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
 
     public void setAwsSecretKey(String awsSecretKey) {
         _awsSecretKey = awsSecretKey;
+    }
+
+    public void setClientID(String _clientID) {
+        this._clientID = _clientID;
     }
 
     public void setOverrideJMSDeliveryMode(Integer jmsDeliveryMode) {

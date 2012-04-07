@@ -7,14 +7,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.jms.*;
 import javax.jms.Queue;
@@ -40,14 +37,19 @@ public abstract class AbstractJMSTest {
     private String _awsAccessKey;
     private String _awsSecretKey;
 
-    @Autowired private ConnectionFactory connectionFactory;
+    @Autowired private ConnectionFactory _connectionFactory;
     private Connection _connection;
     private Queue _testQueue = new NevadoQueue(TEST_QUEUE_NAME);
 
     @Before
     public void setUp() throws JMSException, IOException {
         initializeAWSCredentials();
-        _connection = connectionFactory.createConnection(_awsAccessKey, _awsSecretKey);
+        _connection = createConnection(_connectionFactory);
+        _connection.start();
+    }
+
+    protected Connection createConnection(ConnectionFactory connectionFactory) throws JMSException {
+        return connectionFactory.createConnection(_awsAccessKey, _awsSecretKey);
     }
 
     protected void clearTestQueue() throws JMSException {
@@ -94,6 +96,10 @@ public abstract class AbstractJMSTest {
     @After
     public void tearDown() throws JMSException {
         // Do nothing
+    }
+
+    public ConnectionFactory getConnectionFactory() {
+        return _connectionFactory;
     }
 
     protected Connection getConnection() {

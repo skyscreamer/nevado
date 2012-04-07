@@ -1,24 +1,36 @@
 package org.skyscreamer.nevado.jms;
 
 
+import com.xerox.amazonws.sqs2.SQSException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import javax.jms.*;
+import javax.jms.IllegalStateException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Carter Page
- * Date: 3/19/12
- * Time: 9:43 AM
+ * Nevado's implementation of JMS Connection.
+ *
+ * @author Carter Page <carter@skyscreamer.org>
  */
 public class NevadoConnection implements Connection, QueueConnection, TopicConnection {
-    private String _awsAccessKey;
-    private String _awsSecretKey;
+    private final Log _log = LogFactory.getLog(getClass());
+
+    private boolean _inUse = false;
+    private final SQSConnector _sqsConnector;
     private String _clientID;
     private Integer _jmsDeliveryMode;
     private Long _jmsTTL;
     private Integer _jmsPriority;
 
+    public NevadoConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
+        _sqsConnector = new SQSConnector(awsAccessKey, awsSecretKey);
+        _sqsConnector.test();
+    }
+
     public QueueSession createQueueSession(boolean transacted, int acknowledgeMode) throws JMSException {
-        NevadoSession nevadoSession = new NevadoSession(_awsAccessKey, _awsSecretKey, transacted, acknowledgeMode);
+        _inUse = true;
+        NevadoSession nevadoSession = new NevadoSession(this, transacted, acknowledgeMode);
         nevadoSession.setOverrideJMSDeliveryMode(_jmsDeliveryMode);
         nevadoSession.setOverrideJMSTTL(_jmsTTL);
         nevadoSession.setOverrideJMSPriority(_jmsPriority);
@@ -26,68 +38,82 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
     }
 
     public ConnectionConsumer createConnectionConsumer(Queue queue, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
+        _inUse = true;
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public Session createSession(boolean transacted, int acknowledgeMode) throws JMSException {
+        _inUse = true;
         return createQueueSession(transacted, acknowledgeMode);
     }
 
     public ConnectionMetaData getMetaData() throws JMSException {
+        _inUse = true;
         return NevadoConnectionMetaData.getInstance();
     }
 
     public ExceptionListener getExceptionListener() throws JMSException {
+        _inUse = true;
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void setExceptionListener(ExceptionListener exceptionListener) throws JMSException {
+        _inUse = true;
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void start() throws JMSException {
+        _inUse = true;
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void stop() throws JMSException {
+        _inUse = true;
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void close() throws JMSException {
+        _inUse = true;
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public ConnectionConsumer createConnectionConsumer(Destination destination, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
+        _inUse = true;
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public TopicSession createTopicSession(boolean b, int i) throws JMSException {
+        _inUse = true;
         throw new UnsupportedOperationException("Topics are not yet supported"); // TODO
     }
 
     public ConnectionConsumer createConnectionConsumer(Topic topic, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
+        _inUse = true;
         throw new UnsupportedOperationException("Topics are not yet supported"); // TODO
     }
 
     public ConnectionConsumer createDurableConnectionConsumer(Topic topic, String s, String s1, ServerSessionPool serverSessionPool, int i) throws JMSException {
+        _inUse = true;
         throw new UnsupportedOperationException("Topics are not yet supported"); // TODO
     }
 
     // Getters & Setters
-    public void setAwsAccessKey(String awsAccessKey) {
-        _awsAccessKey = awsAccessKey;
-    }
-
-    public void setAwsSecretKey(String awsSecretKey) {
-        _awsSecretKey = awsSecretKey;
+    protected SQSConnector getSQSConnector() {
+        return _sqsConnector;
     }
 
     public String getClientID() {
         return _clientID;
     }
 
-    public void setClientID(String _clientID) {
-        _clientID = _clientID;
+    public void setClientID(String clientID) throws IllegalStateException {
+        if (clientID != null) {
+            throw new IllegalStateException("Client ID has already been set");
+        }
+        if (_inUse) {
+            throw new IllegalStateException("Client ID cannot be set after the connection is in use");
+        }
+        _clientID = clientID;
     }
 
     public void setOverrideJMSDeliveryMode(Integer jmsDeliveryMode) {

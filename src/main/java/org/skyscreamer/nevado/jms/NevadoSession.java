@@ -8,24 +8,22 @@ import javax.jms.*;
 import java.io.Serializable;
 
 /**
- * Created by IntelliJ IDEA.
- * User: cpage
- * Date: 3/21/12
- * Time: 7:01 PM
- * To change this template use File | Settings | File Templates.
+ * Nevado implementation of the general JMS Session interface.
+ *
+ * @author Carter Page <carter@skyscreamer.org>
  */
 public class NevadoSession implements Session, QueueSession, TopicSession {
     private final Log _log = LogFactory.getLog(getClass());
 
-    private final SQSConnector _sqsConnector;
+    private final NevadoConnection _connection;
     private boolean _transacted;
     private int _acknowledgeMode;
     private Integer _overrideJMSDeliveryMode;
     private Long _overrideJMSTTL;
     private Integer _overrideJMSPriority;
 
-    protected NevadoSession(String awsAccessKey, String awsSecretKey, boolean transacted, int acknowledgeMode) {
-        _sqsConnector = new SQSConnector(awsAccessKey, awsSecretKey);
+    protected NevadoSession(NevadoConnection connection, boolean transacted, int acknowledgeMode) {
+        _connection = connection;
         _transacted = transacted;
         _acknowledgeMode = acknowledgeMode;
     }
@@ -202,7 +200,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
             message.setJMSExpiration(_overrideJMSTTL > 0 ? System.currentTimeMillis() + _overrideJMSTTL : 0);
         }
         message.onSend();
-        _sqsConnector.sendMessage(destination, message, disableMessageID, disableTimestamp);
+        _connection.getSQSConnector().sendMessage(destination, message, disableMessageID, disableTimestamp);
     }
 
     public Message receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException {
@@ -223,7 +221,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     private NevadoMessage getUnfilteredMessage(NevadoDestination destination, long timeoutMs) throws JMSException {
-        NevadoMessage message = _sqsConnector.receiveMessage(destination, timeoutMs);
+        NevadoMessage message = _connection.getSQSConnector().receiveMessage(destination, timeoutMs);
         if (message != null) {
             message.setNevadoSession(this);
             message.setNevadoDestination(destination);
@@ -232,7 +230,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     public void deleteMessage(NevadoMessage message) throws JMSException {
-        _sqsConnector.deleteMessage(message);
+        _connection.getSQSConnector().deleteMessage(message);
     }
 
     public void setOverrideJMSDeliveryMode(Integer jmsDeliveryMode) {

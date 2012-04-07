@@ -1,5 +1,6 @@
 package org.skyscreamer.nevado.jms;
 
+import com.xerox.amazonws.common.AWSError;
 import com.xerox.amazonws.sqs2.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -9,24 +10,25 @@ import org.skyscreamer.nevado.jms.message.NevadoProperty;
 import org.skyscreamer.nevado.jms.util.SerializeUtil;
 
 import javax.jms.JMSException;
+import javax.jms.JMSSecurityException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Carter Page
- * Date: 3/24/12
- * Time: 11:57 AM
+ * Connector for SQS-only implementation of the Nevado JMS driver.
  *
  * TODO: Put the check interval and optional back-off strategy into the NevadoDestinations so they can be
  *       configured on a per-destination basis.
+ *
+ * @author Carter Page <carter@skyscreamer.org>
  */
 public class SQSConnector {
     private final Log _log = LogFactory.getLog(getClass());
 
     private final QueueService _queueService;
     private final long _receiveCheckIntervalMs;
+    private static final String AWS_ERROR_CODE_AUTHENTICATION = "InvalidClientTokenId";
 
     public SQSConnector(String awsAccessKey, String awsSecretKey) {
         _queueService = new QueueService(awsAccessKey, awsSecretKey);
@@ -71,6 +73,37 @@ public class SQSConnector {
         MessageQueue sqsQueue = getSQSQueue(message.getNevadoDestination());
         String sqsReceiptHandle = getSQSReceiptHandle(message);
         deleteSQSMessage(message, sqsQueue, sqsReceiptHandle);
+    }
+
+    /**
+     * Tests the connection.
+     */
+    public void test() throws JMSException {
+        try {
+            _queueService.listMessageQueues(null);
+        } catch (SQSException e) {
+            _log.error("Connection test failed", e);
+            boolean securityException = false;
+            if (e.getErrors().size() > 0)
+            {
+                for(AWSError awsError : e.getErrors())
+                {
+                    if (AWS_ERROR_CODE_AUTHENTICATION.equals(awsError.getCode()))
+                    {
+                        securityException = true;
+                        break;
+                    }
+                }
+            }
+            if (securityException)
+            {
+                throw new JMSSecurityException(e.getMessage());
+            }
+            else
+            {
+                throw new JMSException(e.getMessage());
+            }
+        }
     }
 
     private void deleteSQSMessage(NevadoMessage message, MessageQueue sqsQueue, String sqsReceiptHandle) throws JMSException {

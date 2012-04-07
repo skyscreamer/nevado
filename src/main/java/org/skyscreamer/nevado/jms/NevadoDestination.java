@@ -1,6 +1,8 @@
 package org.skyscreamer.nevado.jms;
 
 import javax.jms.*;
+import javax.naming.Referenceable;
+import java.io.Serializable;
 import java.util.Queue;
 
 /**
@@ -9,7 +11,7 @@ import java.util.Queue;
  * Date: 3/24/12
  * Time: 10:22 AM
  */
-public abstract class NevadoDestination implements Destination {
+public abstract class NevadoDestination implements Destination, Serializable {
     private final String _name;
 
     public NevadoDestination(String name) {
