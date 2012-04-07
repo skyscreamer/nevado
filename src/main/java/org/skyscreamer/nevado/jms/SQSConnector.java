@@ -150,9 +150,19 @@ public class SQSConnector {
                 try {
                     sqsMessage = sqsQueue.receiveMessage();
                 } catch (SQSException e) {
-                    String exMessage = "Unable to reveive message from '" + destination + "': " + e.getMessage();
+                    String exMessage = "Unable to receive message from '" + destination + "': " + e.getMessage();
                     _log.error(exMessage, e);
                     throw new JMSException(exMessage);
+                }
+                if (!connection.isStarted()) {
+                    // Connection was stopped while the REST call to SQS was being made
+                    try {
+                        sqsQueue.setMessageVisibilityTimeout(sqsMessage, 0); // Make it immediately available to the next requestor
+                    } catch (SQSException e) {
+                        String exMessage = "Unable to reset visibility timeout for message: " + e.getMessage();
+                        _log.warn(exMessage, e); // Non-fatal.  Just means the message will disappear until the visibility timeout expires.
+                    }
+                    sqsMessage = null;
                 }
             }
             else {
