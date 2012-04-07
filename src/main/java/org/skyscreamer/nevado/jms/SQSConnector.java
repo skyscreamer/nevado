@@ -146,7 +146,7 @@ public class SQSConnector {
     private Message receiveSQSMessage(NevadoConnection connection, NevadoDestination destination, long timeoutMs, long startTimeMs, MessageQueue sqsQueue) throws JMSException {
         Message sqsMessage;
         while(true) {
-            if (connection.isStarted()) {
+            if (connection.isRunning()) {
                 try {
                     sqsMessage = sqsQueue.receiveMessage();
                 } catch (SQSException e) {
@@ -154,7 +154,7 @@ public class SQSConnector {
                     _log.error(exMessage, e);
                     throw new JMSException(exMessage);
                 }
-                if (!connection.isStarted()) {
+                if (!connection.isRunning()) {
                     // Connection was stopped while the REST call to SQS was being made
                     try {
                         sqsQueue.setMessageVisibilityTimeout(sqsMessage, 0); // Make it immediately available to the next requestor

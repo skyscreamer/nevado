@@ -1,7 +1,6 @@
 package org.skyscreamer.nevado.jms;
 
 
-import com.xerox.amazonws.sqs2.SQSException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -22,7 +21,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
     private Integer _jmsDeliveryMode;
     private Long _jmsTTL;
     private Integer _jmsPriority;
-    private boolean _started = false;
+    private boolean _running = false;
 
     public NevadoConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
         _sqsConnector = new SQSConnector(awsAccessKey, awsSecretKey);
@@ -62,15 +61,15 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
 
     public void start() throws JMSException {
         _inUse = true;
-        _started = true;
+        _running = true;
     }
 
     public void stop() throws JMSException {
-        _started = false;
+        _running = false;
     }
 
     public void close() throws JMSException {
-        _started = false;
+        _running = false;
     }
 
     public ConnectionConsumer createConnectionConsumer(Destination destination, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
@@ -124,7 +123,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         _jmsTTL = jmsTTL;
     }
 
-    public boolean isStarted() {
-        return _started;
+    public boolean isRunning() {
+        return _running;
     }
 }
