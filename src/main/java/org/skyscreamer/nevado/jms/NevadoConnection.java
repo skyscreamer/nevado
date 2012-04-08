@@ -102,7 +102,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
     }
 
     public void setClientID(String clientID) throws IllegalStateException {
-        if (clientID != null) {
+        if (_clientID != null) {
             throw new IllegalStateException("Client ID has already been set");
         }
         if (_inUse) {

@@ -1,5 +1,7 @@
 package org.skyscreamer.nevado.jms;
 
+import org.apache.commons.lang.StringUtils;
+
 import javax.jms.*;
 import java.io.Serializable;
 
@@ -45,7 +47,10 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
 
     private NevadoConnection createNevadoConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
         NevadoConnection connection = new NevadoConnection(awsAccessKey, awsSecretKey);
-        connection.setClientID(_clientID);
+        if (StringUtils.isNotEmpty(_clientID))
+        {
+            connection.setClientID(_clientID);
+        }
         connection.setOverrideJMSDeliveryMode(_jmsDeliveryMode);
         connection.setOverrideJMSPriority(_jmsPriority);
         connection.setOverrideJMSTTL(_jmsTTL);

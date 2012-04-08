@@ -44,22 +44,16 @@ public class ClientIDTest extends AbstractJMSTest {
         Connection conn1 = createConnection(getConnectionFactory());
         Connection conn2 = createConnection(getConnectionFactory());
         conn1.setClientID(TEST_CLIENT_ID);
-        try {
-            conn2.setClientID(TEST_CLIENT_ID);
-        }
-        catch (InvalidClientIDException e) {
-            // Expected
-            return;
-        }
-        Assert.fail("InvalidClientIDException expected for duplicate client IDs");
-    }
-
-    @Test
-    public void testClientID5() throws JMSException {
-        Connection conn1 = createConnection(getConnectionFactory());
-        Connection conn2 = createConnection(getConnectionFactory());
-        conn1.setClientID(TEST_CLIENT_ID);
         conn1.close();
         conn2.setClientID(TEST_CLIENT_ID);
     }
+
+    @Test(expected = javax.jms.IllegalStateException.class)
+    public void testClientID5() throws JMSException {
+        Connection conn = createConnection(getConnectionFactory());
+        Assert.assertNull(conn.getClientID());
+        conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        conn.setClientID(TEST_CLIENT_ID);
+    }
+
 }
