@@ -19,7 +19,7 @@ public class JMSTimestampTest extends AbstractJMSTest {
     @Test
     public void testAssign() throws JMSException {
         clearTestQueue();
-        Message msg = getSession().createMessage();
+        Message msg = createSession().createMessage();
         Assert.assertEquals(0, msg.getJMSTimestamp());
         Message msgOut = sendAndReceive(msg);
         Assert.assertEquals(new Date().getTime(), msg.getJMSTimestamp(), 5000);
@@ -28,12 +28,12 @@ public class JMSTimestampTest extends AbstractJMSTest {
     @Test
     public void testDisable() throws JMSException {
         clearTestQueue();
-        Message msg = getSession().createMessage();
+        Message msg = createSession().createMessage();
         Assert.assertEquals(0, msg.getJMSTimestamp());
-        MessageProducer msgProducer = getSession().createProducer(getTestQueue());
+        MessageProducer msgProducer = createSession().createProducer(getTestQueue());
         msgProducer.setDisableMessageTimestamp(true);
         msgProducer.send(msg);
-        Message msgOut = getSession().createConsumer(getTestQueue()).receive();
+        Message msgOut = createSession().createConsumer(getTestQueue()).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         Assert.assertEquals(0, msg.getJMSTimestamp());

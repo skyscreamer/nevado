@@ -14,7 +14,7 @@ import javax.jms.*;
 public class NullValuesTest extends AbstractJMSTest {
     @Test
     public void testMessageHeadersAndProperties() throws JMSException {
-        Message msg = getSession().createMessage();
+        Message msg = createSession().createMessage();
         msg.setJMSCorrelationID(null);
         Assert.assertNull(msg.getJMSCorrelationID());
         msg.setJMSCorrelationIDAsBytes(null);
@@ -35,13 +35,13 @@ public class NullValuesTest extends AbstractJMSTest {
 
     @Test(expected = NullPointerException.class)
     public void testBytesMessage() throws JMSException {
-        BytesMessage bytesMessage = getSession().createBytesMessage();
+        BytesMessage bytesMessage = createSession().createBytesMessage();
         bytesMessage.writeBytes(null);
     }
 
     @Test
     public void testMapMessage() throws JMSException {
-        MapMessage mapMsg = getSession().createMapMessage();
+        MapMessage mapMsg = createSession().createMapMessage();
         mapMsg.setObject("key", null);
         Assert.assertNull(mapMsg.getObject("key"));
         mapMsg.setString("key", null);
@@ -52,21 +52,21 @@ public class NullValuesTest extends AbstractJMSTest {
 
     @Test
     public void testObjectMessage() throws JMSException {
-        ObjectMessage objMsg = getSession().createObjectMessage();
+        ObjectMessage objMsg = createSession().createObjectMessage();
         objMsg.setObject(null);
         Assert.assertNull(objMsg.getObject());
     }
 
     @Test
     public void testTextMessage() throws JMSException {
-        TextMessage textMsg = getSession().createTextMessage();
+        TextMessage textMsg = createSession().createTextMessage();
         textMsg.setText(null);
         Assert.assertNull(textMsg.getText());
     }
 
     @Test
     public void testStreamMessage() throws JMSException {
-        NevadoStreamMessage streamMsg = (NevadoStreamMessage)getSession().createStreamMessage();
+        NevadoStreamMessage streamMsg = (NevadoStreamMessage) createSession().createStreamMessage();
         streamMsg.writeInt(1);
         streamMsg.writeString(null);
         streamMsg.writeInt(2);
@@ -83,7 +83,7 @@ public class NullValuesTest extends AbstractJMSTest {
     // Technically a primitive array, byte[] should not be null
     @Test(expected = NullPointerException.class)
     public void testStreamMessageNullBytes() throws JMSException {
-        NevadoStreamMessage streamMsg = (NevadoStreamMessage)getSession().createStreamMessage();
+        NevadoStreamMessage streamMsg = (NevadoStreamMessage) createSession().createStreamMessage();
         streamMsg.writeBytes(null);
     }
 }

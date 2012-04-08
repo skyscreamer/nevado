@@ -2,10 +2,17 @@ package org.skyscreamer.nevado.jms;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.skyscreamer.nevado.jms.destination.NevadoDestination;
+import org.skyscreamer.nevado.jms.destination.NevadoQueue;
+import org.skyscreamer.nevado.jms.destination.NevadoTemporaryQueue;
 import org.skyscreamer.nevado.jms.message.*;
 
 import javax.jms.*;
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Nevado implementation of the general JMS Session interface.
@@ -13,6 +20,8 @@ import java.io.Serializable;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class NevadoSession implements Session, QueueSession, TopicSession {
+    public static final String TEMPORARY_QUEUE_PREFIX = "nevado_temp";
+
     private final Log _log = LogFactory.getLog(getClass());
 
     private final NevadoConnection _connection;
@@ -21,6 +30,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     private Integer _overrideJMSDeliveryMode;
     private Long _overrideJMSTTL;
     private Integer _overrideJMSPriority;
+    private final Set<TemporaryQueue> _temporaryQueues = new HashSet<TemporaryQueue>();
 
     protected NevadoSession(NevadoConnection connection, boolean transacted, int acknowledgeMode) {
         _connection = connection;
@@ -92,8 +102,15 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
         // TODO
     }
 
-    public void close() throws JMSException {
-        // TODO
+    public void close() {
+        for(TemporaryQueue temporaryQueue : _temporaryQueues) {
+            try {
+                temporaryQueue.delete();
+            } catch (JMSException e) {
+                // Log but continue
+                _log.error("Unable to delete temporaryQueue " + temporaryQueue, e);
+            }
+        }
     }
 
     public void recover() throws JMSException {
@@ -177,7 +194,25 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     public TemporaryQueue createTemporaryQueue() throws JMSException {
-        return null;  // TODO
+        String tempQueueName = TEMPORARY_QUEUE_PREFIX + UUID.randomUUID();
+        NevadoQueue queue = _connection.getSQSConnector().createQueue(tempQueueName);
+        NevadoTemporaryQueue temporaryQueue = new NevadoTemporaryQueue(this, queue);
+        _temporaryQueues.add(temporaryQueue);
+        return temporaryQueue;
+    }
+
+    public void deleteTemporaryQueue(NevadoTemporaryQueue temporaryQueue) throws JMSException {
+        _connection.getSQSConnector().deleteQueue(temporaryQueue);
+        _temporaryQueues.remove(temporaryQueue);
+    }
+    
+    public Collection<TemporaryQueue> listAllTemporaryQueues() throws JMSException {
+        Collection<NevadoQueue> queues = _connection.getSQSConnector().listQueues(TEMPORARY_QUEUE_PREFIX);
+        Collection<TemporaryQueue> temporaryQueues = new HashSet<TemporaryQueue>(queues.size());
+        for(NevadoQueue queue : queues) {
+            temporaryQueues.add(new NevadoTemporaryQueue(this, queue));
+        }
+        return temporaryQueues;
     }
 
     public TemporaryTopic createTemporaryTopic() throws JMSException {

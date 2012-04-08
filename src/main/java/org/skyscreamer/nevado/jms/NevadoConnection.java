@@ -3,6 +3,8 @@ package org.skyscreamer.nevado.jms;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.skyscreamer.nevado.jms.connector.NevadoConnector;
+import org.skyscreamer.nevado.jms.connector.SQSConnector;
 
 import javax.jms.*;
 import javax.jms.IllegalStateException;
@@ -16,7 +18,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
     private final Log _log = LogFactory.getLog(getClass());
 
     private boolean _inUse = false;
-    private final SQSConnector _sqsConnector;
+    private final NevadoConnector _nevadoConnector;
     private String _clientID;
     private Integer _jmsDeliveryMode;
     private Long _jmsTTL;
@@ -24,8 +26,8 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
     private boolean _running = false;
 
     public NevadoConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
-        _sqsConnector = new SQSConnector(awsAccessKey, awsSecretKey);
-        _sqsConnector.test();
+        _nevadoConnector = new SQSConnector(awsAccessKey, awsSecretKey);
+        _nevadoConnector.test();
     }
 
     public QueueSession createQueueSession(boolean transacted, int acknowledgeMode) throws JMSException {
@@ -93,8 +95,8 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
     }
 
     // Getters & Setters
-    protected SQSConnector getSQSConnector() {
-        return _sqsConnector;
+    protected NevadoConnector getSQSConnector() {
+        return _nevadoConnector;
     }
 
     public String getClientID() {

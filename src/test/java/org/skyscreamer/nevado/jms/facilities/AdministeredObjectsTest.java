@@ -3,9 +3,8 @@ package org.skyscreamer.nevado.jms.facilities;
 import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.NevadoConnectionFactory;
-import org.skyscreamer.nevado.jms.NevadoDestination;
+import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 
-import javax.naming.Referenceable;
 import java.io.Serializable;
 
 /**

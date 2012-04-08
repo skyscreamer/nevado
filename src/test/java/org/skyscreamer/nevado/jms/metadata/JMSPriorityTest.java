@@ -4,7 +4,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
 
-import javax.jms.DeliveryMode;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
@@ -19,7 +18,7 @@ public class JMSPriorityTest extends AbstractJMSTest {
     @Test
     public void testDefault() throws JMSException {
         clearTestQueue();
-        Message msg = getSession().createMessage();
+        Message msg = createSession().createMessage();
         Message msgOut = sendAndReceive(msg);
         Assert.assertEquals(Message.DEFAULT_PRIORITY, msg.getJMSPriority());
         Assert.assertEquals(Message.DEFAULT_PRIORITY, msgOut.getJMSPriority());
@@ -27,18 +26,18 @@ public class JMSPriorityTest extends AbstractJMSTest {
 
     @Test
     public void testAssign() throws JMSException {
-        Message msg1 = getSession().createMessage();
-        MessageProducer msgProducer = getSession().createProducer(getTestQueue());
+        Message msg1 = createSession().createMessage();
+        MessageProducer msgProducer = createSession().createProducer(getTestQueue());
         msgProducer.send(msg1, Message.DEFAULT_DELIVERY_MODE, 0, Message.DEFAULT_TIME_TO_LIVE);
-        Message msgOut = getSession().createConsumer(getTestQueue()).receive();
+        Message msgOut = createSession().createConsumer(getTestQueue()).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         Assert.assertEquals(0, msg1.getJMSPriority());
         Assert.assertEquals(0, msgOut.getJMSPriority());
 
-        Message msg2 = getSession().createMessage();
+        Message msg2 = createSession().createMessage();
         msgProducer.send(msg2, Message.DEFAULT_DELIVERY_MODE, 9, Message.DEFAULT_TIME_TO_LIVE);
-        msgOut = getSession().createConsumer(getTestQueue()).receive();
+        msgOut = createSession().createConsumer(getTestQueue()).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         Assert.assertEquals(9, msg2.getJMSPriority());

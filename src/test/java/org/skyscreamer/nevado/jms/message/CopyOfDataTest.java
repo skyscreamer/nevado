@@ -15,7 +15,7 @@ import java.io.Serializable;
 public class CopyOfDataTest extends AbstractJMSTest {
     @Test
     public void testObjectMessage() throws JMSException {
-        ObjectMessage objMsg = getSession().createObjectMessage();
+        ObjectMessage objMsg = createSession().createObjectMessage();
         TestObject testObj = new TestObject();
         testObj.setValue(1);
         objMsg.setObject(testObj);
@@ -29,7 +29,7 @@ public class CopyOfDataTest extends AbstractJMSTest {
     @Test
     public void testBytesMessage() throws JMSException {
         byte[] bytes = {1, 2, 3};
-        NevadoBytesMessage bytesMessage = (NevadoBytesMessage)getSession().createBytesMessage();
+        NevadoBytesMessage bytesMessage = (NevadoBytesMessage) createSession().createBytesMessage();
         bytesMessage.writeBytes(bytes);
         bytes[1] = 10; // This should not get reflected in the message
         bytesMessage.onSend();
@@ -41,7 +41,7 @@ public class CopyOfDataTest extends AbstractJMSTest {
     @Test
     public void testStreamMessage() throws JMSException {
         byte[] bytes = {1, 2, 3};
-        NevadoStreamMessage streamMessage = (NevadoStreamMessage)getSession().createStreamMessage();
+        NevadoStreamMessage streamMessage = (NevadoStreamMessage) createSession().createStreamMessage();
         streamMessage.writeBytes(bytes);
         bytes[1] = 10; // This should not get reflected in the message
         streamMessage.onSend();
@@ -53,7 +53,7 @@ public class CopyOfDataTest extends AbstractJMSTest {
     @Test
     public void testMapMessage() throws JMSException {
         byte[] bytes = {1, 2, 3};
-        MapMessage mapMessage = getSession().createMapMessage();
+        MapMessage mapMessage = createSession().createMapMessage();
         mapMessage.setBytes("key", bytes);
         bytes[1] = 10; // This should not get reflected in the message
         byte[] bytesOut = mapMessage.getBytes("key");

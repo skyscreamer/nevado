@@ -8,8 +8,6 @@ import org.skyscreamer.nevado.jms.RandomData;
 
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.BytesMessage;
 import java.util.Arrays;
 
 /**
@@ -21,7 +19,7 @@ import java.util.Arrays;
 public class BytesMessageTest extends AbstractJMSTest {
     @Test
     public void testBytesMessage() throws JMSException {
-        BytesMessage msg = getSession().createBytesMessage();
+        BytesMessage msg = createSession().createBytesMessage();
         testBytesMessage(msg);
     }
 

@@ -8,7 +8,6 @@ import org.skyscreamer.nevado.jms.RandomData;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import java.util.Enumeration;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -19,7 +18,7 @@ import java.util.Properties;
 public class PropertyIteratorTest extends AbstractJMSTest {
     @Test
     public void testIterator() throws JMSException {
-        Message msg = getSession().createMessage();
+        Message msg = createSession().createMessage();
         Properties properties = new Properties();
         for(int i = 0 ; i < 100 ; ++i) {
             String key = "a" + i;

@@ -1,8 +1,8 @@
-package org.skyscreamer.nevado.jms;
+package org.skyscreamer.nevado.jms.destination;
 
 import javax.jms.*;
-import javax.naming.Referenceable;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.Queue;
 
 /**
@@ -14,8 +14,28 @@ import java.util.Queue;
 public abstract class NevadoDestination implements Destination, Serializable {
     private final String _name;
 
-    public NevadoDestination(String name) {
+    protected NevadoDestination(String name) {
         _name = name;
+    }
+
+    protected NevadoDestination(NevadoDestination destination) {
+        _name = destination._name;
+    }
+
+    protected NevadoDestination(URL sqsURL) {
+        if (sqsURL == null) {
+            throw new NullPointerException("Null URL");
+        }
+        _name = parseQueueName(sqsURL.getPath());
+    }
+
+    private String parseQueueName(String path) {
+        int lastSlashIndex = path.lastIndexOf('/');
+        if (lastSlashIndex <= 0 || (lastSlashIndex + 1) >= path.length())
+        {
+            throw new IllegalArgumentException("Can't parse queue name from invalid path: " + path);
+        }
+        return path.substring(lastSlashIndex + 1);
     }
 
     public String getName() {

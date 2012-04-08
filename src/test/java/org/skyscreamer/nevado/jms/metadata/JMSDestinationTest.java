@@ -17,10 +17,10 @@ public class JMSDestinationTest extends AbstractJMSTest {
     @Test
     public void testAssign() throws JMSException {
         clearTestQueue();
-        Message msg = getSession().createMessage();
+        Message msg = createSession().createMessage();
         Assert.assertNull(msg.getJMSMessageID());
-        getSession().createProducer(getTestQueue()).send(msg);
-        Message msgOut = getSession().createConsumer(getTestQueue()).receive();
+        createSession().createProducer(getTestQueue()).send(msg);
+        Message msgOut = createSession().createConsumer(getTestQueue()).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         Assert.assertEquals(getTestQueue(), msg.getJMSDestination());

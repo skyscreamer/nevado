@@ -18,7 +18,7 @@ import java.util.Arrays;
 public class MapMessageTest extends AbstractJMSTest {
     @Test
     public void testMapMessage() throws JMSException {
-        MapMessage msg = getSession().createMapMessage();
+        MapMessage msg = createSession().createMapMessage();
         testMapMessage(msg);
     }
 
@@ -311,7 +311,7 @@ public class MapMessageTest extends AbstractJMSTest {
 
 
     private MapMessage initMap(Object o) throws JMSException {
-        MapMessage mapMessage = getSession().createMapMessage();
+        MapMessage mapMessage = createSession().createMapMessage();
         mapMessage.setObject("X", o);
         return mapMessage;
     }

@@ -19,7 +19,7 @@ public class JMSDeliveryModeTest extends AbstractJMSTest {
     @Test
     public void testDefault() throws JMSException {
         clearTestQueue();
-        Message msg = getSession().createMessage();
+        Message msg = createSession().createMessage();
         Message msgOut = sendAndReceive(msg);
         Assert.assertEquals(Message.DEFAULT_DELIVERY_MODE, msg.getJMSDeliveryMode());
         Assert.assertEquals(Message.DEFAULT_DELIVERY_MODE, msgOut.getJMSDeliveryMode());
@@ -27,18 +27,18 @@ public class JMSDeliveryModeTest extends AbstractJMSTest {
 
     @Test
     public void testAssign() throws JMSException {
-        Message msg1 = getSession().createMessage();
-        MessageProducer msgProducer = getSession().createProducer(getTestQueue());
+        Message msg1 = createSession().createMessage();
+        MessageProducer msgProducer = createSession().createProducer(getTestQueue());
         msgProducer.send(msg1, DeliveryMode.NON_PERSISTENT, Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE);
-        Message msgOut = getSession().createConsumer(getTestQueue()).receive();
+        Message msgOut = createSession().createConsumer(getTestQueue()).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         Assert.assertEquals(DeliveryMode.NON_PERSISTENT, msg1.getJMSDeliveryMode());
         Assert.assertEquals(DeliveryMode.NON_PERSISTENT, msgOut.getJMSDeliveryMode());
 
-        Message msg2 = getSession().createMessage();
+        Message msg2 = createSession().createMessage();
         msgProducer.send(msg2, DeliveryMode.PERSISTENT, Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE);
-        msgOut = getSession().createConsumer(getTestQueue()).receive();
+        msgOut = createSession().createConsumer(getTestQueue()).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         Assert.assertEquals(DeliveryMode.PERSISTENT, msg2.getJMSDeliveryMode());

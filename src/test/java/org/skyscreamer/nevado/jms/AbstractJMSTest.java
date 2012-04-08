@@ -6,6 +6,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.runner.RunWith;
+import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -55,7 +56,7 @@ public abstract class AbstractJMSTest {
     protected void clearTestQueue() throws JMSException {
         // Clear out the test queue
         int msgCount = 0;
-        MessageConsumer consumer = getSession().createConsumer(new NevadoQueue(TEST_QUEUE_NAME));
+        MessageConsumer consumer = createSession().createConsumer(new NevadoQueue(TEST_QUEUE_NAME));
         Message message;
         while((message = consumer.receiveNoWait()) != null) {
             ++msgCount;
@@ -65,8 +66,8 @@ public abstract class AbstractJMSTest {
     }
 
     protected Message sendAndReceive(Message msg) throws JMSException {
-        getSession().createProducer(getTestQueue()).send(msg);
-        Message msgOut = getSession().createConsumer(getTestQueue()).receive();
+        createSession().createProducer(getTestQueue()).send(msg);
+        Message msgOut = createSession().createConsumer(getTestQueue()).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         return msgOut;
@@ -106,8 +107,8 @@ public abstract class AbstractJMSTest {
         return _connection;
     }
 
-    protected Session getSession() throws JMSException {
-        return _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+    protected NevadoSession createSession() throws JMSException {
+        return (NevadoSession)_connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
     }
     
     protected Queue getTestQueue() {

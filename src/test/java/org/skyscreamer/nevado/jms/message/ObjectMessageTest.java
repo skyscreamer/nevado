@@ -9,9 +9,7 @@ import org.skyscreamer.nevado.jms.RandomData;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.ObjectMessage;
-import javax.jms.TextMessage;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -23,7 +21,7 @@ import java.util.*;
 public class ObjectMessageTest extends AbstractJMSTest {
     @Test
     public void testObjectMessage() throws JMSException {
-        ObjectMessage msg = getSession().createObjectMessage();
+        ObjectMessage msg = createSession().createObjectMessage();
         testObjectMessage(msg);
     }
 
@@ -47,7 +45,7 @@ public class ObjectMessageTest extends AbstractJMSTest {
         clearTestQueue();
 
         TestObject testObject = new TestObject();
-        ObjectMessage msg = getSession().createObjectMessage(testObject);
+        ObjectMessage msg = createSession().createObjectMessage(testObject);
         Message msgOut = sendAndReceive(msg);
         Assert.assertTrue("Should be an object message", msgOut instanceof ObjectMessage);
         Assert.assertEquals("Object should be equal", testObject, ((ObjectMessage)msgOut).getObject());
@@ -58,7 +56,7 @@ public class ObjectMessageTest extends AbstractJMSTest {
         clearTestQueue();
 
         TestObject testObject = new TestObject();
-        ObjectMessage msg = getSession().createObjectMessage();
+        ObjectMessage msg = createSession().createObjectMessage();
         msg.setObject(testObject);
         Message msgOut = sendAndReceive(msg);
         Assert.assertTrue("Should be an object message", msgOut instanceof ObjectMessage);

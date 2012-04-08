@@ -15,7 +15,7 @@ import javax.jms.Message;
 public class NonexistentPropertyTest extends AbstractJMSTest {
     @Test
     public void testNonexistentProperty() throws JMSException {
-        Message msg = getSession().createMessage();
+        Message msg = createSession().createMessage();
         Assert.assertNull(msg.getStringProperty("noSuchProperty"));
         Assert.assertNull(msg.getObjectProperty("noSuchProperty"));
     }

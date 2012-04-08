@@ -1,9 +1,12 @@
-package org.skyscreamer.nevado.jms;
+package org.skyscreamer.nevado.jms.connector;
 
 import com.xerox.amazonws.common.AWSError;
 import com.xerox.amazonws.sqs2.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.skyscreamer.nevado.jms.NevadoConnection;
+import org.skyscreamer.nevado.jms.destination.NevadoDestination;
+import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
 import org.skyscreamer.nevado.jms.message.InvalidMessage;
 import org.skyscreamer.nevado.jms.message.NevadoProperty;
@@ -13,7 +16,11 @@ import javax.jms.JMSException;
 import javax.jms.JMSSecurityException;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URL;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Connector for SQS-only implementation of the Nevado JMS driver.
@@ -23,7 +30,7 @@ import java.util.Date;
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
-public class SQSConnector {
+public class SQSConnector implements NevadoConnector {
     private final Log _log = LogFactory.getLog(getClass());
 
     private final QueueService _queueService;
@@ -104,6 +111,39 @@ public class SQSConnector {
                 throw new JMSException(e.getMessage());
             }
         }
+    }
+
+    /**
+     * Create a queue
+     *
+     * @param queueName Name of queue to create
+     */
+    public NevadoQueue createQueue(String queueName) throws JMSException {
+        NevadoQueue queue = new NevadoQueue(queueName);
+        getSQSQueue(queue);
+        return queue;
+    }
+
+    public void deleteQueue(NevadoQueue queue) throws JMSException {
+        deleteSQSQueue(queue);
+    }
+
+    public Collection<NevadoQueue> listQueues(String temporaryQueuePrefix) throws JMSException {
+        Collection<NevadoQueue> queues;
+        List<MessageQueue> sqsQueues;
+        try {
+            sqsQueues = _queueService.listMessageQueues(temporaryQueuePrefix);
+        } catch (SQSException e) {
+            String exMessage = "Unable to list queues with prefix '" + temporaryQueuePrefix + "'";
+            _log.error(exMessage, e);
+            throw new JMSException(exMessage);
+        }
+        queues = new HashSet<NevadoQueue>(sqsQueues.size());
+        for(MessageQueue sqsQueue : sqsQueues) {
+            URL sqsURL = sqsQueue.getUrl();
+            queues.add(new NevadoQueue(sqsURL));
+        }
+        return queues;
     }
 
     private void deleteSQSMessage(NevadoMessage message, MessageQueue sqsQueue, String sqsReceiptHandle) throws JMSException {
@@ -253,5 +293,16 @@ public class SQSConnector {
             throw new JMSException(exMessage);
         }
         return sqsQueue;
+    }
+
+    private void deleteSQSQueue(NevadoDestination destination) throws JMSException {
+        MessageQueue sqsQueue = getSQSQueue(destination);
+        try {
+            sqsQueue.deleteQueue();
+        } catch (SQSException e) {
+            String exMessage = "Unable to delete message queue '" + destination + "': " + e.getMessage();
+            _log.error(exMessage, e);
+            throw new JMSException(exMessage);
+        }
     }
 }

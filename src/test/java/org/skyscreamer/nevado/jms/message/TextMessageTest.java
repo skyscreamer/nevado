@@ -5,23 +5,17 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
 import org.skyscreamer.nevado.jms.RandomData;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.io.IOException;
 import java.io.StringReader;
-import java.util.Random;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,7 +27,7 @@ public class TextMessageTest extends AbstractJMSTest {
     @Test
     public void testTextMessage() throws JMSException {
         clearTestQueue();
-        TextMessage msg = getSession().createTextMessage();
+        TextMessage msg = createSession().createTextMessage();
         testTextMessage(msg);
     }
 
@@ -57,7 +51,7 @@ public class TextMessageTest extends AbstractJMSTest {
         clearTestQueue();
 
         String text = "How much wood could a woodchuck chuck?  " + RandomData.readInt() + " logs!";
-        TextMessage msg = getSession().createTextMessage(text);
+        TextMessage msg = createSession().createTextMessage(text);
         Message msgOut = sendAndReceive(msg);
         Assert.assertTrue("Should be a text message", msgOut instanceof TextMessage);
         Assert.assertEquals("Text should match", text, ((TextMessage)msgOut).getText());
@@ -68,7 +62,7 @@ public class TextMessageTest extends AbstractJMSTest {
         clearTestQueue();
         
         String text = "<samplexml><a><b><c x=\"y\">d</c></b></a></samplexml>";
-        TextMessage msg = getSession().createTextMessage(text);
+        TextMessage msg = createSession().createTextMessage(text);
         Message msgOut = sendAndReceive(msg);
         Assert.assertTrue("Should be a text message", msgOut instanceof TextMessage);
 

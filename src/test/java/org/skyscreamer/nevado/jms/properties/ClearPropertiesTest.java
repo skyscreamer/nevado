@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
 
 import javax.jms.JMSException;
-import javax.jms.Message;
 import javax.jms.TextMessage;
 
 /**
@@ -18,7 +17,7 @@ public class ClearPropertiesTest extends AbstractJMSTest {
 
     @Test
     public void testClear() throws JMSException {
-        TextMessage msg = getSession().createTextMessage();
+        TextMessage msg = createSession().createTextMessage();
         msg.setStringProperty("a", "b");
         msg.setText(TEST_BODY);
         TextMessage msgOut = (TextMessage)sendAndReceive(msg);

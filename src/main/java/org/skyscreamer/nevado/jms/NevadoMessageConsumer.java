@@ -1,7 +1,6 @@
 package org.skyscreamer.nevado.jms;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 
 import javax.jms.JMSException;
 import javax.jms.Message;

@@ -21,7 +21,7 @@ public class PropertyNameTest extends AbstractJMSTest {
 
     @Test
     public void testFirstCharacter() throws JMSException {
-        Message msg = getSession().createMessage();
+        Message msg = createSession().createMessage();
         String propertyName = "somename";
         for(char c : VALID_FIRST_CHARS.toCharArray()) {
             msg.setBooleanProperty(c + propertyName, true);
@@ -42,7 +42,7 @@ public class PropertyNameTest extends AbstractJMSTest {
 
     @Test
     public void testReservedNames() throws JMSException {
-        Message msg = getSession().createMessage();
+        Message msg = createSession().createMessage();
         for(String s : RESERVED_NAMES) {
             try {
                 msg.setBooleanProperty(s, true);
@@ -57,7 +57,7 @@ public class PropertyNameTest extends AbstractJMSTest {
 
     @Test
     public void testWhiteSpace() throws JMSException {
-        Message msg = getSession().createMessage();
+        Message msg = createSession().createMessage();
         int count = 0;
         for(char c : WHITESPACE_CHARS.toCharArray()) {
             ++count;

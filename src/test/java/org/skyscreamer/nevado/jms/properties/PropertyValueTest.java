@@ -3,13 +3,12 @@ package org.skyscreamer.nevado.jms.properties;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
-import org.skyscreamer.nevado.jms.NevadoQueue;
+import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageFormatException;
 import java.util.HashMap;
-import java.util.Properties;
 
 /**
  * Test for section 3.5.2 of the JMS 1.1 Specification.
@@ -20,7 +19,7 @@ public class PropertyValueTest extends AbstractJMSTest {
     private static final Object[] INVALID_VALUE_OBJECTS = {new Object(), new HashMap(), new NevadoQueue("X")};
     @Test
     public void testValidValues() throws JMSException {
-        Message msg = getSession().createMessage();
+        Message msg = createSession().createMessage();
         msg.setObjectProperty("boolean", true);
         msg.setObjectProperty("byte", new Byte("1"));
         msg.setObjectProperty("short", new Short("123"));
@@ -32,7 +31,7 @@ public class PropertyValueTest extends AbstractJMSTest {
 
     @Test
     public void testInvalidValues() throws JMSException {
-        Message msg = getSession().createMessage();
+        Message msg = createSession().createMessage();
         for (Object o : INVALID_VALUE_OBJECTS) {
             try {
                 msg.setObjectProperty("otherObject", new Object());

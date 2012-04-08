@@ -15,14 +15,14 @@ import javax.jms.MessageNotWriteableException;
 public class ReadOnlyPropertyTest extends AbstractJMSTest {
     @Test(expected = MessageNotWriteableException.class)
     public void testReadonlyAfterSend() throws JMSException {
-        Message msg = getSession().createMessage();
+        Message msg = createSession().createMessage();
         Message msgOut = sendAndReceive(msg);
         msgOut.setBooleanProperty("test", true);
     }
 
     @Test
     public void testReadonlyAfterSendThenClear() throws JMSException {
-        Message msg = getSession().createMessage();
+        Message msg = createSession().createMessage();
         Message msgOut = sendAndReceive(msg);
         msgOut.clearProperties();
         msgOut.setBooleanProperty("test", true);

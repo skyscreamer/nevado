@@ -8,7 +8,6 @@ import org.skyscreamer.nevado.jms.message.NevadoMessage;
 
 import javax.jms.ConnectionMetaData;
 import javax.jms.JMSException;
-import javax.jms.Message;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -34,7 +33,7 @@ public class JMSXPropertiesTest extends AbstractJMSTest {
 
     @Test
     public void testSetJMSXProperty() throws JMSException {
-        NevadoMessage msg = (NevadoMessage)getSession().createMessage();
+        NevadoMessage msg = (NevadoMessage) createSession().createMessage();
         msg.setJMSXProperty(JMSXProperty.JMSXGroupID, "abc");
         NevadoMessage msgOut = (NevadoMessage)sendAndReceive(msg);
         Assert.assertEquals("abc", msgOut.getJMSXProperty(JMSXProperty.JMSXGroupID));

@@ -4,10 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
 import org.skyscreamer.nevado.jms.RandomData;
-import org.skyscreamer.nevado.jms.message.NevadoStreamMessage;
 
 import javax.jms.*;
-import java.util.Arrays;
 
 /**
  * Test for section 3.5.4 of the JMS 1.1 Specification.
@@ -21,7 +19,7 @@ public class PropertyConversionTest extends AbstractJMSTest {
 
         // Initialize Message properties
         TestValues testValues = new TestValues();
-        Message msg = getSession().createMessage();
+        Message msg = createSession().createMessage();
         msg.setBooleanProperty("bb", testValues.bb);
         msg.setStringProperty("sb", testValues.sb);
         msg.setByteProperty("yy", testValues.yy);
@@ -232,7 +230,7 @@ public class PropertyConversionTest extends AbstractJMSTest {
     public void ldFail() throws JMSException { initMap(RandomData.readLong()).getDoubleProperty("X"); }
 
     private Message initMap(Object o) throws JMSException {
-        Message Message = getSession().createMessage();
+        Message Message = createSession().createMessage();
         Message.setObjectProperty("X", o);
         return Message;
     }

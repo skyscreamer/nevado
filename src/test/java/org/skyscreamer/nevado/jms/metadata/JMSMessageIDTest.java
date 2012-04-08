@@ -12,7 +12,7 @@ public class JMSMessageIDTest extends AbstractJMSTest {
     @Test
     public void testAssign() throws JMSException {
         clearTestQueue();
-        Message msg = getSession().createMessage();
+        Message msg = createSession().createMessage();
         Assert.assertNull(msg.getJMSMessageID());
         Message msgOut = sendAndReceive(msg);
         Assert.assertNotNull(msg.getJMSMessageID());
@@ -23,12 +23,12 @@ public class JMSMessageIDTest extends AbstractJMSTest {
     @Test
     public void testDisable() throws JMSException {
         clearTestQueue();
-        Message msg = getSession().createMessage();
+        Message msg = createSession().createMessage();
         Assert.assertNull(msg.getJMSMessageID());
-        MessageProducer msgProducer = getSession().createProducer(getTestQueue());
+        MessageProducer msgProducer = createSession().createProducer(getTestQueue());
         msgProducer.setDisableMessageID(true);
         msgProducer.send(msg);
-        Message msgOut = getSession().createConsumer(getTestQueue()).receive();
+        Message msgOut = createSession().createConsumer(getTestQueue()).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         Assert.assertNull(msg.getJMSMessageID());

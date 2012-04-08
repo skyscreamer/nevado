@@ -16,7 +16,7 @@ import javax.jms.TextMessage;
 public class ReceivedMessageTest extends AbstractJMSTest {
     @Test
     public void testInitialState() throws JMSException {
-        TextMessage msg = getSession().createTextMessage();
+        TextMessage msg = createSession().createTextMessage();
         msg.setStringProperty("a", "b");
         msg.setText("test");
         msg.setJMSCorrelationID("X");
@@ -56,7 +56,7 @@ public class ReceivedMessageTest extends AbstractJMSTest {
 
     @Test
     public void testClearBodyDoesNotClearProperties() throws JMSException {
-        TextMessage msg = getSession().createTextMessage();
+        TextMessage msg = createSession().createTextMessage();
         msg.setStringProperty("a", "b");
         msg.setText("test");
         TextMessage msgOut = (TextMessage)sendAndReceive(msg);

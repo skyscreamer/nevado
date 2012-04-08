@@ -38,7 +38,7 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
         // Set up and send two messages
         clearTestQueue();
         Connection conn = getConnection();
-        Session session = getSession();
+        Session session = createSession();
         String testBody1 = RandomData.readString();
         String testBody2 = RandomData.readString();
         MessageProducer producer = session.createProducer(getTestQueue());
@@ -62,6 +62,6 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
         msg = consumer.receiveNoWait();
         msg.acknowledge();
         Assert.assertTrue(msg instanceof TextMessage);
-        Assert.assertEquals(testBody2, ((TextMessage)msg).getText());
+        Assert.assertEquals(testBody2, ((TextMessage) msg).getText());
     }
 }
