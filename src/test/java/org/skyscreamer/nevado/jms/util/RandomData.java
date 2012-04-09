@@ -1,4 +1,4 @@
-package org.skyscreamer.nevado.jms;
+package org.skyscreamer.nevado.jms.util;
 
 import java.security.SecureRandom;
 import java.util.Random;

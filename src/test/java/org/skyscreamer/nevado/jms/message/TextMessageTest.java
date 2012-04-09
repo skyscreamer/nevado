@@ -4,7 +4,7 @@ import org.activemq.message.ActiveMQTextMessage;
 import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
-import org.skyscreamer.nevado.jms.RandomData;
+import org.skyscreamer.nevado.jms.util.RandomData;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 

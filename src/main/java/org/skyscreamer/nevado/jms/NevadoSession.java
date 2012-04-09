@@ -31,6 +31,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     private Long _overrideJMSTTL;
     private Integer _overrideJMSPriority;
     private final Set<TemporaryQueue> _temporaryQueues = new HashSet<TemporaryQueue>();
+    private MessageListener _messageListener;
 
     protected NevadoSession(NevadoConnection connection, boolean transacted, int acknowledgeMode) {
         _connection = connection;

@@ -3,7 +3,7 @@ package org.skyscreamer.nevado.jms.properties;
 import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
-import org.skyscreamer.nevado.jms.RandomData;
+import org.skyscreamer.nevado.jms.util.RandomData;
 
 import javax.jms.*;
 
