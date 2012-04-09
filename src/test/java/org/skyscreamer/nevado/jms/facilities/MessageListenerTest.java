@@ -1,0 +1,39 @@
+package org.skyscreamer.nevado.jms.facilities;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.skyscreamer.nevado.jms.AbstractJMSTest;
+import org.skyscreamer.nevado.jms.util.RandomData;
+import org.skyscreamer.nevado.jms.util.TestMessageListener;
+
+import javax.jms.*;
+import java.util.List;
+
+/**
+ * TODO - Description
+ *
+ * @author Carter Page <carter@skyscreamer.org>
+ */
+public class MessageListenerTest extends AbstractJMSTest{
+    @Test
+    public void testMessageListener() throws JMSException {
+        TestMessageListener messageListener = new TestMessageListener();
+        Session session = createSession();
+        session.setMessageListener(messageListener);
+        Assert.assertSame(session.getMessageListener(), messageListener);
+        TextMessage testMessage1 = session.createTextMessage(RandomData.readString());
+        TextMessage testMessage2 = session.createTextMessage(RandomData.readString());
+        TextMessage testMessage3 = session.createTextMessage(RandomData.readString());
+        MessageProducer producer = session.createProducer(getTestQueue());
+        producer.send(testMessage1);
+        producer.send(testMessage2);
+        producer.send(testMessage3);
+        session.run();
+        List<Message> messages = messageListener.getMessages();
+        Assert.assertEquals(3, messages.size());
+        Assert.assertTrue(messages.get(0) instanceof TextMessage);
+        Assert.assertEquals(testMessage1.getText(), ((TextMessage)messages.get(0)).getText());
+        Assert.assertEquals(testMessage2.getText(), ((TextMessage)messages.get(1)).getText());
+        Assert.assertEquals(testMessage3.getText(), ((TextMessage)messages.get(2)).getText());
+    }
+}
