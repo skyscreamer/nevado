@@ -8,6 +8,8 @@ import org.skyscreamer.nevado.jms.connector.SQSConnector;
 
 import javax.jms.*;
 import javax.jms.IllegalStateException;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Nevado's implementation of JMS Connection.
@@ -24,18 +26,25 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
     private Long _jmsTTL;
     private Integer _jmsPriority;
     private boolean _running = false;
+    private volatile ExceptionListener _exceptionListener;
+    private final List<NevadoSession> _sessions = new CopyOnWriteArrayList<NevadoSession>();
 
     public NevadoConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
         _nevadoConnector = new SQSConnector(awsAccessKey, awsSecretKey);
         _nevadoConnector.test();
     }
 
-    public QueueSession createQueueSession(boolean transacted, int acknowledgeMode) throws JMSException {
+    public synchronized QueueSession createQueueSession(boolean transacted, int acknowledgeMode) throws JMSException {
         _inUse = true;
         NevadoSession nevadoSession = new NevadoSession(this, transacted, acknowledgeMode);
         nevadoSession.setOverrideJMSDeliveryMode(_jmsDeliveryMode);
         nevadoSession.setOverrideJMSTTL(_jmsTTL);
         nevadoSession.setOverrideJMSPriority(_jmsPriority);
+        _sessions.add(nevadoSession);
+        if (_running)
+        {
+            nevadoSession.start();
+        }
         return nevadoSession;
     }
 
@@ -53,24 +62,33 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         return NevadoConnectionMetaData.getInstance();
     }
 
-    public ExceptionListener getExceptionListener() throws JMSException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public ExceptionListener getExceptionListener() {
+        return _exceptionListener;
     }
 
-    public void setExceptionListener(ExceptionListener exceptionListener) throws JMSException {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void setExceptionListener(ExceptionListener exceptionListener) {
+        _exceptionListener = exceptionListener;
     }
 
-    public void start() throws JMSException {
+    public synchronized void start() throws JMSException {
         _inUse = true;
         _running = true;
+        for(NevadoSession session : _sessions)
+        {
+            session.start();
+        }
     }
 
-    public void stop() throws JMSException {
+    public synchronized void stop() throws JMSException {
         _running = false;
+        for(NevadoSession session : _sessions)
+        {
+            session.stop();
+        }
     }
 
     public void close() throws JMSException {
+        stop();
         _running = false;
     }
 

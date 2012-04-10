@@ -8,11 +8,11 @@ import org.skyscreamer.nevado.jms.destination.NevadoTemporaryQueue;
 import org.skyscreamer.nevado.jms.message.*;
 
 import javax.jms.*;
+import javax.jms.IllegalStateException;
+import javax.jms.Queue;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Nevado implementation of the general JMS Session interface.
@@ -24,6 +24,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
 
     private final Log _log = LogFactory.getLog(getClass());
 
+    protected boolean _closed = false;
     private final NevadoConnection _connection;
     private boolean _transacted;
     private int _acknowledgeMode;
@@ -32,6 +33,8 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     private Integer _overrideJMSPriority;
     private final Set<TemporaryQueue> _temporaryQueues = new HashSet<TemporaryQueue>();
     private MessageListener _messageListener;
+    private final NevadoSessionExecutor _asyncConsumerRunner = new NevadoSessionExecutor(this);
+    private List<NevadoMessageConsumer> _messageConsumers = new CopyOnWriteArrayList<NevadoMessageConsumer>();
 
     protected NevadoSession(NevadoConnection connection, boolean transacted, int acknowledgeMode) {
         _connection = connection;
@@ -40,48 +43,56 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     public BytesMessage createBytesMessage() throws JMSException {
+        checkClosed();
         NevadoBytesMessage message = new NevadoBytesMessage();
         message.setNevadoSession(this);
         return message;
     }
 
     public MapMessage createMapMessage() throws JMSException {
+        checkClosed();
         NevadoMapMessage message = new NevadoMapMessage();
         message.setNevadoSession(this);
         return message;
     }
 
     public Message createMessage() throws JMSException {
+        checkClosed();
         NevadoMessage message = new NevadoBlankMessage();
         message.setNevadoSession(this);
         return message;
     }
 
     public NevadoObjectMessage createObjectMessage() throws JMSException {
+        checkClosed();
         NevadoObjectMessage message = new NevadoObjectMessage();
         message.setNevadoSession(this);
         return message;
     }
 
     public ObjectMessage createObjectMessage(Serializable serializable) throws JMSException {
+        checkClosed();
         NevadoObjectMessage message = createObjectMessage();
         message.setObject(serializable);
         return message;
     }
 
     public StreamMessage createStreamMessage() throws JMSException {
+        checkClosed();
         NevadoStreamMessage message = new NevadoStreamMessage();
         message.setNevadoSession(this);
         return message;
     }
 
     public NevadoTextMessage createTextMessage() throws JMSException {
+        checkClosed();
         NevadoTextMessage message = new NevadoTextMessage();
         message.setNevadoSession(this);
         return message;
     }
 
     public TextMessage createTextMessage(String text) throws JMSException {
+        checkClosed();
         NevadoTextMessage message = createTextMessage();
         message.setText(text);
         return message;
@@ -96,14 +107,22 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     public void commit() throws JMSException {
+        checkClosed();
         // TODO
     }
 
     public void rollback() throws JMSException {
+        checkClosed();
         // TODO
     }
 
     public void close() {
+        if (_closed)
+        {
+            return;
+        }
+        _closed = true;
+        stop();
         for(TemporaryQueue temporaryQueue : _temporaryQueues) {
             try {
                 temporaryQueue.delete();
@@ -115,14 +134,17 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     public void recover() throws JMSException {
+        checkClosed();
         // TODO
     }
 
     public MessageListener getMessageListener() throws JMSException {
+        checkClosed();
         return null;  // TODO
     }
 
     public void setMessageListener(MessageListener messageListener) throws JMSException {
+        checkClosed();
         // TODO
     }
 
@@ -131,66 +153,84 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     public MessageProducer createProducer(Destination destination) throws JMSException {
+        checkClosed();
         return new NevadoMessageProducer(this, NevadoDestination.getInstance(destination));
     }
 
     public MessageConsumer createConsumer(Destination destination) throws JMSException {
-        return new NevadoMessageConsumer(this, NevadoDestination.getInstance(destination));
+        checkClosed();
+        NevadoMessageConsumer consumer = new NevadoMessageConsumer(this, NevadoDestination.getInstance(destination));
+        _messageConsumers.add(consumer);
+        return consumer;
     }
 
     public MessageConsumer createConsumer(Destination destination, String s) throws JMSException {
+        checkClosed();
         return null;  // TODO
     }
 
     public MessageConsumer createConsumer(Destination destination, String s, boolean b) throws JMSException {
+        checkClosed();
         return null;  // TODO
     }
 
     public Queue createQueue(String s) throws JMSException {
+        checkClosed();
         return null;  // TODO
     }
 
     public QueueReceiver createReceiver(Queue queue) throws JMSException {
+        checkClosed();
         return null; // TODO
     }
 
     public QueueReceiver createReceiver(Queue queue, String s) throws JMSException {
+        checkClosed();
         return null; // TODO
     }
 
     public QueueSender createSender(Queue queue) throws JMSException {
+        checkClosed();
         return null; // TODO
     }
 
     public Topic createTopic(String s) throws JMSException {
+        checkClosed();
         return null;  // TODO
     }
 
     public TopicSubscriber createSubscriber(Topic topic) throws JMSException {
+        checkClosed();
         return null; // TODO
     }
 
     public TopicSubscriber createSubscriber(Topic topic, String s, boolean b) throws JMSException {
+        checkClosed();
         return null; // TODO
     }
 
     public TopicSubscriber createDurableSubscriber(Topic topic, String s) throws JMSException {
+        checkClosed();
         return null;  // TODO
     }
 
     public TopicSubscriber createDurableSubscriber(Topic topic, String s, String s1, boolean b) throws JMSException {
+        checkClosed();
         return null;  // TODO
     }
 
     public TopicPublisher createPublisher(Topic topic) throws JMSException {
+        checkClosed();
         return null; // TODO
     }
 
     public QueueBrowser createBrowser(Queue queue) throws JMSException {
+        checkClosed();
         return null;  // TODO
     }
 
     public QueueBrowser createBrowser(Queue queue, String s) throws JMSException {
+        checkClosed();
         return null;  // TODO
     }
 
@@ -217,10 +257,12 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     public TemporaryTopic createTemporaryTopic() throws JMSException {
+        checkClosed();
         return null;  // TODO
     }
 
     public void unsubscribe(String s) throws JMSException {
+        checkClosed();
         // TODO
     }
 
@@ -279,5 +321,34 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
 
     public void setOverrideJMSPriority(Integer jmsPriority) {
         _overrideJMSPriority = jmsPriority;
+    }
+
+    protected NevadoConnection getConnection() {
+        return _connection;
+    }
+
+    protected List<NevadoMessageConsumer> getMessageConsumers() {
+        return _messageConsumers;
+    }
+
+    protected synchronized void start() {
+        if (!_asyncConsumerRunner.isRunning())
+        {
+            _asyncConsumerRunner.start();
+        }
+    }
+
+    protected synchronized void stop() {
+        if (_asyncConsumerRunner.isRunning())
+        {
+            _asyncConsumerRunner.stop();
+        }
+    }
+
+    private void checkClosed() throws IllegalStateException {
+        if (_closed)
+        {
+            throw new IllegalStateException("This session has been closed");
+        }
     }
 }

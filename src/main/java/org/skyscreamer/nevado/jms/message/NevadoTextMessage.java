@@ -28,4 +28,9 @@ public class NevadoTextMessage extends NevadoMessage implements TextMessage {
     public void internalClearBody() throws JMSException {
         _body = null;
     }
+
+    @Override
+    public String toString() {
+        return _body;
+    }
 }
