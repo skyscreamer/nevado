@@ -114,4 +114,28 @@ public abstract class AbstractJMSTest {
     protected Queue getTestQueue() {
         return _testQueue;
     }
+
+    protected void compareTextMessages(TextMessage[] expectedTextMessages, TextMessage[] actualTextMessages) throws JMSException {
+        if (expectedTextMessages == null)
+        {
+            throw new NullPointerException("Expected text messages cannot be null");
+        }
+        junit.framework.Assert.assertNotNull("Actual text message array null", actualTextMessages);
+        junit.framework.Assert.assertEquals("Expected text message array size does not equal actual", expectedTextMessages.length,
+                actualTextMessages.length);
+        Map<String, Integer> expectedTextCount = countTexts(expectedTextMessages);
+        Map<String, Integer> actualTextCount = countTexts(expectedTextMessages);
+        junit.framework.Assert.assertEquals("Compare expected and actual text messages", expectedTextCount, actualTextCount);
+    }
+
+    private Map<String, Integer> countTexts(TextMessage[] expectedTextMessages) throws JMSException {
+        Map<String, Integer> textCount = new HashMap<String, Integer>();
+        for(TextMessage textMessage : expectedTextMessages) {
+            String text = textMessage.getText();
+            int count = textCount.containsKey(text) ? textCount.get(text) : 0;
+            ++count;
+            textCount.put(text, count);
+        }
+        return textCount;
+    }
 }

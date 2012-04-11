@@ -8,6 +8,8 @@ import org.skyscreamer.nevado.jms.util.RandomData;
 import org.skyscreamer.nevado.jms.util.TestMessageListener;
 
 import javax.jms.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Tests transactional behavior for sessions, per JMS 1.1 Sec. 4.4.7
@@ -17,7 +19,6 @@ import javax.jms.*;
 public class SessionTransactionTest extends AbstractJMSTest {
     @Test
     public void testTransaction() throws JMSException, InterruptedException {
-        clearTestQueue();
         Session controlSession = createSession();
 
         // Create a couple of temporary queues for the test
@@ -40,9 +41,7 @@ public class SessionTransactionTest extends AbstractJMSTest {
         TextMessage msg1 = (NevadoTextMessage) txConsumer.receive();
         TextMessage msg2 = (NevadoTextMessage) txConsumer.receive();
         TextMessage msg3 = (NevadoTextMessage) txConsumer.receive();
-        Assert.assertEquals(ctlMsg1.getText(), msg1.getText());
-        Assert.assertEquals(ctlMsg2.getText(), msg2.getText());
-        Assert.assertEquals(ctlMsg3.getText(), msg3.getText());
+        compareTextMessages(new TextMessage[] {ctlMsg1, ctlMsg2, ctlMsg3}, new TextMessage[] {msg1, msg2, msg3});
         Assert.assertNull(txConsumer.receive(100));
         MessageProducer txProducer = txSession.createProducer(testProduceQueue);
         TextMessage rollbackMsg1 = txSession.createTextMessage(RandomData.readString());
@@ -53,16 +52,14 @@ public class SessionTransactionTest extends AbstractJMSTest {
         txProducer.send(rollbackMsg2);
 
         // Test that nothing has been sent yet
-        Assert.assertNull(consumer.receive(100));
+        Assert.assertNull("Messages sent in a transaction were transmitted before they were committed", consumer.receive(100));
 
         // Rollback, re-read and re-send
         txSession.rollback();
         msg1 = (NevadoTextMessage) txConsumer.receive();
         msg2 = (NevadoTextMessage) txConsumer.receive();
         msg3 = (NevadoTextMessage) txConsumer.receive();
-        Assert.assertEquals(ctlMsg1.getText(), msg1.getText());
-        Assert.assertEquals(ctlMsg2.getText(), msg2.getText());
-        Assert.assertEquals(ctlMsg3.getText(), msg3.getText());
+        compareTextMessages(new TextMessage[] {ctlMsg1, ctlMsg2, ctlMsg3}, new TextMessage[] {msg1, msg2, msg3});
         Assert.assertNull(txConsumer.receive(100));
         TextMessage commitMsg1 = txSession.createTextMessage(RandomData.readString());
         TextMessage commitMsg2 = txSession.createTextMessage(RandomData.readString());
@@ -79,7 +76,6 @@ public class SessionTransactionTest extends AbstractJMSTest {
         TextMessage msgOut1 = (TextMessage)consumer.receiveNoWait();
         TextMessage msgOut2 = (TextMessage)consumer.receiveNoWait();
         Assert.assertNull(consumer.receiveNoWait());
-        Assert.assertEquals(commitMsg1.getText(), msgOut1.getText());
-        Assert.assertEquals(commitMsg2.getText(), msgOut2.getText());
+        compareTextMessages(new TextMessage[] {commitMsg1, commitMsg2}, new TextMessage[] {msgOut1, msgOut2});
     }
 }
