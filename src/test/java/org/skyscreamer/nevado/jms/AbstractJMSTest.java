@@ -33,7 +33,7 @@ import java.util.*;
 public abstract class AbstractJMSTest {
     private static final String TEST_QUEUE_NAME = "testQueue";
 
-    private final Log _log = LogFactory.getLog(AbstractJMSTest.class);
+    protected final Log _log = LogFactory.getLog(AbstractJMSTest.class);
 
     private String _awsAccessKey;
     private String _awsSecretKey;
@@ -96,7 +96,7 @@ public abstract class AbstractJMSTest {
 
     @After
     public void tearDown() throws JMSException {
-        // Do nothing
+        _connection.close();
     }
 
     public ConnectionFactory getConnectionFactory() {
