@@ -12,7 +12,7 @@ import java.util.List;
 public enum JMSXProperty {
     JMSXUserID(String.class, false),
     JMSXAppID(String.class, false),
-    JMSXDeliveryCount(Integer.class, false),
+    JMSXDeliveryCount(Integer.class, true),
     JMSXGroupID(String.class, true),
     JMSXGroupSeq(Integer.class, true),
     JMSXProducerTXID(String.class, false),

@@ -33,7 +33,7 @@ import java.util.*;
 public abstract class AbstractJMSTest {
     private static final String TEST_QUEUE_NAME = "testQueue";
 
-    private final Log _log = LogFactory.getLog(AbstractJMSTest.class);
+    protected final Log _log = LogFactory.getLog(AbstractJMSTest.class);
 
     private String _awsAccessKey;
     private String _awsSecretKey;
@@ -96,7 +96,7 @@ public abstract class AbstractJMSTest {
 
     @After
     public void tearDown() throws JMSException {
-        // Do nothing
+        _connection.close();
     }
 
     public ConnectionFactory getConnectionFactory() {
@@ -113,5 +113,29 @@ public abstract class AbstractJMSTest {
     
     protected Queue getTestQueue() {
         return _testQueue;
+    }
+
+    protected void compareTextMessages(TextMessage[] expectedTextMessages, TextMessage[] actualTextMessages) throws JMSException {
+        if (expectedTextMessages == null)
+        {
+            throw new NullPointerException("Expected text messages cannot be null");
+        }
+        junit.framework.Assert.assertNotNull("Actual text message array null", actualTextMessages);
+        junit.framework.Assert.assertEquals("Expected text message array size does not equal actual", expectedTextMessages.length,
+                actualTextMessages.length);
+        Map<String, Integer> expectedTextCount = countTexts(expectedTextMessages);
+        Map<String, Integer> actualTextCount = countTexts(expectedTextMessages);
+        junit.framework.Assert.assertEquals("Compare expected and actual text messages", expectedTextCount, actualTextCount);
+    }
+
+    private Map<String, Integer> countTexts(TextMessage[] expectedTextMessages) throws JMSException {
+        Map<String, Integer> textCount = new HashMap<String, Integer>();
+        for(TextMessage textMessage : expectedTextMessages) {
+            String text = textMessage.getText();
+            int count = textCount.containsKey(text) ? textCount.get(text) : 0;
+            ++count;
+            textCount.put(text, count);
+        }
+        return textCount;
     }
 }
