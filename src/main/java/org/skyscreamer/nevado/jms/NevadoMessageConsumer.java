@@ -29,17 +29,32 @@ public class NevadoMessageConsumer implements MessageConsumer {
 
     public synchronized Message receive() throws JMSException {
         checkAsync();
-        return _session.receiveMessage(_destination, -1);
+        Message msg = _session.receiveMessage(_destination, -1);
+        if (msg != null && _session.getAcknowledgeMode() == Session.AUTO_ACKNOWLEDGE)
+        {
+            msg.acknowledge();
+        }
+        return msg;
     }
 
     public synchronized Message receive(long timeoutMs) throws JMSException {
         checkAsync();
-        return _session.receiveMessage(_destination, timeoutMs);
+        Message msg = _session.receiveMessage(_destination, timeoutMs);
+        if (msg != null && _session.getAcknowledgeMode() == Session.AUTO_ACKNOWLEDGE)
+        {
+            msg.acknowledge();
+        }
+        return msg;
     }
 
     public synchronized Message receiveNoWait() throws JMSException {
         checkAsync();
-        return _session.receiveMessage(_destination, 0);
+        Message msg = _session.receiveMessage(_destination, 0);
+        if (msg != null && _session.getAcknowledgeMode() == Session.AUTO_ACKNOWLEDGE)
+        {
+            msg.acknowledge();
+        }
+        return msg;
     }
 
     public synchronized void close() throws JMSException {
@@ -52,6 +67,10 @@ public class NevadoMessageConsumer implements MessageConsumer {
         if (message != null) {
             getMessageListener().onMessage(message);
             messageProcessed = true;
+            if (_session.getAcknowledgeMode() == Session.AUTO_ACKNOWLEDGE)
+            {
+                message.acknowledge();
+            }
         }
         return messageProcessed;
     }

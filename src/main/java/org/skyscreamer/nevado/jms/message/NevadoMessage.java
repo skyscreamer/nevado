@@ -17,6 +17,7 @@ import java.util.Enumeration;
 public abstract class NevadoMessage extends AbstractMessage implements Message {
     private transient NevadoSession _nevadoSession;
     private transient NevadoDestination _nevadoDestination;
+    private transient boolean _acknowledged = false;
 
     public NevadoMessage() {}
 
@@ -71,11 +72,14 @@ public abstract class NevadoMessage extends AbstractMessage implements Message {
     }
 
     public void acknowledge() throws JMSException {
-        _nevadoSession.deleteMessage(this);
+        if (!_acknowledged) {
+            _nevadoSession.acknowledgeMessage(this);
+            _acknowledged = true;
+        }
     }
 
     public void expire() throws JMSException {
-        _nevadoSession.deleteMessage(this);
+        _nevadoSession.expireMessage(this);
     }
 
     public static NevadoMessage getInstance(Message message) throws JMSException {
@@ -120,5 +124,13 @@ public abstract class NevadoMessage extends AbstractMessage implements Message {
 
     public Object getJMSXProperty(JMSXProperty property) throws JMSException {
         return super.getObjectProperty(property + "");
+    }
+
+    public boolean isAcknowledged() {
+        return _acknowledged;
+    }
+
+    public void setAcknowledged(boolean acknowledged) {
+        _acknowledged = acknowledged;
     }
 }

@@ -6,6 +6,7 @@ import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoTemporaryQueue;
 import org.skyscreamer.nevado.jms.message.*;
+import org.skyscreamer.nevado.jms.util.MessageHolder;
 
 import javax.jms.*;
 import javax.jms.IllegalStateException;
@@ -35,6 +36,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     private MessageListener _messageListener;
     private final NevadoSessionExecutor _asyncConsumerRunner = new NevadoSessionExecutor(this);
     private List<NevadoMessageConsumer> _messageConsumers = new CopyOnWriteArrayList<NevadoMessageConsumer>();
+    private final Map<Destination, MessageHolder> _internalMessagesMap = new HashMap<Destination, MessageHolder>();
 
     protected NevadoSession(NevadoConnection connection, boolean transacted, int acknowledgeMode) {
         _connection = connection;
@@ -135,7 +137,11 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
 
     public void recover() throws JMSException {
         checkClosed();
-        // TODO
+        if (_acknowledgeMode == CLIENT_ACKNOWLEDGE) {
+            for(MessageHolder messageHolder : _internalMessagesMap.values()) {
+                messageHolder.reset();
+            }
+        }
     }
 
     public MessageListener getMessageListener() throws JMSException {
@@ -299,15 +305,64 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     private NevadoMessage getUnfilteredMessage(NevadoDestination destination, long timeoutMs) throws JMSException {
-        NevadoMessage message = _connection.getSQSConnector().receiveMessage(_connection, destination, timeoutMs);
+        NevadoMessage message = null;
+        if (_acknowledgeMode == CLIENT_ACKNOWLEDGE)
+        {
+            if (_internalMessagesMap.containsKey(destination))
+            {
+                MessageHolder messageHolder = _internalMessagesMap.get(destination);
+                message = messageHolder.getNextMessage();
+            }
+        }
+
+        if (message == null)
+        {
+            message = _connection.getSQSConnector().receiveMessage(_connection, destination, timeoutMs);
+            if (message != null && _acknowledgeMode == CLIENT_ACKNOWLEDGE)
+            {
+                if (!_internalMessagesMap.containsKey(destination))
+                {
+                    _internalMessagesMap.put(destination, new MessageHolder());
+                }
+                _internalMessagesMap.get(destination).add(message);
+            }
+        }
         if (message != null) {
             message.setNevadoSession(this);
             message.setNevadoDestination(destination);
+            if (message.propertyExists(JMSXProperty.JMSXDeliveryCount + "")) {
+                int redeliveryCount = (Integer)message.getJMSXProperty(JMSXProperty.JMSXDeliveryCount);
+                ++redeliveryCount;
+                message.setJMSXProperty(JMSXProperty.JMSXDeliveryCount, redeliveryCount);
+                message.setJMSRedelivered(true);
+            }
+            else {
+                message.setJMSXProperty(JMSXProperty.JMSXDeliveryCount, 1);
+            }
         }
         return message;
     }
 
-    public void deleteMessage(NevadoMessage message) throws JMSException {
+    public void acknowledgeMessage(NevadoMessage message) throws JMSException {
+        if (_acknowledgeMode == CLIENT_ACKNOWLEDGE)
+        {
+            for(NevadoMessage msg : _internalMessagesMap.get(message.getNevadoDestination()).getMessageList())
+            {
+                deleteMessage(msg);
+                msg.setAcknowledged(true);
+            }
+        }
+        else
+        {
+            deleteMessage(message);
+        }
+    }
+
+    public void expireMessage(NevadoMessage message) throws JMSException {
+        deleteMessage(message);
+    }
+
+    private void deleteMessage(NevadoMessage message) throws JMSException {
         _connection.getSQSConnector().deleteMessage(message);
     }
 
