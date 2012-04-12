@@ -5,8 +5,10 @@ import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
 
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Interface for connecting to the underlying implementation of the messaging system
@@ -15,6 +17,7 @@ import java.util.Collection;
  */
 public interface NevadoConnector {
     void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException;
+    void sendMessages(NevadoDestination destination, List<NevadoMessage> outgoingMessages) throws JMSException;
     NevadoMessage receiveMessage(NevadoConnection connection, NevadoDestination destination, long timeoutMs)
         throws JMSException;
     void deleteMessage(NevadoMessage message) throws JMSException;
@@ -23,4 +26,5 @@ public interface NevadoConnector {
     NevadoQueue createQueue(String queueName) throws JMSException;
     void deleteQueue(NevadoQueue queue) throws JMSException;
     Collection<NevadoQueue> listQueues(String temporaryQueuePrefix) throws JMSException;
+    void resetMessage(NevadoMessage message) throws JMSException;
 }

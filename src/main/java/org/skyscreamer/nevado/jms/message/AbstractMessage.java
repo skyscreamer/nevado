@@ -2,8 +2,10 @@ package org.skyscreamer.nevado.jms.message;
 
 import org.apache.commons.codec.binary.StringUtils;
 import org.skyscreamer.nevado.jms.util.PropertyConvertUtil;
+import org.skyscreamer.nevado.jms.util.SerializeUtil;
 
 import javax.jms.*;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
@@ -16,7 +18,7 @@ import java.util.*;
  *
  * @author Carter Page
  */
-public abstract class AbstractMessage implements Message, Serializable {
+public abstract class AbstractMessage<T> implements Message, Serializable {
     public static final String WHITESPACE_CHARS = " \t\r\n";
     public static final String[] RESERVED_PROPERTY_NAMES = { "NULL", "TRUE", "FALSE", "NOT", "AND", "OR", "BETWEEN",
             "LIKE", "IN", "IS", "ESCAPE" };
@@ -273,5 +275,15 @@ public abstract class AbstractMessage implements Message, Serializable {
     public void onSend() {
         _readOnlyProperties = true;
         _readOnlyBody = true;
+    }
+
+    public T copyOf() throws JMSException {
+        try {
+            byte[] data = SerializeUtil.serialize(this);
+            return (T)SerializeUtil.deserialize(data);
+        }
+        catch(IOException e) {
+            throw new JMSException("Unable to make copy of messsage: " + e.getMessage());
+        }
     }
 }

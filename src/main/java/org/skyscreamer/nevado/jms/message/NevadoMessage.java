@@ -14,7 +14,7 @@ import java.util.Enumeration;
  * Time: 8:36 PM
  * To change this template use File | Settings | File Templates.
  */
-public abstract class NevadoMessage extends AbstractMessage implements Message {
+public abstract class NevadoMessage extends AbstractMessage<NevadoMessage> implements Message {
     private transient NevadoSession _nevadoSession;
     private transient NevadoDestination _nevadoDestination;
     private transient boolean _acknowledged = false;

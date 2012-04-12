@@ -1,8 +1,10 @@
 package org.skyscreamer.nevado.jms.util;
 
+import org.skyscreamer.nevado.jms.NevadoSession;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
 
 import javax.jms.Destination;
+import javax.jms.JMSException;
 import java.util.*;
 
 /**
@@ -11,9 +13,14 @@ import java.util.*;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class MessageHolder {
+    private final NevadoSession _session;
     private final Map<Destination, List<NevadoMessage>> _messageHolder
             = new HashMap<Destination, List<NevadoMessage>>();
     private final Map<Destination, Integer> _messageIndex = new HashMap<Destination, Integer>();
+
+    public MessageHolder(NevadoSession session) {
+        _session = session;
+    }
 
     public void add(Destination destination, NevadoMessage msg)
     {
@@ -48,7 +55,37 @@ public class MessageHolder {
         return message;
     }
 
-    public List<NevadoMessage> getConsumedMessages(Destination destination)
+    public void acknowledgeConsumedMessages() throws JMSException
+    {
+        // Separate the wheat from the chaff
+        List<NevadoMessage> consumedMessages = new ArrayList<NevadoMessage>();
+        List<NevadoMessage> unconsumedMessages = new ArrayList<NevadoMessage>();
+        for(Destination destination : _messageHolder.keySet())
+        {
+            for(NevadoMessage msg : getConsumedMessages(destination))
+            {
+                consumedMessages.add(msg);
+            }
+            for(NevadoMessage msg : getUnconsumedMessages(destination))
+            {
+                unconsumedMessages.add(msg);
+            }
+        }
+
+        // Delete consumed messages, reset the rest
+        _session.deleteMessage(consumedMessages.toArray(new NevadoMessage[0]));
+        for(NevadoMessage msg : consumedMessages)
+        {
+            msg.setAcknowledged(true);
+        }
+        _session.resetMessage(unconsumedMessages.toArray(new NevadoMessage[0]));
+
+        // Re-initialize state
+        _messageHolder.clear();
+        _messageIndex.clear();
+    }
+
+    private List<NevadoMessage> getConsumedMessages(Destination destination)
     {
         if (_messageHolder.containsKey(destination))
         {
@@ -62,7 +99,7 @@ public class MessageHolder {
         }
     }
 
-    public List<NevadoMessage> getUnconsumedMessages(Destination destination)
+    private List<NevadoMessage> getUnconsumedMessages(Destination destination)
     {
         if (_messageHolder.containsKey(destination))
         {

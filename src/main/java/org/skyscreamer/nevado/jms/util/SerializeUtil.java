@@ -11,6 +11,11 @@ import java.io.Serializable;
 
 public class SerializeUtil
 {
+    public static Serializable copy( Serializable serializable ) throws IOException
+    {
+        return deserialize(serialize(serializable));
+    }
+
     public static String serializeToString( Serializable serializable ) throws IOException
     {
         byte[] data = serialize(serializable);

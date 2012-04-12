@@ -12,6 +12,7 @@ import org.skyscreamer.nevado.jms.message.InvalidMessage;
 import org.skyscreamer.nevado.jms.message.NevadoProperty;
 import org.skyscreamer.nevado.jms.util.SerializeUtil;
 
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.JMSSecurityException;
 import java.io.IOException;
@@ -67,6 +68,14 @@ public class SQSConnector implements NevadoConnector {
             message.setJMSTimestamp(System.currentTimeMillis());
         }
         _log.info("Sent message " + sqsMessageId);
+    }
+
+    // TODO - Typica 1.7 doesn't support batch send :-(
+    public void sendMessages(NevadoDestination destination, List<NevadoMessage> nevadoMessages) throws JMSException {
+        for(NevadoMessage message : nevadoMessages)
+        {
+            sendMessage(destination, message);
+        }
     }
 
     public NevadoMessage receiveMessage(NevadoConnection connection, NevadoDestination destination, long timeoutMs) throws JMSException {
@@ -147,6 +156,24 @@ public class SQSConnector implements NevadoConnector {
             queues.add(new NevadoQueue(sqsURL));
         }
         return queues;
+    }
+
+    public void resetMessage(NevadoMessage message) throws JMSException {
+        String sqsReceiptHandle = (String)message.getNevadoProperty(NevadoProperty.SQSReceiptHandle);
+        if (sqsReceiptHandle == null)
+        {
+            throw new JMSException("Message does not contain an SQSReceiptHandle, so cannot be reset.  " +
+                    "Did this come from an SQS queue?");
+        }
+        MessageQueue sqsQueue = getSQSQueue(message.getNevadoDestination());
+        try {
+            sqsQueue.setMessageVisibilityTimeout(sqsReceiptHandle, 0);
+        } catch (SQSException e) {
+            String exMessage = "Unable to reset message visibility to zero (" + message.getJMSMessageID()
+                    + ") with receipt handle " + sqsReceiptHandle;
+            _log.error(exMessage, e);
+            throw new JMSException(exMessage);
+        }
     }
 
     private void deleteSQSMessage(NevadoMessage message, MessageQueue sqsQueue, String sqsReceiptHandle) throws JMSException {
