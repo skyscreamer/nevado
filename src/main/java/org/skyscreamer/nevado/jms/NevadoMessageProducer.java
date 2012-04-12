@@ -96,7 +96,8 @@ public class NevadoMessageProducer implements MessageProducer {
         nevadoMessage.setJMSDeliveryMode(deliveryMode);
         nevadoMessage.setJMSPriority(priority);
         nevadoMessage.setJMSExpiration(ttl > 0 ? System.currentTimeMillis() + ttl : 0);
-        _session.sendMessage(nevadoDestination, nevadoMessage,
-                _disableMessageID, _disableTimestamp);
+        nevadoMessage.setDisableMessageID(_disableMessageID);
+        nevadoMessage.setDisableTimestamp(_disableTimestamp);
+        _session.sendMessage(nevadoDestination, nevadoMessage);
     }
 }

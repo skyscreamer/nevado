@@ -49,18 +49,21 @@ public class SQSConnector implements NevadoConnector {
         _receiveCheckIntervalMs = receiveCheckIntervalMs;
     }
 
-    public void sendMessage(NevadoDestination destination, NevadoMessage message, boolean disableMessageID,
-                            boolean disableTimestamp) throws JMSException {
+    public void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException
+    {
         MessageQueue sqsQueue = getSQSQueue(destination);
         String serializedMessage = serializeMessage(message);
         String sqsMessageId = sendSQSMessage(destination, sqsQueue, serializedMessage);
-        if (!disableMessageID) {
+        if (!message.isDisableMessageID())
+        {
             message.setJMSMessageID("ID:" + sqsMessageId);
         }
-        else {
+        else
+        {
             message.setNevadoProperty(NevadoProperty.DisableMessageID, true);
         }
-        if (!disableTimestamp) {
+        if (!message.isDisableTimestamp())
+        {
             message.setJMSTimestamp(System.currentTimeMillis());
         }
         _log.info("Sent message " + sqsMessageId);

@@ -78,4 +78,42 @@ public class SessionTransactionTest extends AbstractJMSTest {
         Assert.assertNull(consumer.receiveNoWait());
         compareTextMessages(new TextMessage[] {commitMsg1, commitMsg2}, new TextMessage[] {msgOut1, msgOut2});
     }
+
+    @Test
+    public void testTransactionRollbackPartialReplay() throws JMSException, InterruptedException {
+        Session controlSession = createSession();
+
+        // Create a couple of temporary queues for the test
+        Queue testConsumeQueue = controlSession.createTemporaryQueue();
+
+        // Put some messages in a queue and set up the listener to monitor production
+        TextMessage ctlMsg1 = controlSession.createTextMessage(RandomData.readString());
+        TextMessage ctlMsg2 = controlSession.createTextMessage(RandomData.readString());
+        TextMessage ctlMsg3 = controlSession.createTextMessage(RandomData.readString());
+        MessageProducer producer = controlSession.createProducer(testConsumeQueue);
+        producer.send(ctlMsg1);
+        producer.send(ctlMsg2);
+        producer.send(ctlMsg3);
+
+        // Read some messages, send some messages
+        Session txSession = getConnection().createSession(true, Session.SESSION_TRANSACTED);
+        MessageConsumer txConsumer = txSession.createConsumer(testConsumeQueue);
+        TextMessage msg1 = (NevadoTextMessage) txConsumer.receive();
+        TextMessage msg2 = (NevadoTextMessage) txConsumer.receive();
+        TextMessage msg3 = (NevadoTextMessage) txConsumer.receive();
+        compareTextMessages(new TextMessage[] {ctlMsg1, ctlMsg2, ctlMsg3}, new TextMessage[] {msg1, msg2, msg3});
+        Assert.assertNull(txConsumer.receive(100));
+
+        // Rollback, re-read (partially) and re-send
+        txSession.rollback();
+        msg1 = (NevadoTextMessage) txConsumer.receive();
+        msg2 = (NevadoTextMessage) txConsumer.receive();
+        compareTextMessages(new TextMessage[] {ctlMsg1, ctlMsg2}, new TextMessage[] {msg1, msg2});
+
+        // Commit and check the results
+        txSession.commit();
+        msg3 = (NevadoTextMessage) txConsumer.receive(500);
+        Assert.assertEquals(ctlMsg3, msg3);
+        txSession.commit();
+    }
 }

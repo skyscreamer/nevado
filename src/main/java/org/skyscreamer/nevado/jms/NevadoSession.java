@@ -36,7 +36,8 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     private MessageListener _messageListener;
     private final NevadoSessionExecutor _asyncConsumerRunner = new NevadoSessionExecutor(this);
     private List<NevadoMessageConsumer> _messageConsumers = new CopyOnWriteArrayList<NevadoMessageConsumer>();
-    private final Map<Destination, MessageHolder> _internalMessagesMap = new HashMap<Destination, MessageHolder>();
+    private final Map<Destination, MessageHolder> _incomingStagedMessages = new HashMap<Destination, MessageHolder>();
+    private final Map<Destination, List<NevadoMessage>> _outgoingTxMessages = new HashMap<Destination, List<NevadoMessage>>();
 
     protected NevadoSession(NevadoConnection connection, boolean transacted, int acknowledgeMode) {
         _connection = connection;
@@ -108,14 +109,43 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
         return _acknowledgeMode;
     }
 
+    // TODO - Think about how to handle a failure during commit
     public void commit() throws JMSException {
         checkClosed();
-        // TODO
+        if (_transacted)
+        {
+            for(Destination destination : _outgoingTxMessages.keySet())
+            {
+                List<NevadoMessage> outgoingMessages = _outgoingTxMessages.get(destination);
+                _connection.getSQSConnector().sendMessages(destination, outgoingMessages);
+            }
+            _outgoingTxMessages.clear();
+
+            for(Destination destination : _incomingStagedMessages.keySet())
+            {
+                for(NevadoMessage msg : _incomingStagedMessages.get(destination).getConsumedMessages())
+                {
+                    deleteMessage(msg);
+                    msg.setAcknowledged(true);
+                }
+                for(NevadoMessage msg : _incomingStagedMessages.get(destination).getUnconsumedMessages())
+                {
+                    resetMessage(msg);
+                }
+            }
+            _incomingStagedMessages.clear();
+        }
     }
 
     public void rollback() throws JMSException {
         checkClosed();
-        // TODO
+        if (_transacted)
+        {
+            _outgoingTxMessages.clear();
+            for(MessageHolder messageHolder : _incomingStagedMessages.values()) {
+                messageHolder.reset();
+            }
+        }
     }
 
     public void close() {
@@ -138,7 +168,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     public void recover() throws JMSException {
         checkClosed();
         if (_acknowledgeMode == CLIENT_ACKNOWLEDGE) {
-            for(MessageHolder messageHolder : _internalMessagesMap.values()) {
+            for(MessageHolder messageHolder : _incomingStagedMessages.values()) {
                 messageHolder.reset();
             }
         }
@@ -272,8 +302,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
         // TODO
     }
 
-    public void sendMessage(NevadoDestination destination, NevadoMessage message, boolean disableMessageID,
-                            boolean disableTimestamp) throws JMSException {
+    public void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException {
         if (_overrideJMSDeliveryMode != null) {
             message.setJMSDeliveryMode(_overrideJMSDeliveryMode);
         }
@@ -284,7 +313,18 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
             message.setJMSExpiration(_overrideJMSTTL > 0 ? System.currentTimeMillis() + _overrideJMSTTL : 0);
         }
         message.onSend();
-        _connection.getSQSConnector().sendMessage(destination, message, disableMessageID, disableTimestamp);
+        if (_transacted)
+        {
+            if (!_outgoingTxMessages.containsKey(destination))
+            {
+                _outgoingTxMessages.put(destination, new ArrayList<NevadoMessage>());
+            }
+            _outgoingTxMessages.get(destination).add(message.copyOf());
+        }
+        else
+        {
+            _connection.getSQSConnector().sendMessage(destination, message);
+        }
     }
 
     public Message receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException {
@@ -306,27 +346,34 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
 
     private NevadoMessage getUnfilteredMessage(NevadoDestination destination, long timeoutMs) throws JMSException {
         NevadoMessage message = null;
-        if (_acknowledgeMode == CLIENT_ACKNOWLEDGE)
+
+        // First check the holder in case there was a recover or rollback
+        if (_acknowledgeMode == CLIENT_ACKNOWLEDGE || _transacted)
         {
-            if (_internalMessagesMap.containsKey(destination))
+            if (_incomingStagedMessages.containsKey(destination))
             {
-                MessageHolder messageHolder = _internalMessagesMap.get(destination);
+                MessageHolder messageHolder = _incomingStagedMessages.get(destination);
                 message = messageHolder.getNextMessage();
             }
         }
 
+        // Else grab a message from the queue
         if (message == null)
         {
             message = _connection.getSQSConnector().receiveMessage(_connection, destination, timeoutMs);
-            if (message != null && _acknowledgeMode == CLIENT_ACKNOWLEDGE)
+
+            // Hold onto messages in a transaction or in CLIENT_ACKNOWLEDGE mode
+            if (message != null && (_acknowledgeMode == CLIENT_ACKNOWLEDGE || _transacted))
             {
-                if (!_internalMessagesMap.containsKey(destination))
+                if (!_incomingStagedMessages.containsKey(destination))
                 {
-                    _internalMessagesMap.put(destination, new MessageHolder());
+                    _incomingStagedMessages.put(destination, new MessageHolder());
                 }
-                _internalMessagesMap.get(destination).add(message);
+                _incomingStagedMessages.get(destination).add(message);
             }
         }
+
+        // If we've got a message decorate it appropriately
         if (message != null) {
             message.setNevadoSession(this);
             message.setNevadoDestination(destination);
@@ -344,17 +391,20 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     public void acknowledgeMessage(NevadoMessage message) throws JMSException {
-        if (_acknowledgeMode == CLIENT_ACKNOWLEDGE)
-        {
-            for(NevadoMessage msg : _internalMessagesMap.get(message.getNevadoDestination()).getMessageList())
+        if (!_transacted) {
+            if (_acknowledgeMode == CLIENT_ACKNOWLEDGE)
             {
-                deleteMessage(msg);
-                msg.setAcknowledged(true);
+                for(NevadoMessage msg : _incomingStagedMessages.get(message.getNevadoDestination()).getConsumedMessages())
+                {
+                    deleteMessage(msg);
+                    msg.setAcknowledged(true);
+                }
+                _incomingStagedMessages.clear();
             }
-        }
-        else
-        {
-            deleteMessage(message);
+            else
+            {
+                deleteMessage(message);
+            }
         }
     }
 
@@ -364,6 +414,11 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
 
     private void deleteMessage(NevadoMessage message) throws JMSException {
         _connection.getSQSConnector().deleteMessage(message);
+    }
+
+    private void resetMessage(NevadoMessage message) throws JMSException
+    {
+        _connection.getSQSConnector().returnMessageToQueue(message);
     }
 
     public void setOverrideJMSDeliveryMode(Integer jmsDeliveryMode) {

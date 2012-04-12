@@ -14,8 +14,7 @@ import java.util.Collection;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public interface NevadoConnector {
-    void sendMessage(NevadoDestination destination, NevadoMessage message, boolean disableMessageID,
-        boolean disableTimestamp) throws JMSException;
+    void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException;
     NevadoMessage receiveMessage(NevadoConnection connection, NevadoDestination destination, long timeoutMs)
         throws JMSException;
     void deleteMessage(NevadoMessage message) throws JMSException;

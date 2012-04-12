@@ -18,6 +18,8 @@ public abstract class NevadoMessage extends AbstractMessage implements Message {
     private transient NevadoSession _nevadoSession;
     private transient NevadoDestination _nevadoDestination;
     private transient boolean _acknowledged = false;
+    private transient boolean _disableMessageID = false;
+    private transient boolean _disableTimestamp = false;
 
     public NevadoMessage() {}
 
@@ -132,5 +134,21 @@ public abstract class NevadoMessage extends AbstractMessage implements Message {
 
     public void setAcknowledged(boolean acknowledged) {
         _acknowledged = acknowledged;
+    }
+
+    public boolean isDisableMessageID() {
+        return _disableMessageID;
+    }
+
+    public void setDisableMessageID(boolean _disableMessageID) {
+        this._disableMessageID = _disableMessageID;
+    }
+
+    public boolean isDisableTimestamp() {
+        return _disableTimestamp;
+    }
+
+    public void setDisableTimestamp(boolean _disableTimestamp) {
+        this._disableTimestamp = _disableTimestamp;
     }
 }
