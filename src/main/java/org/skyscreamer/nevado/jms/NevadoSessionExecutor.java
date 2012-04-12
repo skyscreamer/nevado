@@ -25,42 +25,44 @@ public class NevadoSessionExecutor implements Runnable {
     }
 
     public void run() {
-        synchronized (_runningLock) {
-            while(!_closed) {
-                boolean messageProcessed = false;
-                for(NevadoMessageConsumer consumer : _session.getMessageConsumers()) {
-                    if (_closed)
-                    {
-                        break;
-                    }
-                    if (consumer.getMessageListener() != null) {
-                        try {
-                            if (consumer.processAsyncMessage()) {
-                                messageProcessed = true;
-                            }
-                        } catch (JMSException e) {
-                            _log.error("Unable to process message for consumer on " + consumer.getDestination(), e);
-                            ExceptionListener exceptionListener = _session.getConnection().getExceptionListener();
-                            if (exceptionListener != null)
-                            {
-                                exceptionListener.onException(e);
-                            }
+        while(!_closed) {
+            boolean messageProcessed = false;
+            for(NevadoMessageConsumer consumer : _session.getMessageConsumers()) {
+                if (_closed)
+                {
+                    break;
+                }
+                if (consumer.getMessageListener() != null) {
+                    try {
+                        if (consumer.processAsyncMessage()) {
+                            messageProcessed = true;
+                        }
+                    } catch (JMSException e) {
+                        _log.error("Unable to process message for consumer on " + consumer.getDestination(), e);
+                        ExceptionListener exceptionListener = _session.getConnection().getExceptionListener();
+                        if (exceptionListener != null)
+                        {
+                            exceptionListener.onException(e);
                         }
                     }
                 }
-                if (!_closed) {
-                    if (messageProcessed == true)
-                    {
-                        _sleeper.reset();
-                    }
-                    _sleeper.sleep();
-                }
             }
+            if (!_closed) {
+                if (messageProcessed == true)
+                {
+                    // If we're getting messages tell the back-off sleeper
+                    _sleeper.reset();
+                }
+                _sleeper.sleep();
+            }
+        }
+        synchronized (_runningLock) {
+            _runningLock.notify();
         }
     }
 
     synchronized void start() {
-        if (runner == null) {
+        if (!_closed && runner == null) {
             runner = new Thread(this);
             //runner.setPriority(Thread.MAX_PRIORITY);
             //runner.setDaemon(true);
@@ -68,12 +70,13 @@ public class NevadoSessionExecutor implements Runnable {
         }
     }
 
-    public void stop() {
-        _closed = true;
-        synchronized (_runningLock) {
-            // This should freeze until the thread exits
+    synchronized void stop() throws InterruptedException {
+        if (!_closed) {
+            _closed = true;
+            synchronized (_runningLock) {
+                _runningLock.wait();
+            }
         }
-        runner = null;
     }
 
     public boolean isRunning() {
