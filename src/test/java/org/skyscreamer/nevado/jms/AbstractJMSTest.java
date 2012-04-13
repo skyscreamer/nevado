@@ -39,7 +39,7 @@ public abstract class AbstractJMSTest {
     private String _awsSecretKey;
 
     @Autowired private ConnectionFactory _connectionFactory;
-    private Connection _connection;
+    private NevadoConnection _connection;
     private Queue _testQueue;
 
     @Before
@@ -50,8 +50,8 @@ public abstract class AbstractJMSTest {
         _testQueue = createTempQueue();
     }
 
-    protected Connection createConnection(ConnectionFactory connectionFactory) throws JMSException {
-        return connectionFactory.createConnection(_awsAccessKey, _awsSecretKey);
+    protected NevadoConnection createConnection(ConnectionFactory connectionFactory) throws JMSException {
+        return (NevadoConnection)connectionFactory.createConnection(_awsAccessKey, _awsSecretKey);
     }
 
     /*
@@ -106,7 +106,7 @@ public abstract class AbstractJMSTest {
         return _connectionFactory;
     }
 
-    protected Connection getConnection() {
+    protected NevadoConnection getConnection() {
         return _connection;
     }
 

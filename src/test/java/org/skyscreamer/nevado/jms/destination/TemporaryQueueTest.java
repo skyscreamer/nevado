@@ -35,11 +35,11 @@ public class TemporaryQueueTest extends AbstractJMSTest {
         NevadoSession session = createSession();
         TemporaryQueue temporaryQueue = session.createTemporaryQueue();
         Thread.sleep(15000);
-        Collection<TemporaryQueue> allTemporaryQueues = createSession().listAllTemporaryQueues();
+        Collection<TemporaryQueue> allTemporaryQueues = getConnection().listAllTemporaryQueues();
         Assert.assertTrue("Temporary queue should exist", allTemporaryQueues.contains(temporaryQueue));
         session.close();
         Thread.sleep(60000);
-        allTemporaryQueues = createSession().listAllTemporaryQueues();
+        allTemporaryQueues = getConnection().listAllTemporaryQueues();
         Assert.assertFalse("Temporary queue should not exist", allTemporaryQueues.contains(temporaryQueue));
     }
 }

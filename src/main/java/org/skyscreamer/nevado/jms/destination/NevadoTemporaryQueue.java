@@ -1,5 +1,6 @@
 package org.skyscreamer.nevado.jms.destination;
 
+import org.skyscreamer.nevado.jms.NevadoConnection;
 import org.skyscreamer.nevado.jms.NevadoSession;
 
 import javax.jms.JMSException;
@@ -11,16 +12,16 @@ import javax.jms.TemporaryQueue;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class NevadoTemporaryQueue extends NevadoQueue implements TemporaryQueue {
-    private transient NevadoSession _session;
+    private transient NevadoConnection _connection;
 
-    public NevadoTemporaryQueue(NevadoSession session, NevadoQueue queue) {
+    public NevadoTemporaryQueue(NevadoConnection connection, NevadoQueue queue) {
         super(queue);
-        _session = session;
+        _connection = connection;
     }
 
     public synchronized void delete() throws JMSException {
-        if (_session != null) {
-            _session.deleteTemporaryQueue(this);
+        if (_connection != null) {
+            _connection.deleteTemporaryQueue(this);
         }
     }
 }
