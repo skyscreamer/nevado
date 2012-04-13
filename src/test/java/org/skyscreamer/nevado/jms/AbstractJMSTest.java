@@ -7,6 +7,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
+import org.skyscreamer.nevado.jms.util.TestExceptionListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -31,8 +32,6 @@ import java.util.*;
         TransactionalTestExecutionListener.class})
 @ContextConfiguration(locations = { "classpath:/testContext.xml" })
 public abstract class AbstractJMSTest {
-    private static final String TEST_QUEUE_NAME = "testQueue";
-
     protected final Log _log = LogFactory.getLog(AbstractJMSTest.class);
 
     private String _awsAccessKey;
@@ -40,37 +39,24 @@ public abstract class AbstractJMSTest {
 
     @Autowired private ConnectionFactory _connectionFactory;
     private NevadoConnection _connection;
-    private Queue _testQueue;
+    private TestExceptionListener _exceptionListener = new TestExceptionListener();
 
     @Before
     public void setUp() throws JMSException, IOException {
         initializeAWSCredentials();
         _connection = createConnection(_connectionFactory);
+        _connection.setExceptionListener(_exceptionListener);
         _connection.start();
-        _testQueue = createTempQueue();
     }
 
     protected NevadoConnection createConnection(ConnectionFactory connectionFactory) throws JMSException {
         return (NevadoConnection)connectionFactory.createConnection(_awsAccessKey, _awsSecretKey);
     }
 
-    /*
-    protected void clearTestQueue() throws JMSException {
-        // Clear out the test queue
-        int msgCount = 0;
-        MessageConsumer consumer = createSession().createConsumer(new NevadoQueue(TEST_QUEUE_NAME));
-        Message message;
-        while((message = consumer.receiveNoWait()) != null) {
-            ++msgCount;
-            message.acknowledge();
-        }
-        _log.info("Cleared out " + msgCount + " messages");
-    }
-    */
-
     protected Message sendAndReceive(Message msg) throws JMSException {
-        createSession().createProducer(_testQueue).send(msg);
-        Message msgOut = createSession().createConsumer(_testQueue).receive();
+        Queue testQueue = createTempQueue();
+        createSession().createProducer(testQueue).send(msg);
+        Message msgOut = createSession().createConsumer(testQueue).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         return msgOut;
@@ -99,6 +85,7 @@ public abstract class AbstractJMSTest {
 
     @After
     public void tearDown() throws JMSException {
+        Assert.assertEquals("Exception listener caught some exceptions", 0, _exceptionListener.getExceptions().size());
         _connection.close();
     }
 

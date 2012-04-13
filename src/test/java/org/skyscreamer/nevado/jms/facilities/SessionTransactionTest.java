@@ -79,7 +79,7 @@ public class SessionTransactionTest extends AbstractJMSTest {
         compareTextMessages(new TextMessage[] {commitMsg1, commitMsg2}, new TextMessage[] {msgOut1, msgOut2});
     }
 
-    @Test(timeout = 5000)
+    @Test
     public void testTransactionRollbackPartialReplay() throws JMSException, InterruptedException {
         Session controlSession = createSession();
 
@@ -106,14 +106,14 @@ public class SessionTransactionTest extends AbstractJMSTest {
 
         // Rollback, re-read (partially) and re-send
         txSession.rollback();
-        msg1 = (NevadoTextMessage) txConsumer.receive();
-        msg2 = (NevadoTextMessage) txConsumer.receive();
-        compareTextMessages(new TextMessage[] {ctlMsg1, ctlMsg2}, new TextMessage[] {msg1, msg2});
+        TextMessage rollbackMsg1 = (NevadoTextMessage) txConsumer.receive();
+        TextMessage rollbackMsg2 = (NevadoTextMessage) txConsumer.receive();
+        compareTextMessages(new TextMessage[] {msg1, msg2}, new TextMessage[] {rollbackMsg1, rollbackMsg2});
 
         // Commit and check the results
         txSession.commit();
-        msg3 = (NevadoTextMessage) txConsumer.receive(500);
-        Assert.assertEquals(ctlMsg3, msg3);
+        TextMessage rollbackMsg3 = (NevadoTextMessage) txConsumer.receive(500);
+        Assert.assertEquals(msg3.getText(), rollbackMsg3.getText());
         txSession.commit();
     }
 }
