@@ -89,7 +89,10 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
 
     public void close() throws JMSException {
         stop();
-        _running = false;
+        for(NevadoSession session : _sessions)
+        {
+            session.close();
+        }
     }
 
     public ConnectionConsumer createConnectionConsumer(Destination destination, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {

@@ -20,24 +20,24 @@ import java.util.Random;
 public class MessageAcknowledgementTest extends AbstractJMSTest {
     @Test
     public void testAutoAcknowledge() throws JMSException {
-        clearTestQueue();
         Connection connection = getConnection();
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Message msg = session.createMessage();
-        session.createProducer(getTestQueue()).send(msg);
-        NevadoMessage msgOut = (NevadoMessage)session.createConsumer(getTestQueue()).receive();
+        Queue tempQueue = createTempQueue();
+        session.createProducer(tempQueue).send(msg);
+        NevadoMessage msgOut = (NevadoMessage)session.createConsumer(tempQueue).receive();
         Assert.assertTrue(msgOut.isAcknowledged());
     }
 
     @Test
     public void testAsyncAutoAcknowledge() throws JMSException, InterruptedException {
-        clearTestQueue();
         Connection connection = getConnection();
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Message msg = session.createMessage();
-        session.createProducer(getTestQueue()).send(msg);
+        Queue tempQueue = createTempQueue();
+        session.createProducer(tempQueue).send(msg);
         TestMessageListener messageListener = new TestMessageListener();
-        session.createConsumer(getTestQueue()).setMessageListener(messageListener);
+        session.createConsumer(tempQueue).setMessageListener(messageListener);
         Thread.sleep(500);
         Assert.assertEquals(1, messageListener.getMessages().size());
         Assert.assertTrue(((NevadoMessage)messageListener.getMessages().get(0)).isAcknowledged());
@@ -46,33 +46,32 @@ public class MessageAcknowledgementTest extends AbstractJMSTest {
 
     @Test
     public void testDupsOkayAcknowledge() throws JMSException {
-        clearTestQueue();
         Connection connection = getConnection();
         Session session = connection.createSession(false, Session.DUPS_OK_ACKNOWLEDGE);
         Message msg = session.createMessage();
-        session.createProducer(getTestQueue()).send(msg);
-        NevadoMessage msgOut = (NevadoMessage)session.createConsumer(getTestQueue()).receive();
+        Queue tempQueue = createTempQueue();
+        session.createProducer(tempQueue).send(msg);
+        NevadoMessage msgOut = (NevadoMessage)session.createConsumer(tempQueue).receive();
         Assert.assertFalse(msgOut.isAcknowledged());
         msgOut.acknowledge();
     }
 
     @Test
     public void testClientAcknowledge() throws JMSException {
-        clearTestQueue();
-
         // Send messages
         Connection connection = getConnection();
         Session session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
         TextMessage msg1 = session.createTextMessage(RandomData.readString());
         TextMessage msg2 = session.createTextMessage(RandomData.readString());
         TextMessage msg3 = session.createTextMessage(RandomData.readString());
-        MessageProducer producer = session.createProducer(getTestQueue());
+        Queue tempQueue = createTempQueue();
+        MessageProducer producer = session.createProducer(tempQueue);
         producer.send(msg1);
         producer.send(msg2);
         producer.send(msg3);
 
         // Get messages
-        MessageConsumer consumer = session.createConsumer(getTestQueue());
+        MessageConsumer consumer = session.createConsumer(tempQueue);
         NevadoTextMessage msgOut1 = (NevadoTextMessage)consumer.receive();
         Assert.assertEquals(1, msgOut1.getIntProperty(JMSXProperty.JMSXDeliveryCount + ""));
         NevadoTextMessage msgOut2 = (NevadoTextMessage)consumer.receive();
@@ -113,21 +112,20 @@ public class MessageAcknowledgementTest extends AbstractJMSTest {
 
     @Test
     public void testPartialClientAcknowledge() throws JMSException {
-        clearTestQueue();
-
         // Send messages
         Connection connection = getConnection();
         Session session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
         TextMessage msg1 = session.createTextMessage(RandomData.readString());
         TextMessage msg2 = session.createTextMessage(RandomData.readString());
         TextMessage msg3 = session.createTextMessage(RandomData.readString());
-        MessageProducer producer = session.createProducer(getTestQueue());
+        Queue tempQueue = createTempQueue();
+        MessageProducer producer = session.createProducer(tempQueue);
         producer.send(msg1);
         producer.send(msg2);
         producer.send(msg3);
 
         // Get messages
-        MessageConsumer consumer = session.createConsumer(getTestQueue());
+        MessageConsumer consumer = session.createConsumer(tempQueue);
         NevadoTextMessage msgOut1 = (NevadoTextMessage)consumer.receive();
         Assert.assertEquals(1, msgOut1.getIntProperty(JMSXProperty.JMSXDeliveryCount + ""));
         NevadoTextMessage msgOut2 = (NevadoTextMessage)consumer.receive();
@@ -135,37 +133,34 @@ public class MessageAcknowledgementTest extends AbstractJMSTest {
         NevadoTextMessage msgOut3 = (NevadoTextMessage)consumer.receive();
         Assert.assertEquals(1, msgOut3.getIntProperty(JMSXProperty.JMSXDeliveryCount + ""));
         Assert.assertFalse(msgOut1.isAcknowledged());
-        Assert.assertEquals(msg1.getText(), msgOut1.getText());
         Assert.assertFalse(msgOut2.isAcknowledged());
-        Assert.assertEquals(msg2.getText(), msgOut2.getText());
         Assert.assertFalse(msgOut3.isAcknowledged());
-        Assert.assertEquals(msg3.getText(), msgOut3.getText());
+        compareTextMessages(new TextMessage[] {msg1, msg2, msg3}, new TextMessage[] {msgOut1, msgOut2, msgOut3});
 
         // Recover and replay (partially)
         session.recover();
-        msgOut1 = (NevadoTextMessage)consumer.receive();
-        msgOut2 = (NevadoTextMessage)consumer.receive();
-        Assert.assertTrue(msgOut1.getJMSRedelivered());
-        Assert.assertTrue(msgOut2.getJMSRedelivered());
-        Assert.assertEquals(2, msgOut1.getIntProperty(JMSXProperty.JMSXDeliveryCount + ""));
-        Assert.assertEquals(2, msgOut2.getIntProperty(JMSXProperty.JMSXDeliveryCount + ""));
-        Assert.assertFalse(msgOut1.isAcknowledged());
-        Assert.assertEquals(msg1.getText(), msgOut1.getText());
-        Assert.assertFalse(msgOut2.isAcknowledged());
-        Assert.assertEquals(msg2.getText(), msgOut2.getText());
+        NevadoTextMessage msgAfterRecover1 = (NevadoTextMessage)consumer.receive();
+        NevadoTextMessage msgAfterRecover2 = (NevadoTextMessage)consumer.receive();
+        Assert.assertTrue(msgAfterRecover1.getJMSRedelivered());
+        Assert.assertTrue(msgAfterRecover2.getJMSRedelivered());
+        Assert.assertEquals(2, msgAfterRecover1.getIntProperty(JMSXProperty.JMSXDeliveryCount + ""));
+        Assert.assertEquals(2, msgAfterRecover2.getIntProperty(JMSXProperty.JMSXDeliveryCount + ""));
+        Assert.assertFalse(msgAfterRecover1.isAcknowledged());
+        Assert.assertFalse(msgAfterRecover2.isAcknowledged());
+        compareTextMessages(new TextMessage[] {msgOut1, msgOut2}, new TextMessage[] {msgAfterRecover1, msgAfterRecover2});
 
         // Acknowledging one should acknowledge the others
-        msgOut2.acknowledge();
-        Assert.assertTrue(msgOut1.isAcknowledged());
-        Assert.assertTrue(msgOut2.isAcknowledged());
+        msgAfterRecover2.acknowledge();
+        Assert.assertTrue(msgAfterRecover1.isAcknowledged());
+        Assert.assertTrue(msgAfterRecover2.isAcknowledged());
 
         // The third message should be back on the queue
-        msgOut3 = (NevadoTextMessage)consumer.receive(500);
-        Assert.assertTrue(msgOut3.getJMSRedelivered());
-        Assert.assertEquals(2, msgOut3.getIntProperty(JMSXProperty.JMSXDeliveryCount + ""));
-        Assert.assertFalse(msgOut3.isAcknowledged());
-        Assert.assertEquals(msg3.getText(), msgOut3.getText());
-        msgOut3.acknowledge();
-        Assert.assertTrue(msgOut3.isAcknowledged());
+        NevadoTextMessage msgAfterAck = (NevadoTextMessage)consumer.receive(500);
+        Assert.assertTrue(msgAfterAck.getJMSRedelivered());
+        Assert.assertEquals(2, msgAfterAck.getIntProperty(JMSXProperty.JMSXDeliveryCount + ""));
+        Assert.assertFalse(msgAfterAck.isAcknowledged());
+        Assert.assertEquals(msgOut3.getText(), msgAfterAck.getText());
+        msgAfterAck.acknowledge();
+        Assert.assertTrue(msgAfterAck.isAcknowledged());
     }
 }

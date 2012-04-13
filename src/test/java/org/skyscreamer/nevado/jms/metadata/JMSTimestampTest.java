@@ -7,6 +7,7 @@ import org.skyscreamer.nevado.jms.AbstractJMSTest;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
+import javax.jms.Queue;
 import java.util.Date;
 
 /**
@@ -18,7 +19,6 @@ import java.util.Date;
 public class JMSTimestampTest extends AbstractJMSTest {
     @Test
     public void testAssign() throws JMSException {
-        clearTestQueue();
         Message msg = createSession().createMessage();
         Assert.assertEquals(0, msg.getJMSTimestamp());
         Message msgOut = sendAndReceive(msg);
@@ -27,13 +27,13 @@ public class JMSTimestampTest extends AbstractJMSTest {
 
     @Test
     public void testDisable() throws JMSException {
-        clearTestQueue();
         Message msg = createSession().createMessage();
         Assert.assertEquals(0, msg.getJMSTimestamp());
-        MessageProducer msgProducer = createSession().createProducer(getTestQueue());
+        Queue tempQueue = createTempQueue();
+        MessageProducer msgProducer = createSession().createProducer(tempQueue);
         msgProducer.setDisableMessageTimestamp(true);
         msgProducer.send(msg);
-        Message msgOut = createSession().createConsumer(getTestQueue()).receive();
+        Message msgOut = createSession().createConsumer(tempQueue).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         Assert.assertEquals(0, msg.getJMSTimestamp());

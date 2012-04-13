@@ -28,11 +28,11 @@ public class JMSHeaderOverrideTest extends AbstractJMSTest {
         conn.start();
         _overriddenSession = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-        clearTestQueue();
         Message msg = _overriddenSession.createMessage();
 
-        _overriddenSession.createProducer(getTestQueue()).send(msg);
-        Message msgOut = _overriddenSession.createConsumer(getTestQueue()).receive();
+        Queue tempQueue = createTempQueue();
+        _overriddenSession.createProducer(tempQueue).send(msg);
+        Message msgOut = _overriddenSession.createConsumer(tempQueue).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
 

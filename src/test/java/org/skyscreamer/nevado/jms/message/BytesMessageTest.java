@@ -30,8 +30,6 @@ public class BytesMessageTest extends AbstractJMSTest {
     }
 
     private void testBytesMessage(BytesMessage msg) throws JMSException {
-        clearTestQueue();
-
         // Initialize MapMessage
         TestValues testValues = new TestValues();
         msg.writeBoolean(testValues.bb);

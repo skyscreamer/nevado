@@ -7,6 +7,7 @@ import org.skyscreamer.nevado.jms.AbstractJMSTest;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
+import javax.jms.Queue;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,7 +18,6 @@ import javax.jms.MessageProducer;
 public class JMSPriorityTest extends AbstractJMSTest {
     @Test
     public void testDefault() throws JMSException {
-        clearTestQueue();
         Message msg = createSession().createMessage();
         Message msgOut = sendAndReceive(msg);
         Assert.assertEquals(Message.DEFAULT_PRIORITY, msg.getJMSPriority());
@@ -27,9 +27,10 @@ public class JMSPriorityTest extends AbstractJMSTest {
     @Test
     public void testAssign() throws JMSException {
         Message msg1 = createSession().createMessage();
-        MessageProducer msgProducer = createSession().createProducer(getTestQueue());
+        Queue tempQueue = createTempQueue();
+        MessageProducer msgProducer = createSession().createProducer(tempQueue);
         msgProducer.send(msg1, Message.DEFAULT_DELIVERY_MODE, 0, Message.DEFAULT_TIME_TO_LIVE);
-        Message msgOut = createSession().createConsumer(getTestQueue()).receive();
+        Message msgOut = createSession().createConsumer(tempQueue).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         Assert.assertEquals(0, msg1.getJMSPriority());
@@ -37,7 +38,7 @@ public class JMSPriorityTest extends AbstractJMSTest {
 
         Message msg2 = createSession().createMessage();
         msgProducer.send(msg2, Message.DEFAULT_DELIVERY_MODE, 9, Message.DEFAULT_TIME_TO_LIVE);
-        msgOut = createSession().createConsumer(getTestQueue()).receive();
+        msgOut = createSession().createConsumer(tempQueue).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         Assert.assertEquals(9, msg2.getJMSPriority());

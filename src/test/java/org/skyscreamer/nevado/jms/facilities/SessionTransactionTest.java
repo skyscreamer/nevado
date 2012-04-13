@@ -79,7 +79,7 @@ public class SessionTransactionTest extends AbstractJMSTest {
         compareTextMessages(new TextMessage[] {commitMsg1, commitMsg2}, new TextMessage[] {msgOut1, msgOut2});
     }
 
-    @Test
+    @Test(timeout = 5000)
     public void testTransactionRollbackPartialReplay() throws JMSException, InterruptedException {
         Session controlSession = createSession();
 

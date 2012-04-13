@@ -26,14 +26,12 @@ import java.io.StringReader;
 public class TextMessageTest extends AbstractJMSTest {
     @Test
     public void testTextMessage() throws JMSException {
-        clearTestQueue();
         TextMessage msg = createSession().createTextMessage();
         testTextMessage(msg);
     }
 
     @Test
     public void testAlienTextMessage() throws JMSException {
-        clearTestQueue();
         TextMessage msg = new ActiveMQTextMessage();
         testTextMessage(msg);
     }
@@ -48,8 +46,6 @@ public class TextMessageTest extends AbstractJMSTest {
 
     @Test
     public void testTextMessage2() throws JMSException {
-        clearTestQueue();
-
         String text = "How much wood could a woodchuck chuck?  " + RandomData.readInt() + " logs!";
         TextMessage msg = createSession().createTextMessage(text);
         Message msgOut = sendAndReceive(msg);
@@ -59,8 +55,6 @@ public class TextMessageTest extends AbstractJMSTest {
     
     @Test
     public void testXmlMessage() throws Exception {
-        clearTestQueue();
-        
         String text = "<samplexml><a><b><c x=\"y\">d</c></b></a></samplexml>";
         TextMessage msg = createSession().createTextMessage(text);
         Message msgOut = sendAndReceive(msg);

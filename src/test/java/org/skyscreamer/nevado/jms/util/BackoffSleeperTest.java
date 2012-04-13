@@ -22,10 +22,10 @@ public class BackoffSleeperTest {
         sleeper.sleep();
         Assert.assertEquals(now + 150, System.currentTimeMillis(), 5);
         sleeper.sleep();
-        Assert.assertEquals(now + 250, System.currentTimeMillis(), 5);
+        Assert.assertEquals(now + 250, System.currentTimeMillis(), 10);
         sleeper.reset();
-        Assert.assertEquals(now + 250, System.currentTimeMillis(), 5);
+        Assert.assertEquals(now + 250, System.currentTimeMillis(), 10);
         sleeper.sleep();
-        Assert.assertEquals(now + 260, System.currentTimeMillis(), 5);
+        Assert.assertEquals(now + 260, System.currentTimeMillis(), 10);
     }
 }

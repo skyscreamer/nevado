@@ -29,8 +29,6 @@ public class MapMessageTest extends AbstractJMSTest {
     }
 
     private void testMapMessage(MapMessage msg) throws JMSException {
-        clearTestQueue();
-
         // Initialize MapMessage
         TestValues testValues = new TestValues();
         msg.setBoolean("bb", testValues.bb);

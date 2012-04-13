@@ -40,19 +40,21 @@ public abstract class AbstractJMSTest {
 
     @Autowired private ConnectionFactory _connectionFactory;
     private Connection _connection;
-    private Queue _testQueue = new NevadoQueue(TEST_QUEUE_NAME);
+    private Queue _testQueue;
 
     @Before
     public void setUp() throws JMSException, IOException {
         initializeAWSCredentials();
         _connection = createConnection(_connectionFactory);
         _connection.start();
+        _testQueue = createTempQueue();
     }
 
     protected Connection createConnection(ConnectionFactory connectionFactory) throws JMSException {
         return connectionFactory.createConnection(_awsAccessKey, _awsSecretKey);
     }
 
+    /*
     protected void clearTestQueue() throws JMSException {
         // Clear out the test queue
         int msgCount = 0;
@@ -64,10 +66,11 @@ public abstract class AbstractJMSTest {
         }
         _log.info("Cleared out " + msgCount + " messages");
     }
+    */
 
     protected Message sendAndReceive(Message msg) throws JMSException {
-        createSession().createProducer(getTestQueue()).send(msg);
-        Message msgOut = createSession().createConsumer(getTestQueue()).receive();
+        createSession().createProducer(_testQueue).send(msg);
+        Message msgOut = createSession().createConsumer(_testQueue).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         return msgOut;
@@ -107,12 +110,19 @@ public abstract class AbstractJMSTest {
         return _connection;
     }
 
-    protected NevadoSession createSession() throws JMSException {
+    protected NevadoSession createSession() throws JMSException
+    {
         return (NevadoSession)_connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
     }
-    
-    protected Queue getTestQueue() {
-        return _testQueue;
+
+    protected Queue createTempQueue() throws JMSException
+    {
+        return createTempQueue(createSession());
+    }
+
+    protected Queue createTempQueue(NevadoSession session) throws JMSException
+    {
+        return session.createTemporaryQueue();
     }
 
     protected void compareTextMessages(TextMessage[] expectedTextMessages, TextMessage[] actualTextMessages) throws JMSException {

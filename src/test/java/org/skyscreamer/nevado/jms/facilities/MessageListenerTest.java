@@ -18,14 +18,14 @@ import java.util.List;
 public class MessageListenerTest extends AbstractJMSTest{
     @Test
     public void testMessageListener() throws JMSException, InterruptedException {
-        clearTestQueue();
         TestMessageListener messageListener = new TestMessageListener();
         Session session = createSession();
-        session.createConsumer(getTestQueue()).setMessageListener(messageListener);
+        Queue tempQueue = createTempQueue();
+        session.createConsumer(tempQueue).setMessageListener(messageListener);
         TextMessage testMessage1 = session.createTextMessage(RandomData.readString());
         TextMessage testMessage2 = session.createTextMessage(RandomData.readString());
         TextMessage testMessage3 = session.createTextMessage(RandomData.readString());
-        MessageProducer producer = session.createProducer(getTestQueue());
+        MessageProducer producer = session.createProducer(tempQueue);
         producer.send(testMessage1);
         Thread.sleep(500);
         producer.send(testMessage2);
@@ -44,7 +44,8 @@ public class MessageListenerTest extends AbstractJMSTest{
     public void testAsyncBlocksSync() throws JMSException {
         TestMessageListener messageListener = new TestMessageListener();
         Session session = createSession();
-        MessageConsumer consumer = session.createConsumer(getTestQueue());
+        Queue tempQueue = createTempQueue();
+        MessageConsumer consumer = session.createConsumer(tempQueue);
         consumer.setMessageListener(messageListener);
         consumer.receiveNoWait();
     }
@@ -53,7 +54,8 @@ public class MessageListenerTest extends AbstractJMSTest{
     public void testAsyncThenSyncNoBlock() throws JMSException {
         TestMessageListener messageListener = new TestMessageListener();
         Session session = createSession();
-        MessageConsumer consumer = session.createConsumer(getTestQueue());
+        Queue tempQueue = createTempQueue();
+        MessageConsumer consumer = session.createConsumer(tempQueue);
         consumer.setMessageListener(messageListener);
         consumer.setMessageListener(null);
         consumer.receiveNoWait();

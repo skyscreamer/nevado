@@ -7,11 +7,11 @@ import org.skyscreamer.nevado.jms.AbstractJMSTest;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
+import javax.jms.Queue;
 
 public class JMSMessageIDTest extends AbstractJMSTest {
     @Test
     public void testAssign() throws JMSException {
-        clearTestQueue();
         Message msg = createSession().createMessage();
         Assert.assertNull(msg.getJMSMessageID());
         Message msgOut = sendAndReceive(msg);
@@ -22,13 +22,13 @@ public class JMSMessageIDTest extends AbstractJMSTest {
     
     @Test
     public void testDisable() throws JMSException {
-        clearTestQueue();
         Message msg = createSession().createMessage();
         Assert.assertNull(msg.getJMSMessageID());
-        MessageProducer msgProducer = createSession().createProducer(getTestQueue());
+        Queue tempQueue = createTempQueue();
+        MessageProducer msgProducer = createSession().createProducer(tempQueue);
         msgProducer.setDisableMessageID(true);
         msgProducer.send(msg);
-        Message msgOut = createSession().createConsumer(getTestQueue()).receive();
+        Message msgOut = createSession().createConsumer(tempQueue).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         Assert.assertNull(msg.getJMSMessageID());

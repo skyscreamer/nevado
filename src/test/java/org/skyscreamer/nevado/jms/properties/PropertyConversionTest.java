@@ -15,8 +15,6 @@ import javax.jms.*;
 public class PropertyConversionTest extends AbstractJMSTest {
     @Test
     public void testSupportedConversions() throws JMSException {
-        clearTestQueue();
-
         // Initialize Message properties
         TestValues testValues = new TestValues();
         Message msg = createSession().createMessage();

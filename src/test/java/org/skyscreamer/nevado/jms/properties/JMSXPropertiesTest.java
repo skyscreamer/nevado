@@ -26,9 +26,10 @@ public class JMSXPropertiesTest extends AbstractJMSTest {
         while(e.hasMoreElements()) {
             supportedPropertyNames.add((String)e.nextElement());
         }
-        Assert.assertEquals(2, supportedPropertyNames.size());
+        Assert.assertEquals(3, supportedPropertyNames.size());
         Assert.assertTrue(supportedPropertyNames.contains("JMSXGroupID"));
         Assert.assertTrue(supportedPropertyNames.contains("JMSXGroupSeq"));
+        Assert.assertTrue(supportedPropertyNames.contains("JMSXDeliveryCount"));
     }
 
     @Test

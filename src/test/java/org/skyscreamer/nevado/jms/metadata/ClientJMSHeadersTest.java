@@ -18,7 +18,6 @@ import javax.jms.Message;
 public class ClientJMSHeadersTest extends AbstractJMSTest {
     @Test
     public void testAssign() throws JMSException {
-        clearTestQueue();
         Message msg = createSession().createMessage();
         msg.setJMSCorrelationID(RandomData.readString());
         msg.setJMSReplyTo(new NevadoQueue("nosuchqueue"));

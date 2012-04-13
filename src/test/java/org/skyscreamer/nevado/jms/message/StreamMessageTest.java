@@ -29,8 +29,6 @@ public class StreamMessageTest extends AbstractJMSTest {
     }
 
     private void testStreamMessage(StreamMessage msg) throws JMSException {
-        clearTestQueue();
-
         // Initialize MapMessage
         TestValues testValues = new TestValues();
         msg.writeBoolean(testValues.bb);
