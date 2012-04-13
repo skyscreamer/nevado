@@ -11,7 +11,7 @@ import org.apache.commons.logging.LogFactory;
 public class BackoffSleeper {
     private final Log _log = LogFactory.getLog(getClass());
 
-    private long _wait;
+    private volatile long _wait;
     private final long _minWait;
     private final long _maxWait;
     private final double _backoffMultiplier;

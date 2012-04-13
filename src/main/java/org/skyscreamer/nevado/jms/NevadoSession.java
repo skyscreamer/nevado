@@ -3,8 +3,6 @@ package org.skyscreamer.nevado.jms;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
-import org.skyscreamer.nevado.jms.destination.NevadoQueue;
-import org.skyscreamer.nevado.jms.destination.NevadoTemporaryQueue;
 import org.skyscreamer.nevado.jms.message.*;
 import org.skyscreamer.nevado.jms.util.MessageHolder;
 
@@ -31,8 +29,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     private Long _overrideJMSTTL;
     private Integer _overrideJMSPriority;
     private MessageListener _messageListener;
-    private final NevadoSessionExecutor _asyncConsumerRunner = new NevadoSessionExecutor(this);
-    private List<NevadoMessageConsumer> _messageConsumers = new CopyOnWriteArrayList<NevadoMessageConsumer>();
+    private final AsyncConsumerRunner _asyncConsumerRunner;
     private final MessageHolder _incomingStagedMessages = new MessageHolder(this);
     private final Map<NevadoDestination, List<NevadoMessage>> _outgoingTxMessages
             = new HashMap<NevadoDestination, List<NevadoMessage>>();
@@ -41,6 +38,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
         _connection = connection;
         _transacted = transacted;
         _acknowledgeMode = acknowledgeMode;
+        _asyncConsumerRunner = new AsyncConsumerRunner(_connection);
     }
 
     public BytesMessage createBytesMessage() throws JMSException {
@@ -169,7 +167,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     public MessageConsumer createConsumer(Destination destination) throws JMSException {
         checkClosed();
         NevadoMessageConsumer consumer = new NevadoMessageConsumer(this, NevadoDestination.getInstance(destination));
-        _messageConsumers.add(consumer);
+        _asyncConsumerRunner.addAsyncConsumer(consumer);
         return consumer;
     }
 
@@ -386,27 +384,17 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
         return _connection;
     }
 
-    protected List<NevadoMessageConsumer> getMessageConsumers() {
-        return _messageConsumers;
-    }
-
     protected synchronized void start() {
-        if (!_asyncConsumerRunner.isRunning())
-        {
-            _asyncConsumerRunner.start();
-        }
+        _asyncConsumerRunner.start();
     }
 
     protected synchronized void stop() throws JMSException {
-        if (_asyncConsumerRunner.isRunning())
-        {
-            try {
-                _asyncConsumerRunner.stop();
-            } catch (InterruptedException e) {
-                String exMessage = "Session threads may not have closed yet: " + e.getMessage();
-                _log.error(exMessage, e);
-                throw new JMSException(exMessage);
-            }
+        try {
+            _asyncConsumerRunner.stop();
+        } catch (InterruptedException e) {
+            String exMessage = "Session threads may not have closed yet: " + e.getMessage();
+            _log.error(exMessage, e);
+            throw new JMSException(exMessage);
         }
     }
 

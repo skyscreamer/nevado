@@ -103,7 +103,7 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
         Assert.assertEquals(testBody2, ((TextMessage) msg).getText());
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void testAsyncClientPause() throws Exception {
         // Set up listener
         Connection conn = getConnection();

@@ -19,15 +19,15 @@ public class NevadoMessageConsumer implements MessageConsumer {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public synchronized MessageListener getMessageListener() {
+    public MessageListener getMessageListener() {
         return _messageListener;
     }
 
-    public synchronized void setMessageListener(MessageListener messageListener) throws JMSException {
+    public void setMessageListener(MessageListener messageListener) throws JMSException {
         _messageListener = messageListener;
     }
 
-    public synchronized Message receive() throws JMSException {
+    public Message receive() throws JMSException {
         checkAsync();
         Message msg = _session.receiveMessage(_destination, -1);
         if (msg != null && _session.getAcknowledgeMode() == Session.AUTO_ACKNOWLEDGE)
@@ -37,7 +37,7 @@ public class NevadoMessageConsumer implements MessageConsumer {
         return msg;
     }
 
-    public synchronized Message receive(long timeoutMs) throws JMSException {
+    public Message receive(long timeoutMs) throws JMSException {
         checkAsync();
         Message msg = _session.receiveMessage(_destination, timeoutMs);
         if (msg != null && _session.getAcknowledgeMode() == Session.AUTO_ACKNOWLEDGE)
@@ -47,7 +47,7 @@ public class NevadoMessageConsumer implements MessageConsumer {
         return msg;
     }
 
-    public synchronized Message receiveNoWait() throws JMSException {
+    public Message receiveNoWait() throws JMSException {
         checkAsync();
         Message msg = _session.receiveMessage(_destination, 0);
         if (msg != null && _session.getAcknowledgeMode() == Session.AUTO_ACKNOWLEDGE)
@@ -57,11 +57,11 @@ public class NevadoMessageConsumer implements MessageConsumer {
         return msg;
     }
 
-    public synchronized void close() throws JMSException {
+    public void close() throws JMSException {
         _messageListener = null;
     }
 
-    protected synchronized boolean processAsyncMessage() throws JMSException {
+    protected boolean processAsyncMessage() throws JMSException {
         boolean messageProcessed = false;
         Message message = _session.receiveMessage(_destination, 0);
         if (message != null) {
