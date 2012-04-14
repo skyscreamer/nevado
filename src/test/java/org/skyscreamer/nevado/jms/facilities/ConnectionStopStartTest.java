@@ -48,14 +48,13 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
         String asyncTestBody = RandomData.readString();
         TextMessage asyncTestMessage = asyncSession.createTextMessage(asyncTestBody);
         asyncProducer.send(asyncTestMessage);
-        Thread.sleep(100);
-        Assert.assertEquals(0, messageListener.getMessages().size());
+        Thread.sleep(200);
+        Assert.assertTrue(messageListener.isEmpty());
 
         conn.start();
 
-        Thread.sleep(300);
-        Assert.assertEquals(1, messageListener.getMessages().size());
-        Assert.assertEquals(asyncTestBody, ((TextMessage)messageListener.getMessages().get(0)).getText());
+        TextMessage message = (TextMessage)messageListener.getMessage(1000);
+        Assert.assertEquals(asyncTestBody, message.getText());
     }
     
     @Test
@@ -108,30 +107,29 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
         // Set up listener
         Connection conn = getConnection();
         Session session = createSession();
-        String testBody1 = RandomData.readString();
-        String testBody2 = RandomData.readString();
+        TextMessage testMsg1 = session.createTextMessage(RandomData.readString());
+        TextMessage testMsg2 = session.createTextMessage(RandomData.readString());
         Queue tempQueue = createTempQueue(session);
         MessageProducer producer = session.createProducer(tempQueue);
-        producer.send(session.createTextMessage(testBody1));
-        producer.send(session.createTextMessage(testBody2));
+        producer.send(testMsg1);
+        producer.send(testMsg2);
 
         // Add listener
         TestMessageListener messageListener = new TestMessageListener();
         session.createConsumer(tempQueue).setMessageListener(messageListener);
-        Thread.sleep(1000);
-        Assert.assertEquals(2, messageListener.getMessages().size());
-        Assert.assertEquals(testBody1, ((TextMessage)messageListener.getMessages().get(0)).getText());
-        Assert.assertEquals(testBody2, ((TextMessage)messageListener.getMessages().get(1)).getText());
+        TextMessage msgOut1 = (TextMessage)messageListener.getMessage(1000);
+        TextMessage msgOut2 = (TextMessage)messageListener.getMessage(1000);
+        compareTextMessages(new TextMessage[] { testMsg1, testMsg2}, new TextMessage[] { msgOut1, msgOut2 });
+        Assert.assertTrue(messageListener.isEmpty());
 
         // Pause
         conn.stop();
         String testBody3 = RandomData.readString();
         producer.send(session.createTextMessage(testBody3));
         Thread.sleep(200);
-        Assert.assertEquals(2, messageListener.getMessages().size());
+        Assert.assertTrue(messageListener.isEmpty());
         conn.start();
-        Thread.sleep(1000);
-        Assert.assertEquals(3, messageListener.getMessages().size());
-        Assert.assertEquals(testBody3, ((TextMessage)messageListener.getMessages().get(2)).getText());
+        Assert.assertEquals(testBody3, ((TextMessage)messageListener.getMessage(1000)).getText());
+        Assert.assertTrue(messageListener.isEmpty());
     }
 }

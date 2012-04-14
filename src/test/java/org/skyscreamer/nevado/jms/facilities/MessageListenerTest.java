@@ -27,17 +27,14 @@ public class MessageListenerTest extends AbstractJMSTest{
         TextMessage testMessage3 = session.createTextMessage(RandomData.readString());
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(testMessage1);
-        Thread.sleep(500);
         producer.send(testMessage2);
-        Thread.sleep(500);
         producer.send(testMessage3);
-        Thread.sleep(2000);
-        List<Message> messages = messageListener.getMessages();
-        Assert.assertEquals(3, messages.size());
-        Assert.assertTrue(messages.get(0) instanceof TextMessage);
-        Assert.assertEquals(testMessage1.getText(), ((TextMessage) messages.get(0)).getText());
-        Assert.assertEquals(testMessage2.getText(), ((TextMessage) messages.get(1)).getText());
-        Assert.assertEquals(testMessage3.getText(), ((TextMessage) messages.get(2)).getText());
+        TextMessage msgOut1 = (TextMessage)messageListener.getMessage(1000);
+        TextMessage msgOut2 = (TextMessage)messageListener.getMessage(1000);
+        TextMessage msgOut3 = (TextMessage)messageListener.getMessage(1000);
+        compareTextMessages(new TextMessage[] {testMessage1, testMessage2, testMessage3},
+                new TextMessage[] {msgOut1, msgOut2, msgOut3});
+        Assert.assertTrue(messageListener.isEmpty());
     }
 
     @Test(expected = IllegalStateException.class)

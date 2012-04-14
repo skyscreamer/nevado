@@ -2,16 +2,15 @@ package org.skyscreamer.nevado.jms.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.skyscreamer.nevado.jms.message.NevadoMessage;
 import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * Test MessageListener.  Listens for messages, and adds them to an array for later review.
@@ -20,7 +19,7 @@ import java.util.Set;
  */
 public class TestMessageListener implements MessageListener {
     private final Log _log = LogFactory.getLog(getClass());
-    private final List<Message> _messages = new ArrayList<Message>();
+    private final BlockingQueue<Message> _messages = new LinkedBlockingQueue<Message>();
 
     public void onMessage(Message message) {
         _messages.add(message);
@@ -32,7 +31,19 @@ public class TestMessageListener implements MessageListener {
         }
     }
 
-    public List<Message> getMessages() {
-        return _messages;
+    public NevadoMessage getMessage(long waitMs) {
+        NevadoMessage message;
+        try {
+            message = (NevadoMessage)_messages.poll(waitMs, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            // No message for you!
+            message = null;
+        }
+        return message;
+    }
+
+    public boolean isEmpty()
+    {
+        return _messages.isEmpty();
     }
 }

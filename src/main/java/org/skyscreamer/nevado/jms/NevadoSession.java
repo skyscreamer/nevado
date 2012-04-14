@@ -295,6 +295,12 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
             message = getUnfilteredMessage(destination, timeoutMs);
         }
 
+        // Auto-ack
+        if (message != null && _acknowledgeMode == Session.AUTO_ACKNOWLEDGE)
+        {
+            message.acknowledge();
+        }
+
         // Set session and destination
         return message;
     }
