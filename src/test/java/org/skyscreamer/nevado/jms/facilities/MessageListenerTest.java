@@ -20,7 +20,7 @@ public class MessageListenerTest extends AbstractJMSTest{
     public void testMessageListener() throws JMSException, InterruptedException {
         TestMessageListener messageListener = new TestMessageListener();
         Session session = createSession();
-        Queue tempQueue = createTempQueue();
+        Queue tempQueue = createTempQueue(session);
         session.createConsumer(tempQueue).setMessageListener(messageListener);
         TextMessage testMessage1 = session.createTextMessage(RandomData.readString());
         TextMessage testMessage2 = session.createTextMessage(RandomData.readString());
@@ -44,7 +44,7 @@ public class MessageListenerTest extends AbstractJMSTest{
     public void testAsyncBlocksSync() throws JMSException {
         TestMessageListener messageListener = new TestMessageListener();
         Session session = createSession();
-        Queue tempQueue = createTempQueue();
+        Queue tempQueue = createTempQueue(session);
         MessageConsumer consumer = session.createConsumer(tempQueue);
         consumer.setMessageListener(messageListener);
         consumer.receiveNoWait();
@@ -54,7 +54,7 @@ public class MessageListenerTest extends AbstractJMSTest{
     public void testAsyncThenSyncNoBlock() throws JMSException {
         TestMessageListener messageListener = new TestMessageListener();
         Session session = createSession();
-        Queue tempQueue = createTempQueue();
+        Queue tempQueue = createTempQueue(session);
         MessageConsumer consumer = session.createConsumer(tempQueue);
         consumer.setMessageListener(messageListener);
         consumer.setMessageListener(null);

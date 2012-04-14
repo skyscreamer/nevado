@@ -4,10 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageProducer;
-import javax.jms.Queue;
+import javax.jms.*;
 
 public class JMSMessageIDTest extends AbstractJMSTest {
     @Test
@@ -22,13 +19,14 @@ public class JMSMessageIDTest extends AbstractJMSTest {
     
     @Test
     public void testDisable() throws JMSException {
-        Message msg = createSession().createMessage();
+        Session session = createSession();
+        Message msg = session.createMessage();
         Assert.assertNull(msg.getJMSMessageID());
-        Queue tempQueue = createTempQueue();
-        MessageProducer msgProducer = createSession().createProducer(tempQueue);
+        Queue tempQueue = createTempQueue(session);
+        MessageProducer msgProducer = session.createProducer(tempQueue);
         msgProducer.setDisableMessageID(true);
         msgProducer.send(msg);
-        Message msgOut = createSession().createConsumer(tempQueue).receive();
+        Message msgOut = session.createConsumer(tempQueue).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         Assert.assertNull(msg.getJMSMessageID());

@@ -19,7 +19,7 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
         // Set up session for sync messages
         Connection conn = createConnection(getConnectionFactory());
         Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        Queue tempQueue = createTempQueue();
+        Queue tempQueue = createTempQueue(session);
         MessageProducer producer = session.createProducer(tempQueue);
         String testBody = RandomData.readString();
         TextMessage testMessage = session.createTextMessage(testBody);
@@ -42,7 +42,7 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
         Connection conn = createConnection(getConnectionFactory());
         Session asyncSession = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
         TestMessageListener messageListener = new TestMessageListener();
-        Queue tempQueue = createTempQueue();
+        Queue tempQueue = createTempQueue(asyncSession);
         asyncSession.createConsumer(tempQueue).setMessageListener(messageListener);
         MessageProducer asyncProducer = asyncSession.createProducer(tempQueue);
         String asyncTestBody = RandomData.readString();
@@ -65,7 +65,7 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
         Session session = createSession();
         String testBody1 = RandomData.readString();
         String testBody2 = RandomData.readString();
-        Queue tempQueue = createTempQueue();
+        Queue tempQueue = createTempQueue(session);
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(session.createTextMessage(testBody1));
         producer.send(session.createTextMessage(testBody2));
@@ -110,7 +110,7 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
         Session session = createSession();
         String testBody1 = RandomData.readString();
         String testBody2 = RandomData.readString();
-        Queue tempQueue = createTempQueue();
+        Queue tempQueue = createTempQueue(session);
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(session.createTextMessage(testBody1));
         producer.send(session.createTextMessage(testBody2));
@@ -118,7 +118,7 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
         // Add listener
         TestMessageListener messageListener = new TestMessageListener();
         session.createConsumer(tempQueue).setMessageListener(messageListener);
-        Thread.sleep(500);
+        Thread.sleep(1000);
         Assert.assertEquals(2, messageListener.getMessages().size());
         Assert.assertEquals(testBody1, ((TextMessage)messageListener.getMessages().get(0)).getText());
         Assert.assertEquals(testBody2, ((TextMessage)messageListener.getMessages().get(1)).getText());

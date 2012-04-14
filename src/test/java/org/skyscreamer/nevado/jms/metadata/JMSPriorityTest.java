@@ -4,10 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageProducer;
-import javax.jms.Queue;
+import javax.jms.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,19 +23,20 @@ public class JMSPriorityTest extends AbstractJMSTest {
 
     @Test
     public void testAssign() throws JMSException {
-        Message msg1 = createSession().createMessage();
-        Queue tempQueue = createTempQueue();
-        MessageProducer msgProducer = createSession().createProducer(tempQueue);
+        Session session = createSession();
+        Message msg1 = session.createMessage();
+        Queue tempQueue = createTempQueue(session);
+        MessageProducer msgProducer = session.createProducer(tempQueue);
         msgProducer.send(msg1, Message.DEFAULT_DELIVERY_MODE, 0, Message.DEFAULT_TIME_TO_LIVE);
-        Message msgOut = createSession().createConsumer(tempQueue).receive();
+        Message msgOut = session.createConsumer(tempQueue).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         Assert.assertEquals(0, msg1.getJMSPriority());
         Assert.assertEquals(0, msgOut.getJMSPriority());
 
-        Message msg2 = createSession().createMessage();
+        Message msg2 = session.createMessage();
         msgProducer.send(msg2, Message.DEFAULT_DELIVERY_MODE, 9, Message.DEFAULT_TIME_TO_LIVE);
-        msgOut = createSession().createConsumer(tempQueue).receive();
+        msgOut = session.createConsumer(tempQueue).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         Assert.assertEquals(9, msg2.getJMSPriority());

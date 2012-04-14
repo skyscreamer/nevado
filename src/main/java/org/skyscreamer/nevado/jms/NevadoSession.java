@@ -129,13 +129,12 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
         }
     }
 
-    public void close() throws JMSException {
-        if (_closed)
+    public synchronized void close() throws JMSException {
+        if (!_closed)
         {
-            return;
+            stop();
+            _closed = true;
         }
-        _closed = true;
-        stop();
     }
 
     public void recover() throws JMSException {
@@ -165,20 +164,21 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     }
 
     public MessageConsumer createConsumer(Destination destination) throws JMSException {
+        return createConsumer(destination, null);
+    }
+
+    public MessageConsumer createConsumer(Destination destination, String selector) throws JMSException {
+        return createConsumer(destination, selector, false);
+    }
+
+    public MessageConsumer createConsumer(Destination destination, String selector, boolean noLocal) throws JMSException
+    {
+        // TODO - Selector and noLocal currently ignored
         checkClosed();
+        checkValidDestination(destination);
         NevadoMessageConsumer consumer = new NevadoMessageConsumer(this, NevadoDestination.getInstance(destination));
         _asyncConsumerRunner.addAsyncConsumer(consumer);
         return consumer;
-    }
-
-    public MessageConsumer createConsumer(Destination destination, String s) throws JMSException {
-        checkClosed();
-        return null;  // TODO
-    }
-
-    public MessageConsumer createConsumer(Destination destination, String s, boolean b) throws JMSException {
-        checkClosed();
-        return null;  // TODO
     }
 
     public Queue createQueue(String s) throws JMSException {
@@ -402,6 +402,18 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
         if (_closed)
         {
             throw new IllegalStateException("This session has been closed");
+        }
+    }
+
+    private void checkValidDestination(Destination destination) throws JMSException
+    {
+        if (destination instanceof TemporaryQueue)
+        {
+            if (!_connection.listAllTemporaryQueues().contains(destination))
+            {
+                throw new InvalidDestinationException("Consumers for temporary queues cannot be created outside of " +
+                        "connection where the temporary queue was created.");
+            }
         }
     }
 }

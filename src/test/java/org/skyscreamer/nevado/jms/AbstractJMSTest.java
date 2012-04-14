@@ -54,8 +54,9 @@ public abstract class AbstractJMSTest {
     }
 
     protected Message sendAndReceive(Message msg) throws JMSException {
-        Queue testQueue = createTempQueue();
-        createSession().createProducer(testQueue).send(msg);
+        Session session = createSession();
+        Queue testQueue = createTempQueue(session);
+        session.createProducer(testQueue).send(msg);
         Message msgOut = createSession().createConsumer(testQueue).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
@@ -102,12 +103,7 @@ public abstract class AbstractJMSTest {
         return (NevadoSession)_connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
     }
 
-    protected Queue createTempQueue() throws JMSException
-    {
-        return createTempQueue(createSession());
-    }
-
-    protected Queue createTempQueue(NevadoSession session) throws JMSException
+    protected Queue createTempQueue(Session session) throws JMSException
     {
         return session.createTemporaryQueue();
     }

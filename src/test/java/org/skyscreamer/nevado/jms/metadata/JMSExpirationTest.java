@@ -4,10 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageProducer;
-import javax.jms.Queue;
+import javax.jms.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,14 +22,15 @@ public class JMSExpirationTest extends AbstractJMSTest {
 
     @Test
     public void testSetExpiration() throws JMSException {
-        Message msg = createSession().createMessage();
-        Queue tempQueue = createTempQueue();
-        MessageProducer msgProducer = createSession().createProducer(tempQueue);
+        Session session = createSession();
+        Message msg = session.createMessage();
+        Queue tempQueue = createTempQueue(session);
+        MessageProducer msgProducer = session.createProducer(tempQueue);
         msgProducer.setDisableMessageID(true);
         long time = System.currentTimeMillis();
         msgProducer.send(msg, Message.DEFAULT_DELIVERY_MODE, Message.DEFAULT_PRIORITY, 60000);
         Assert.assertEquals(time + 60000, msg.getJMSExpiration(), 100);
-        Message msgOut = createSession().createConsumer(tempQueue).receive();
+        Message msgOut = session.createConsumer(tempQueue).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         Assert.assertEquals(time + 60000, msgOut.getJMSExpiration(), 100);
@@ -40,14 +38,15 @@ public class JMSExpirationTest extends AbstractJMSTest {
 
     @Test
     public void testExpire() throws JMSException, InterruptedException {
-        Message msgToExpire = createSession().createMessage();
-        Message msgWithoutExpire = createSession().createMessage();
-        Queue tempQueue = createTempQueue();
-        MessageProducer msgProducer = createSession().createProducer(tempQueue);
+        Session session = createSession();
+        Message msgToExpire = session.createMessage();
+        Message msgWithoutExpire = session.createMessage();
+        Queue tempQueue = createTempQueue(session);
+        MessageProducer msgProducer = session.createProducer(tempQueue);
         msgProducer.send(msgToExpire, Message.DEFAULT_DELIVERY_MODE, Message.DEFAULT_PRIORITY, 10);
         msgProducer.send(msgWithoutExpire);
         Thread.sleep(10);
-        Message msgOut = createSession().createConsumer(tempQueue).receive();
+        Message msgOut = session.createConsumer(tempQueue).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         Assert.assertEquals("Should skip the expired message", msgWithoutExpire.getJMSMessageID(),

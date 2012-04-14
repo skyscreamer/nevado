@@ -20,10 +20,20 @@ public class TemporaryQueueTest extends AbstractJMSTest {
         NevadoSession session = createSession();
         TemporaryQueue temporaryQueue = session.createTemporaryQueue();
         TextMessage testMessage = session.createTextMessage(RandomData.readString());
-        createSession().createProducer(temporaryQueue).send(testMessage);
-        Message msgOut = createSession().createConsumer(temporaryQueue).receive();
+        session.createProducer(temporaryQueue).send(testMessage);
+        Message msgOut = session.createConsumer(temporaryQueue).receive();
         Assert.assertTrue(msgOut instanceof TextMessage);
         Assert.assertEquals("Message body not equal", testMessage.getText(), ((TextMessage) msgOut).getText());
+    }
+
+    @Test(expected = InvalidDestinationException.class)
+    public void testTemporaryQueueAcrossConnections() throws Exception
+    {
+        NevadoSession session = createSession();
+        TemporaryQueue temporaryQueue = session.createTemporaryQueue();
+        Connection theWrongConnection = createConnection(getConnectionFactory());
+        Session theWrongSession = theWrongConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        MessageConsumer consumer = theWrongSession.createConsumer(temporaryQueue);
     }
 
     // Because the queues returned by SQS ListQueues is not synchronous with creation and deletion of queues, it is

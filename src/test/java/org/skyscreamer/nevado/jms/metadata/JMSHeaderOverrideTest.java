@@ -30,7 +30,7 @@ public class JMSHeaderOverrideTest extends AbstractJMSTest {
 
         Message msg = _overriddenSession.createMessage();
 
-        Queue tempQueue = createTempQueue();
+        Queue tempQueue = createTempQueue(_overriddenSession);
         _overriddenSession.createProducer(tempQueue).send(msg);
         Message msgOut = _overriddenSession.createConsumer(tempQueue).receive();
         Assert.assertNotNull("Got null message back", msgOut);
@@ -39,5 +39,6 @@ public class JMSHeaderOverrideTest extends AbstractJMSTest {
         Assert.assertEquals(DeliveryMode.NON_PERSISTENT, msgOut.getJMSDeliveryMode());
         Assert.assertEquals(9, msgOut.getJMSPriority());
         Assert.assertEquals(System.currentTimeMillis() + 60000, msgOut.getJMSExpiration(), 1000);
+        conn.close();
     }
 }

@@ -22,7 +22,7 @@ public class AsyncConsumerRunner implements Runnable {
     private final Connection _connection;
     private final Set<NevadoMessageConsumer> _asyncConsumers = new CopyOnWriteArraySet<NevadoMessageConsumer>();
     private volatile boolean _running = false;
-    private final BackoffSleeper _sleeper = new BackoffSleeper(10, 15000, 2.0);
+    private final BackoffSleeper _sleeper = new BackoffSleeper(50, 15000, 2.0);
     private Thread runner;
 
     protected AsyncConsumerRunner(Connection connection) {
@@ -30,7 +30,9 @@ public class AsyncConsumerRunner implements Runnable {
     }
 
     public void run() {
+        _log.info("Starting async loop");
         RUN_LOOP: while(_running) {
+            _log.info("Running async loop");
             boolean messageProcessed = false;
             for(NevadoMessageConsumer consumer : _asyncConsumers)
             {
@@ -42,8 +44,10 @@ public class AsyncConsumerRunner implements Runnable {
                 // If we're getting messages tell the back-off sleeper
                 _sleeper.reset();
             }
+            _log.info("Sleeping async loop");
             _sleeper.sleep();
         }
+        _log.info("Exiting async loop");
     }
 
     public void addAsyncConsumer(NevadoMessageConsumer asyncConsumer)
