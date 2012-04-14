@@ -142,6 +142,11 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         _temporaryQueues.remove(temporaryQueue);
     }
 
+    public boolean ownsTemporaryQueue(TemporaryQueue temporaryQueue)
+    {
+        return _temporaryQueues.contains(temporaryQueue);
+    }
+
     public Collection<TemporaryQueue> listAllTemporaryQueues() throws JMSException {
         Collection<NevadoQueue> queues = getSQSConnector().listQueues(TEMPORARY_QUEUE_PREFIX);
         Collection<TemporaryQueue> temporaryQueues = new HashSet<TemporaryQueue>(queues.size());

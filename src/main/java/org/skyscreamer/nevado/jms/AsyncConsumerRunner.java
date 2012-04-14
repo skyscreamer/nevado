@@ -30,9 +30,9 @@ public class AsyncConsumerRunner implements Runnable {
     }
 
     public void run() {
-        _log.info("Starting async loop");
+        _log.debug("Starting async loop");
         RUN_LOOP: while(_running) {
-            _log.info("Running async loop");
+            _log.debug("Running async loop");
             boolean messageProcessed = false;
             for(NevadoMessageConsumer consumer : _asyncConsumers)
             {
@@ -44,10 +44,10 @@ public class AsyncConsumerRunner implements Runnable {
                 // If we're getting messages tell the back-off sleeper
                 _sleeper.reset();
             }
-            _log.info("Sleeping async loop");
+            _log.debug("Sleeping async loop");
             _sleeper.sleep();
         }
-        _log.info("Exiting async loop");
+        _log.debug("Exiting async loop");
     }
 
     public void addAsyncConsumer(NevadoMessageConsumer asyncConsumer)

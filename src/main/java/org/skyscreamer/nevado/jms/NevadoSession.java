@@ -1,5 +1,6 @@
 package org.skyscreamer.nevado.jms;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
@@ -409,7 +410,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     {
         if (destination instanceof TemporaryQueue)
         {
-            if (!_connection.listAllTemporaryQueues().contains(destination))
+            if (!_connection.ownsTemporaryQueue((TemporaryQueue)destination))
             {
                 throw new InvalidDestinationException("Consumers for temporary queues cannot be created outside of " +
                         "connection where the temporary queue was created.");
