@@ -8,6 +8,7 @@ import org.skyscreamer.nevado.jms.util.RandomData;
 
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
+import javax.jms.MessageEOFException;
 import java.util.Arrays;
 
 /**
@@ -27,6 +28,16 @@ public class BytesMessageTest extends AbstractJMSTest {
     public void testAlienBytesMessage() throws JMSException {
         BytesMessage msg = new ActiveMQBytesMessage();
         testBytesMessage(msg);
+    }
+
+    @Test(expected = MessageEOFException.class)
+    public void testMessageEOF() throws JMSException {
+        BytesMessage msg = createSession().createBytesMessage();
+        msg.writeByte(RandomData.readByte());
+        BytesMessage msgOut = (BytesMessage)sendAndReceive(msg);
+        msgOut.readByte();
+        byte b = msgOut.readByte();
+        _log.error("Got back an extra byte: " + b);
     }
 
     private void testBytesMessage(BytesMessage msg) throws JMSException {

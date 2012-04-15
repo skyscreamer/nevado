@@ -28,6 +28,16 @@ public class StreamMessageTest extends AbstractJMSTest {
         testStreamMessage(msg);
     }
 
+    @Test(expected = MessageEOFException.class)
+    public void testMessageEOF() throws JMSException {
+        StreamMessage msg = createSession().createStreamMessage();
+        msg.writeByte(RandomData.readByte());
+        StreamMessage msgOut = (StreamMessage)sendAndReceive(msg);
+        msgOut.readByte();
+        byte b = msgOut.readByte();
+        _log.error("Got back an extra byte: " + b);
+    }
+
     private void testStreamMessage(StreamMessage msg) throws JMSException {
         // Initialize MapMessage
         TestValues testValues = new TestValues();
