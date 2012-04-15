@@ -101,27 +101,7 @@ public class SQSConnector implements NevadoConnector {
         try {
             _queueService.listMessageQueues(null);
         } catch (SQSException e) {
-            _log.error("Connection test failed: " + e.getMessage());
-            boolean securityException = false;
-            if (e.getErrors().size() > 0)
-            {
-                for(AWSError awsError : e.getErrors())
-                {
-                    if (AWS_ERROR_CODE_AUTHENTICATION.equals(awsError.getCode()))
-                    {
-                        securityException = true;
-                        break;
-                    }
-                }
-            }
-            if (securityException)
-            {
-                throw new JMSSecurityException(e.getMessage());
-            }
-            else
-            {
-                throw new JMSException(e.getMessage());
-            }
+            throw handleSQSException("Connection test failed", e);
         }
     }
 
@@ -146,9 +126,7 @@ public class SQSConnector implements NevadoConnector {
         try {
             sqsQueues = _queueService.listMessageQueues(temporaryQueuePrefix);
         } catch (SQSException e) {
-            String exMessage = "Unable to list queues with prefix '" + temporaryQueuePrefix + "'";
-            _log.error(exMessage, e);
-            throw new JMSException(exMessage);
+            throw handleSQSException("Unable to list queues with prefix '" + temporaryQueuePrefix + "'", e);
         }
         queues = new HashSet<NevadoQueue>(sqsQueues.size());
         for(MessageQueue sqsQueue : sqsQueues) {
@@ -169,10 +147,8 @@ public class SQSConnector implements NevadoConnector {
         try {
             sqsQueue.setMessageVisibilityTimeout(sqsReceiptHandle, 0);
         } catch (SQSException e) {
-            String exMessage = "Unable to reset message visibility to zero (" + message.getJMSMessageID()
-                    + ") with receipt handle " + sqsReceiptHandle;
-            _log.error(exMessage, e);
-            throw new JMSException(exMessage);
+            throw handleSQSException("Unable to reset message visibility to zero (" + message.getJMSMessageID()
+                    + ") with receipt handle " + sqsReceiptHandle, e);
         }
     }
 
@@ -180,9 +156,7 @@ public class SQSConnector implements NevadoConnector {
         try {
             sqsQueue.deleteMessage(sqsReceiptHandle);
         } catch (SQSException e) {
-            String exMessage = "Unable to delete message (" + message.getJMSMessageID() + ") with receipt handle " + sqsReceiptHandle;
-            _log.error(exMessage, e);
-            throw new JMSException(exMessage);
+            throw handleSQSException("Unable to delete message (" + message.getJMSMessageID() + ") with receipt handle " + sqsReceiptHandle, e);
         }
     }
 
@@ -220,9 +194,7 @@ public class SQSConnector implements NevadoConnector {
                 try {
                     sqsMessage = sqsQueue.receiveMessage();
                 } catch (SQSException e) {
-                    String exMessage = "Unable to receive message from '" + destination + "': " + e.getMessage();
-                    _log.error(exMessage, e);
-                    throw new JMSException(exMessage);
+                    throw handleSQSException("Unable to receive message from '" + destination, e);
                 }
                 if (!connection.isRunning()) {
                     // Connection was stopped while the REST call to SQS was being made
@@ -258,9 +230,7 @@ public class SQSConnector implements NevadoConnector {
         try {
             return sqsQueue.sendMessage(serializedMessage);
         } catch (SQSException e) {
-            String exMessage = "Unable to send message to queue '" + destination + "': " + e.getMessage();
-            _log.error(exMessage, e);
-            throw new JMSException(exMessage);
+            throw handleSQSException("Unable to send message to queue '" + destination, e);
         }
     }
 
@@ -318,9 +288,7 @@ public class SQSConnector implements NevadoConnector {
         try {
             sqsQueue = _queueService.getOrCreateMessageQueue(destination.getName());
         } catch (SQSException e) {
-            String exMessage = "Unable to get message queue '" + destination + "': " + e.getMessage();
-            _log.error(exMessage, e);
-            throw new JMSException(exMessage);
+            throw handleSQSException("Unable to get message queue '" + destination, e);
         }
         return sqsQueue;
     }
@@ -330,9 +298,39 @@ public class SQSConnector implements NevadoConnector {
         try {
             sqsQueue.deleteQueue();
         } catch (SQSException e) {
-            String exMessage = "Unable to delete message queue '" + destination + "': " + e.getMessage();
-            _log.error(exMessage, e);
-            throw new JMSException(exMessage);
+            throw handleSQSException("Unable to delete message queue '" + destination, e);
         }
+    }
+
+    private JMSException handleSQSException(String message, SQSException e) {
+        JMSException jmsException;
+        String exMessage = message + ": " + e.getMessage();
+        _log.error(exMessage, e);
+        boolean securityException = isSecurityException(e);
+        if (securityException)
+        {
+            jmsException = new JMSSecurityException(exMessage);
+        }
+        else
+        {
+            jmsException = new JMSException(exMessage);
+        }
+        return jmsException;
+    }
+
+    private boolean isSecurityException(SQSException e) {
+        boolean securityException = false;
+        if (e.getErrors().size() > 0)
+        {
+            for(AWSError awsError : e.getErrors())
+            {
+                if (AWS_ERROR_CODE_AUTHENTICATION.equals(awsError.getCode()))
+                {
+                    securityException = true;
+                    break;
+                }
+            }
+        }
+        return securityException;
     }
 }
