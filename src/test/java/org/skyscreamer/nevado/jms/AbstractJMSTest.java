@@ -136,4 +136,9 @@ public abstract class AbstractJMSTest {
         }
         return textCount;
     }
+
+    protected void breakSession(NevadoSession session)
+    {
+        session.setBreakSessionForTesting(true);
+    }
 }

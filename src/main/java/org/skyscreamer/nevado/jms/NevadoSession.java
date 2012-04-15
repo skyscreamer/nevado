@@ -36,6 +36,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
             = new HashMap<NevadoDestination, List<NevadoMessage>>();
     private final Set<NevadoMessageConsumer> _consumers = new HashSet<NevadoMessageConsumer>();
     private final Set<NevadoMessageProducer> _producers = new HashSet<NevadoMessageProducer>();
+    private boolean _TESTING_ONLY_break = false;
 
     protected NevadoSession(NevadoConnection connection, boolean transacted, int acknowledgeMode)
     {
@@ -335,6 +336,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
 
     public Message receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException
     {
+        testBreak();
         NevadoMessage message = getUnfilteredMessage(destination, timeoutMs);
 
         // Filter expired messages
@@ -448,6 +450,10 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
         _overrideJMSPriority = jmsPriority;
     }
 
+    public boolean isClosed() {
+        return _closed;
+    }
+
     protected NevadoConnection getConnection()
     {
         return _connection;
@@ -489,7 +495,15 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
         }
     }
 
-    public boolean isClosed() {
-        return _closed;
+    protected void setBreakSessionForTesting(boolean value)
+    {
+        _TESTING_ONLY_break = value;
+    }
+
+    private void testBreak() throws JMSException {
+        if (_TESTING_ONLY_break)
+        {
+            throw new JMSException("SESSION DELIBERATELY THROWING EXCEPTION - FOR TESTING MODE ONLY");
+        }
     }
 }
