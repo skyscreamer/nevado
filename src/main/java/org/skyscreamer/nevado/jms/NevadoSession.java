@@ -1,25 +1,22 @@
 package org.skyscreamer.nevado.jms;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import org.skyscreamer.nevado.jms.message.*;
-import org.skyscreamer.nevado.jms.util.MessageHolder;
 
 import javax.jms.*;
 import javax.jms.IllegalStateException;
 import javax.jms.Queue;
 import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Nevado implementation of the general JMS Session interface.
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
-public class NevadoSession implements Session, QueueSession, TopicSession {
+public class NevadoSession implements Session {
     private final Log _log = LogFactory.getLog(getClass());
 
     protected boolean _closed = false;
@@ -120,7 +117,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
         return _acknowledgeMode;
     }
 
-    // TODO - Think about how to handle a failure during commit
+    // TODO - Think about how to handle a failure during commit (a break mid-way would fool atomicity)
     public void commit() throws JMSException
     {
         checkClosed();
@@ -218,28 +215,28 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
         return consumer;
     }
 
-    public Queue createQueue(String s) throws JMSException
+    public QueueBrowser createBrowser(Queue queue) throws JMSException
     {
         checkClosed();
         return null;  // TODO
     }
 
-    public QueueReceiver createReceiver(Queue queue) throws JMSException
+    public QueueBrowser createBrowser(Queue queue, String s) throws JMSException
     {
         checkClosed();
-        return null; // TODO
+        return null;  // TODO
     }
 
-    public QueueReceiver createReceiver(Queue queue, String s) throws JMSException
+    public TemporaryQueue createTemporaryQueue() throws JMSException
     {
         checkClosed();
-        return null; // TODO
+        return _connection.createTemporaryQueue();
     }
 
-    public QueueSender createSender(Queue queue) throws JMSException
+    public Queue createQueue(String s) throws JMSException
     {
         checkClosed();
-        return null; // TODO
+        return null;  // TODO
     }
 
     public Topic createTopic(String s) throws JMSException
@@ -276,24 +273,6 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     {
         checkClosed();
         return null; // TODO
-    }
-
-    public QueueBrowser createBrowser(Queue queue) throws JMSException
-    {
-        checkClosed();
-        return null;  // TODO
-    }
-
-    public QueueBrowser createBrowser(Queue queue, String s) throws JMSException
-    {
-        checkClosed();
-        return null;  // TODO
-    }
-
-    public TemporaryQueue createTemporaryQueue() throws JMSException
-    {
-        checkClosed();
-        return _connection.createTemporaryQueue();
     }
 
     public TemporaryTopic createTemporaryTopic() throws JMSException
@@ -401,6 +380,10 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     public void acknowledgeMessage(NevadoMessage message) throws JMSException
     {
         checkClosed();
+        if (this != message.getNevadoSession())
+        {
+            throw new IllegalStateException("Session should only acknowledge its own messages");
+        }
         if (!_transacted) {
             if (_acknowledgeMode == CLIENT_ACKNOWLEDGE)
             {
@@ -416,10 +399,14 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     public void expireMessage(NevadoMessage message) throws JMSException
     {
         checkClosed();
+        if (this != message.getNevadoSession())
+        {
+            throw new IllegalStateException("Session should only expire its own messages");
+        }
         deleteMessage(message);
     }
 
-    public void deleteMessage(NevadoMessage... messages) throws JMSException
+    protected void deleteMessage(NevadoMessage... messages) throws JMSException
     {
         for(NevadoMessage message : messages)
         {
@@ -427,7 +414,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
         }
     }
 
-    public void resetMessage(NevadoMessage... messages) throws JMSException
+    protected void resetMessage(NevadoMessage... messages) throws JMSException
     {
         for(NevadoMessage message : messages)
         {
@@ -475,7 +462,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
         }
     }
 
-    private void checkClosed() throws IllegalStateException
+    protected void checkClosed() throws IllegalStateException
     {
         if (_closed)
         {

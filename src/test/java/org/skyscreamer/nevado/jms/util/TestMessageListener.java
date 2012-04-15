@@ -3,13 +3,10 @@ package org.skyscreamer.nevado.jms.util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
-import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import javax.jms.TextMessage;
-import java.util.*;
 import java.util.concurrent.*;
 
 /**

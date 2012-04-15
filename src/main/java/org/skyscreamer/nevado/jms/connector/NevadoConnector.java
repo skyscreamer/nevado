@@ -5,7 +5,6 @@ import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
 
-import javax.jms.Destination;
 import javax.jms.JMSException;
 import java.util.Collection;
 import java.util.List;

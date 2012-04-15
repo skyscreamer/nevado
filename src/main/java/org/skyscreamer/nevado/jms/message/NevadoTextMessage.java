@@ -1,6 +1,5 @@
 package org.skyscreamer.nevado.jms.message;
 
-import com.xerox.amazonws.sqs2.Message;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import javax.jms.JMSException;

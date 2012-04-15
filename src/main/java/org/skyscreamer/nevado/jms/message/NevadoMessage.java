@@ -1,7 +1,7 @@
 package org.skyscreamer.nevado.jms.message;
 
-import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import org.skyscreamer.nevado.jms.NevadoSession;
+import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 
 import javax.jms.*;
 import javax.jms.Message;

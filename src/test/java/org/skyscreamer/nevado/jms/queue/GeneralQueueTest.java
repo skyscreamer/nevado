@@ -2,8 +2,9 @@ package org.skyscreamer.nevado.jms.queue;
 
 import junit.framework.Assert;
 import org.junit.Test;
-import org.skyscreamer.nevado.jms.AbstractJMSTest;
-import org.skyscreamer.nevado.jms.NevadoSession;
+import org.skyscreamer.nevado.jms.*;
+import org.skyscreamer.nevado.jms.destination.NevadoDestination;
+import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 
 import javax.jms.*;
 import java.util.HashSet;
@@ -43,4 +44,24 @@ public class GeneralQueueTest extends AbstractJMSTest {
                     messagesOut.contains(message));
         }
     }
+
+    @Test
+    public void testCommonAndPTPAreSameImplementation()
+    {
+        Assert.assertTrue(ConnectionFactory.class.isAssignableFrom(NevadoConnectionFactory.class));
+        Assert.assertTrue(QueueConnectionFactory.class.isAssignableFrom(NevadoConnectionFactory.class));
+        Assert.assertTrue(ConnectionFactory.class.isAssignableFrom(NevadoConnectionFactory.class));
+        Assert.assertTrue(QueueConnectionFactory.class.isAssignableFrom(NevadoConnectionFactory.class));
+        Assert.assertTrue(Queue.class.isAssignableFrom(NevadoQueue.class));
+        Assert.assertTrue(NevadoDestination.class.isAssignableFrom(NevadoQueue.class));
+        Assert.assertTrue(Destination.class.isAssignableFrom(NevadoDestination.class));
+        Assert.assertTrue(Session.class.isAssignableFrom(NevadoSession.class));
+        Assert.assertTrue(QueueSession.class.isAssignableFrom(NevadoQueueSession.class));
+        Assert.assertTrue(NevadoSession.class.isAssignableFrom(NevadoQueueSession.class));
+        Assert.assertTrue(MessageProducer.class.isAssignableFrom(NevadoMessageProducer.class));
+        Assert.assertTrue(QueueSender.class.isAssignableFrom(NevadoMessageProducer.class));
+        Assert.assertTrue(MessageConsumer.class.isAssignableFrom(NevadoMessageConsumer.class));
+        Assert.assertTrue(QueueReceiver.class.isAssignableFrom(NevadoMessageConsumer.class));
+    }
+
 }

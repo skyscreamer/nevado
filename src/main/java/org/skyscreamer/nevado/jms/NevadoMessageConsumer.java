@@ -5,7 +5,7 @@ import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import javax.jms.*;
 import javax.jms.IllegalStateException;
 
-public class NevadoMessageConsumer implements MessageConsumer {
+public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver {
     private boolean _closed = false;
     private final NevadoSession _session;
     private final NevadoDestination _destination;
@@ -77,6 +77,17 @@ public class NevadoMessageConsumer implements MessageConsumer {
         {
             throw new IllegalStateException("Synchronous message delivery cannot be requested from a consumer after " +
                     "a message listener has been registered");
+        }
+    }
+
+    public Queue getQueue() throws JMSException {
+        if (_destination instanceof Queue)
+        {
+            return (Queue)_destination;
+        }
+        else
+        {
+            throw new IllegalStateException("getQueue() can only be called for a QueueSender");
         }
     }
 

@@ -41,10 +41,29 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         _nevadoConnector.test();
     }
 
-    public synchronized NevadoSession createQueueSession(boolean transacted, int acknowledgeMode) throws JMSException {
+    public synchronized NevadoQueueSession createQueueSession(boolean transacted, int acknowledgeMode) throws JMSException {
+        checkClosed();
+        _inUse = true;
+        NevadoQueueSession nevadoSession = new NevadoQueueSession(this, transacted, acknowledgeMode);
+        initializeSession(nevadoSession);
+        return nevadoSession;
+    }
+
+    public ConnectionConsumer createConnectionConsumer(Queue queue, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
+        checkClosed();
+        _inUse = true;
+        return null;  // TODO
+    }
+
+    public NevadoSession createSession(boolean transacted, int acknowledgeMode) throws JMSException {
         checkClosed();
         _inUse = true;
         NevadoSession nevadoSession = new NevadoSession(this, transacted, acknowledgeMode);
+        initializeSession(nevadoSession);
+        return nevadoSession;
+    }
+
+    private void initializeSession(NevadoSession nevadoSession) {
         nevadoSession.setOverrideJMSDeliveryMode(_jmsDeliveryMode);
         nevadoSession.setOverrideJMSTTL(_jmsTTL);
         nevadoSession.setOverrideJMSPriority(_jmsPriority);
@@ -53,19 +72,6 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         {
             nevadoSession.start();
         }
-        return nevadoSession;
-    }
-
-    public ConnectionConsumer createConnectionConsumer(Queue queue, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
-        checkClosed();
-        _inUse = true;
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public NevadoSession createSession(boolean transacted, int acknowledgeMode) throws JMSException {
-        checkClosed();
-        _inUse = true;
-        return createQueueSession(transacted, acknowledgeMode);
     }
 
     public NevadoConnectionMetaData getMetaData() throws JMSException {
@@ -125,7 +131,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
     public ConnectionConsumer createConnectionConsumer(Destination destination, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
         checkClosed();
         _inUse = true;
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;  // TODO
     }
 
     public TopicSession createTopicSession(boolean b, int i) throws JMSException {

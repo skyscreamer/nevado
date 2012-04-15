@@ -33,7 +33,7 @@ public class NevadoBytesMessage extends NevadoMessage implements BytesMessage {
 
     public NevadoBytesMessage() {}
 
-    public NevadoBytesMessage(BytesMessage message) throws JMSException {
+    protected NevadoBytesMessage(BytesMessage message) throws JMSException {
         super(message);
         message.reset();
         for(int count = 0 ; count < message.getBodyLength() ; ) {

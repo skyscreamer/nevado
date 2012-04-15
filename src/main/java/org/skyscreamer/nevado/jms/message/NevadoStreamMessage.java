@@ -7,10 +7,6 @@ import org.skyscreamer.nevado.jms.util.MarshallingSupport;
 
 import javax.jms.*;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.DeflaterOutputStream;
-import java.util.zip.InflaterInputStream;
 
 /**
  * This class borrrows heavily from ActiveMQStreamMessage, Copyright 2004 Protique Ltd,
@@ -38,7 +34,7 @@ public class NevadoStreamMessage extends NevadoMessage implements StreamMessage 
 
     public NevadoStreamMessage() {}
 
-    public NevadoStreamMessage(StreamMessage message) throws JMSException {
+    protected NevadoStreamMessage(StreamMessage message) throws JMSException {
         super(message);
         message.reset();
         while(true) {

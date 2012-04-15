@@ -1,6 +1,5 @@
-package org.skyscreamer.nevado.jms.util;
+package org.skyscreamer.nevado.jms;
 
-import org.skyscreamer.nevado.jms.NevadoSession;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
 
 import javax.jms.Destination;
