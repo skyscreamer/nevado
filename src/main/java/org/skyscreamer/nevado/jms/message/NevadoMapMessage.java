@@ -1,5 +1,6 @@
 package org.skyscreamer.nevado.jms.message;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.skyscreamer.nevado.jms.util.CharWrapper;
 
 import javax.jms.JMSException;
@@ -150,5 +151,23 @@ public class NevadoMapMessage extends NevadoMessage implements MapMessage {
 
     public boolean itemExists(String key) throws JMSException {
         return _map.containsKey(key);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NevadoMapMessage that = (NevadoMapMessage) o;
+
+        if (_messageID != null ? !_messageID.equals(that._messageID) : that._messageID != null) return false;
+        if (_map != null ? !_map.equals(that._map) : that._map != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(_messageID).append(_map).toHashCode();
     }
 }

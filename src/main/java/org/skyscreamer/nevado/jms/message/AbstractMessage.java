@@ -24,7 +24,7 @@ public abstract class AbstractMessage<T> implements Message, Serializable {
             "LIKE", "IN", "IS", "ESCAPE" };
 
     private final Map<String, Object> _properties = new HashMap<String, Object>();
-    private String _messageID;
+    String _messageID;
     private long _timestamp = 0;
     private String _correlationID;
     private Destination _jmsReplyTo;

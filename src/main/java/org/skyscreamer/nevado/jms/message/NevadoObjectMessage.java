@@ -1,5 +1,6 @@
 package org.skyscreamer.nevado.jms.message;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.skyscreamer.nevado.jms.util.SerializeUtil;
 
 import javax.jms.JMSException;
@@ -62,5 +63,23 @@ public class NevadoObjectMessage extends NevadoMessage implements ObjectMessage 
                 throw new JMSException("Unable to deserialize body object");
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NevadoObjectMessage that = (NevadoObjectMessage) o;
+
+        if (_messageID != null ? !_messageID.equals(that._messageID) : that._messageID != null) return false;
+        if (_bodyBytes != null ? !_bodyBytes.equals(that._bodyBytes) : that._bodyBytes != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(_messageID).append(_bodyBytes).toHashCode();
     }
 }

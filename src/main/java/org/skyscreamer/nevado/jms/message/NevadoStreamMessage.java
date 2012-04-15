@@ -1,5 +1,6 @@
 package org.skyscreamer.nevado.jms.message;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.skyscreamer.nevado.jms.util.MarshallingSupport;
@@ -1182,5 +1183,23 @@ public class NevadoStreamMessage extends NevadoMessage implements StreamMessage 
     public String toString() {
         return super.toString() + " NevadoStreamMessage{ " + "bytesOut = " + bytesOut + ", dataOut = " + dataOut
                 + ", dataIn = " + dataIn + " }";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NevadoStreamMessage that = (NevadoStreamMessage) o;
+
+        if (_messageID != null ? !_messageID.equals(that._messageID) : that._messageID != null) return false;
+        if (_body != null ? !_body.equals(that._body) : that._body != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(_messageID).append(_body).toHashCode();
     }
 }
