@@ -11,12 +11,13 @@ import java.util.*;
 
 /**
  * Generic non-Nevado-specific abstract message.  Designed specific to the generic specification.  Could
- * be used for other implementations.
+ * theoretically be used for other implementations.
  *
  * This abstraction was created to breakout specification-specific logic from Nevado's provider-specific
  * logic.
  *
  * @author Carter Page
+ * @see NevadoMessage
  */
 public abstract class AbstractMessage<T> implements Message, Serializable {
     public static final String WHITESPACE_CHARS = " \t\r\n";

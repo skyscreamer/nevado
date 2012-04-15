@@ -95,6 +95,19 @@ public class ConnectionCloseTest extends AbstractJMSTest {
         Assert.assertTrue(producer.isClosed());
     }
 
+    @Test
+    public void testRecursiveSessionClose() throws JMSException
+    {
+        NevadoSession session = createSession();
+        Queue testQueue = createTempQueue(session);
+        NevadoMessageConsumer consumer = session.createConsumer(testQueue);
+        NevadoMessageProducer producer = session.createProducer(testQueue);
+        session.close();
+        Assert.assertTrue(session.isClosed());
+        Assert.assertTrue(consumer.isClosed());
+        Assert.assertTrue(producer.isClosed());
+    }
+
     @Test(expected = IllegalStateException.class)
     public void testAcknowledgeMessage() throws JMSException
     {
@@ -114,6 +127,14 @@ public class ConnectionCloseTest extends AbstractJMSTest {
         NevadoConnection testConnection = getConnection();
         testConnection.close();
         testConnection.close(); // This must not throw an exception
+    }
+
+    @Test
+    public void reCloseSession() throws JMSException
+    {
+        Session session = createSession();
+        session.close();
+        session.close(); // This must not throw an exception
     }
 
     @Test(expected = IllegalStateException.class)

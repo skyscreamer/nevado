@@ -1,6 +1,7 @@
 package org.skyscreamer.nevado.jms.destination;
 
 import javax.jms.*;
+import javax.jms.IllegalStateException;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.Queue;
@@ -42,7 +43,7 @@ public abstract class NevadoDestination implements Destination, Serializable {
         return _name;
     }
 
-    public static NevadoDestination getInstance(Destination destination) {
+    public static NevadoDestination getInstance(Destination destination) throws IllegalStateException {
         NevadoDestination nevadoDestination = null;
 
         if (destination != null) {
@@ -51,10 +52,10 @@ public abstract class NevadoDestination implements Destination, Serializable {
             }
             else {
                 if (destination instanceof TemporaryQueue) {
-                    // Create new NevadoTemporaryQueue - TODO
+                    throw new IllegalStateException("TemporaryQueues cannot be copied");
                 }
                 else if (destination instanceof TemporaryTopic) {
-                    // Create new NevadoTemporaryTopic - TODO
+                    throw new IllegalStateException("TemporaryDestinations cannot be copied");
                 }
                 else if (destination instanceof Queue) {
                     // Create new NevadoQueue - TODO

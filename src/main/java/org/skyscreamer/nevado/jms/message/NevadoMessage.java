@@ -8,11 +8,16 @@ import javax.jms.Message;
 import java.util.Enumeration;
 
 /**
- * Created by IntelliJ IDEA.
- * User: cpage
- * Date: 3/21/12
- * Time: 8:36 PM
- * To change this template use File | Settings | File Templates.
+ * Nevado abstract message class.  It adds all the nevado-specific functionality that is common
+ * to all messages;
+ *
+ * @author Carter Page <carter@skyscreamer.org>
+ * @see NevadoBlankMessage
+ * @see NevadoBytesMessage
+ * @see NevadoObjectMessage
+ * @see NevadoStreamMessage
+ * @see NevadoMapMessage
+ * @see NevadoTextMessage
  */
 public abstract class NevadoMessage extends AbstractMessage<NevadoMessage> implements Message {
     private transient NevadoSession _nevadoSession;
