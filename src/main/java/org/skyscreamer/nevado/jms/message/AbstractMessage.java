@@ -255,17 +255,27 @@ public abstract class AbstractMessage<T> implements Message, Serializable {
         }
     }
 
-    private void checkValidPropertyName(String name) {
-        if (name == null || name.trim().length() == 0) {
+    private void checkValidPropertyName(String name)
+    {
+        if (name == null || name.trim().length() == 0)
+        {
             throw new IllegalArgumentException("Property name cannot be empty");
         }
-        if (!Character.isJavaIdentifierStart(name.charAt(0))) {
+        if (!Character.isJavaIdentifierStart(name.charAt(0)))
+        {
             throw new IllegalArgumentException("Invalid first character: " + name.charAt(0));
         }
-        if (Arrays.asList(RESERVED_PROPERTY_NAMES).contains(name)) {
+        if (Arrays.asList(RESERVED_PROPERTY_NAMES).contains(name))
+        {
             throw new IllegalArgumentException("Property name cannot be reserved word '" + name + "'");
         }
-        for(char c : WHITESPACE_CHARS.toCharArray()) {
+        if (name.startsWith(NevadoProperty.PROVIDER_PREFIX))
+        {
+            throw new IllegalArgumentException("Property name cannot start with provider-reserved prefix of "
+                    + NevadoProperty.PROVIDER_PREFIX);
+        }
+        for(char c : WHITESPACE_CHARS.toCharArray())
+        {
             if (name.indexOf(c) > -1) {
                 throw new IllegalArgumentException("Property name cannot contain whitespace: '" + name + "'");
             }
