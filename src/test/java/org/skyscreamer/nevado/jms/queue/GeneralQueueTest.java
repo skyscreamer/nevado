@@ -50,8 +50,8 @@ public class GeneralQueueTest extends AbstractJMSTest {
     {
         Assert.assertTrue(ConnectionFactory.class.isAssignableFrom(NevadoConnectionFactory.class));
         Assert.assertTrue(QueueConnectionFactory.class.isAssignableFrom(NevadoConnectionFactory.class));
-        Assert.assertTrue(ConnectionFactory.class.isAssignableFrom(NevadoConnectionFactory.class));
-        Assert.assertTrue(QueueConnectionFactory.class.isAssignableFrom(NevadoConnectionFactory.class));
+        Assert.assertTrue(Connection.class.isAssignableFrom(NevadoConnection.class));
+        Assert.assertTrue(QueueConnection.class.isAssignableFrom(NevadoConnection.class));
         Assert.assertTrue(Queue.class.isAssignableFrom(NevadoQueue.class));
         Assert.assertTrue(NevadoDestination.class.isAssignableFrom(NevadoQueue.class));
         Assert.assertTrue(Destination.class.isAssignableFrom(NevadoDestination.class));
