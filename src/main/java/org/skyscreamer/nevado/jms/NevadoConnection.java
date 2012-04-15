@@ -24,6 +24,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
 
     private final Log _log = LogFactory.getLog(getClass());
 
+    private boolean _closed = false;
     private boolean _inUse = false;
     private final NevadoConnector _nevadoConnector;
     private String _clientID;
@@ -40,7 +41,8 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         _nevadoConnector.test();
     }
 
-    public synchronized QueueSession createQueueSession(boolean transacted, int acknowledgeMode) throws JMSException {
+    public synchronized NevadoSession createQueueSession(boolean transacted, int acknowledgeMode) throws JMSException {
+        checkClosed();
         _inUse = true;
         NevadoSession nevadoSession = new NevadoSession(this, transacted, acknowledgeMode);
         nevadoSession.setOverrideJMSDeliveryMode(_jmsDeliveryMode);
@@ -55,16 +57,18 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
     }
 
     public ConnectionConsumer createConnectionConsumer(Queue queue, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
+        checkClosed();
         _inUse = true;
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public Session createSession(boolean transacted, int acknowledgeMode) throws JMSException {
+    public NevadoSession createSession(boolean transacted, int acknowledgeMode) throws JMSException {
+        checkClosed();
         _inUse = true;
         return createQueueSession(transacted, acknowledgeMode);
     }
 
-    public ConnectionMetaData getMetaData() throws JMSException {
+    public NevadoConnectionMetaData getMetaData() throws JMSException {
         return NevadoConnectionMetaData.getInstance();
     }
 
@@ -72,11 +76,14 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         return _exceptionListener;
     }
 
-    public void setExceptionListener(ExceptionListener exceptionListener) {
+    public void setExceptionListener(ExceptionListener exceptionListener) throws IllegalStateException {
+        checkClosed();
         _exceptionListener = exceptionListener;
     }
 
-    public synchronized void start() throws JMSException {
+    public synchronized void start() throws JMSException
+    {
+        checkClosed();
         _inUse = true;
         _running = true;
         for(NevadoSession session : _sessions)
@@ -85,7 +92,9 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         }
     }
 
-    public synchronized void stop() throws JMSException {
+    public synchronized void stop() throws JMSException
+    {
+        checkClosed();
         _running = false;
         for(NevadoSession session : _sessions)
         {
@@ -94,42 +103,51 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
     }
 
     public synchronized void close() throws JMSException {
-        for(NevadoSession session : _sessions)
-        {
-            session.close();
-        }
-        for(NevadoTemporaryQueue temporaryQueue : new ArrayList<NevadoTemporaryQueue>(_temporaryQueues)) {
-            try {
-                deleteTemporaryQueue(temporaryQueue);
-            } catch (JMSException e) {
-                // Log but continue
-                _log.error("Unable to delete temporaryQueue " + temporaryQueue, e);
+        if (!_closed) {
+            for(NevadoSession session : _sessions)
+            {
+                session.close();
             }
+            for(NevadoTemporaryQueue temporaryQueue : new ArrayList<NevadoTemporaryQueue>(_temporaryQueues)) {
+                try {
+                    deleteTemporaryQueue(temporaryQueue);
+                } catch (JMSException e) {
+                    // Log but continue
+                    _log.error("Unable to delete temporaryQueue " + temporaryQueue, e);
+                }
+            }
+            _temporaryQueues.clear();
+            _closed = true;
         }
-        _temporaryQueues.clear();
     }
 
     public ConnectionConsumer createConnectionConsumer(Destination destination, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
+        checkClosed();
         _inUse = true;
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public TopicSession createTopicSession(boolean b, int i) throws JMSException {
+        checkClosed();
         _inUse = true;
         throw new UnsupportedOperationException("Topics are not yet supported"); // TODO
     }
 
     public ConnectionConsumer createConnectionConsumer(Topic topic, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
+        checkClosed();
         _inUse = true;
         throw new UnsupportedOperationException("Topics are not yet supported"); // TODO
     }
 
     public ConnectionConsumer createDurableConnectionConsumer(Topic topic, String s, String s1, ServerSessionPool serverSessionPool, int i) throws JMSException {
+        checkClosed();
         _inUse = true;
         throw new UnsupportedOperationException("Topics are not yet supported"); // TODO
     }
 
-    public TemporaryQueue createTemporaryQueue() throws JMSException {
+    public NevadoTemporaryQueue createTemporaryQueue() throws JMSException
+    {
+        checkClosed();
         String tempQueueName = TEMPORARY_QUEUE_PREFIX + UUID.randomUUID();
         NevadoQueue queue = getSQSConnector().createQueue(tempQueueName);
         NevadoTemporaryQueue temporaryQueue = new NevadoTemporaryQueue(this, queue);
@@ -137,7 +155,9 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         return temporaryQueue;
     }
 
-    public void deleteTemporaryQueue(NevadoTemporaryQueue temporaryQueue) throws JMSException {
+    public void deleteTemporaryQueue(NevadoTemporaryQueue temporaryQueue) throws JMSException
+    {
+        checkClosed();
         getSQSConnector().deleteQueue(temporaryQueue);
         _temporaryQueues.remove(temporaryQueue);
     }
@@ -166,6 +186,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
     }
 
     public void setClientID(String clientID) throws IllegalStateException {
+        checkClosed();
         if (_clientID != null) {
             throw new IllegalStateException("Client ID has already been set");
         }
@@ -175,19 +196,33 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         _clientID = clientID;
     }
 
-    public void setOverrideJMSDeliveryMode(Integer jmsDeliveryMode) {
+    public void setOverrideJMSDeliveryMode(Integer jmsDeliveryMode) throws IllegalStateException {
+        checkClosed();
         _jmsDeliveryMode = jmsDeliveryMode;
     }
 
-    public void setOverrideJMSPriority(Integer jmsPriority) {
+    public void setOverrideJMSPriority(Integer jmsPriority) throws IllegalStateException {
+        checkClosed();
         _jmsPriority = jmsPriority;
     }
 
-    public void setOverrideJMSTTL(Long jmsTTL) {
+    public void setOverrideJMSTTL(Long jmsTTL) throws IllegalStateException {
+        checkClosed();
         _jmsTTL = jmsTTL;
     }
 
     public boolean isRunning() {
         return _running;
+    }
+
+    public boolean isClosed() {
+        return _closed;
+    }
+
+    private void checkClosed() throws IllegalStateException {
+        if (_closed)
+        {
+            throw new IllegalStateException("Connection is closed");
+        }
     }
 }

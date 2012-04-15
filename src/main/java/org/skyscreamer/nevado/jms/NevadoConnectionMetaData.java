@@ -28,7 +28,7 @@ public class NevadoConnectionMetaData implements ConnectionMetaData {
     private final String _provider = _package.getImplementationTitle();
     private final ProviderVersion _version = new ProviderVersion(_package.getImplementationVersion());
 
-    public static ConnectionMetaData getInstance() {
+    public static NevadoConnectionMetaData getInstance() {
         return INSTANCE;
     }
 

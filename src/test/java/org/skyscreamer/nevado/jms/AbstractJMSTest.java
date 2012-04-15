@@ -108,6 +108,11 @@ public abstract class AbstractJMSTest {
         return session.createTemporaryQueue();
     }
 
+    protected void deleteQueue(NevadoQueue queue) throws JMSException
+    {
+        _connection.getSQSConnector().deleteQueue(queue);
+    }
+
     protected void compareTextMessages(TextMessage[] expectedTextMessages, TextMessage[] actualTextMessages) throws JMSException {
         if (expectedTextMessages == null)
         {

@@ -6,6 +6,7 @@ import javax.jms.*;
 import javax.jms.IllegalStateException;
 
 public class NevadoMessageConsumer implements MessageConsumer {
+    private boolean _closed = false;
     private final NevadoSession _session;
     private final NevadoDestination _destination;
     private volatile MessageListener _messageListener;
@@ -24,29 +25,39 @@ public class NevadoMessageConsumer implements MessageConsumer {
     }
 
     public void setMessageListener(MessageListener messageListener) throws JMSException {
+        checkClosed();
         _messageListener = messageListener;
     }
 
     public Message receive() throws JMSException {
+        checkClosed();
         checkAsync();
         return _session.receiveMessage(_destination, -1);
     }
 
     public Message receive(long timeoutMs) throws JMSException {
+        checkClosed();
         checkAsync();
         return _session.receiveMessage(_destination, timeoutMs);
     }
 
     public Message receiveNoWait() throws JMSException {
+        checkClosed();
         checkAsync();
         return _session.receiveMessage(_destination, 0);
     }
 
-    public void close() throws JMSException {
-        _messageListener = null;
+    public synchronized void close() throws JMSException {
+        if (!_closed)
+        {
+            _messageListener = null;
+            _closed = true;
+        }
     }
 
-    protected boolean processAsyncMessage() throws JMSException {
+    protected boolean processAsyncMessage() throws JMSException
+    {
+        checkClosed();
         boolean messageProcessed = false;
         Message message = _session.receiveMessage(_destination, 0);
         if (message != null) {
@@ -60,7 +71,8 @@ public class NevadoMessageConsumer implements MessageConsumer {
         return messageProcessed;
     }
 
-    private void checkAsync() throws IllegalStateException {
+    private void checkAsync() throws IllegalStateException
+    {
         if (_messageListener != null)
         {
             throw new IllegalStateException("Synchronous message delivery cannot be requested from a consumer after " +
@@ -68,7 +80,21 @@ public class NevadoMessageConsumer implements MessageConsumer {
         }
     }
 
-    protected Destination getDestination() {
+    protected Destination getDestination()
+    {
         return _destination;
+    }
+
+    public boolean isClosed()
+    {
+        return _closed;
+    }
+
+    private void checkClosed() throws IllegalStateException
+    {
+        if (_closed)
+        {
+            throw new IllegalStateException("This consumer has been closed");
+        }
     }
 }

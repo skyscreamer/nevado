@@ -3,10 +3,8 @@ package org.skyscreamer.nevado.jms;
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
 
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageProducer;
+import javax.jms.*;
+import javax.jms.IllegalStateException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,6 +14,7 @@ import javax.jms.MessageProducer;
  * To change this template use File | Settings | File Templates.
  */
 public class NevadoMessageProducer implements MessageProducer {
+    private boolean _closed = false;
     private NevadoSession _session;
     private NevadoDestination _destination;
     private boolean _disableMessageID = false;
@@ -27,6 +26,7 @@ public class NevadoMessageProducer implements MessageProducer {
     }
 
     public void setDisableMessageID(boolean disableMessageID) throws JMSException {
+        checkClosed();
         _disableMessageID = disableMessageID;
     }
 
@@ -35,6 +35,7 @@ public class NevadoMessageProducer implements MessageProducer {
     }
 
     public void setDisableMessageTimestamp(boolean disableTimestamp) throws JMSException {
+        checkClosed();
         _disableTimestamp = disableTimestamp;
     }
 
@@ -43,7 +44,8 @@ public class NevadoMessageProducer implements MessageProducer {
     }
 
     public void setDeliveryMode(int i) throws JMSException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        checkClosed();
+        // TODO
     }
 
     public int getDeliveryMode() throws JMSException {
@@ -51,7 +53,8 @@ public class NevadoMessageProducer implements MessageProducer {
     }
 
     public void setPriority(int i) throws JMSException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        checkClosed();
+        // TODO
     }
 
     public int getPriority() throws JMSException {
@@ -59,7 +62,8 @@ public class NevadoMessageProducer implements MessageProducer {
     }
 
     public void setTimeToLive(long l) throws JMSException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        checkClosed();
+        // TODO
     }
 
     public long getTimeToLive() throws JMSException {
@@ -70,8 +74,11 @@ public class NevadoMessageProducer implements MessageProducer {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public void close() throws JMSException {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public synchronized void close() throws JMSException {
+        if (!_closed)
+        {
+            _closed = true;
+        }
     }
 
     public void send(Message message) throws JMSException {
@@ -90,6 +97,7 @@ public class NevadoMessageProducer implements MessageProducer {
     public void send(Destination destination, Message message, int deliveryMode, int priority, long ttl)
             throws JMSException
     {
+        checkClosed();
         NevadoDestination nevadoDestination = NevadoDestination.getInstance(destination);
         NevadoMessage nevadoMessage = NevadoMessage.getInstance(message);
         nevadoMessage.setJMSDestination(destination);
@@ -99,5 +107,18 @@ public class NevadoMessageProducer implements MessageProducer {
         nevadoMessage.setDisableMessageID(_disableMessageID);
         nevadoMessage.setDisableTimestamp(_disableTimestamp);
         _session.sendMessage(nevadoDestination, nevadoMessage);
+    }
+
+    public boolean isClosed()
+    {
+        return _closed;
+    }
+
+    private void checkClosed() throws javax.jms.IllegalStateException
+    {
+        if (_closed)
+        {
+            throw new IllegalStateException("This producer has been closed");
+        }
     }
 }
