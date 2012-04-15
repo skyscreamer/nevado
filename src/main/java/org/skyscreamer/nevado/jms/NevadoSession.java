@@ -140,7 +140,8 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
         checkClosed();
         if (_transacted)
         {
-            reset();
+            _outgoingTxMessages.clear();
+            _incomingStagedMessages.reset();
         }
     }
 
@@ -149,7 +150,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
         if (!_closed)
         {
             stop();
-            reset();
+            _incomingStagedMessages.close();
             for(NevadoMessageProducer producer : _producers)
             {
                 producer.close();
@@ -166,14 +167,8 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
     {
         checkClosed();
         if (_acknowledgeMode == CLIENT_ACKNOWLEDGE) {
-            reset();
+            _incomingStagedMessages.reset();
         }
-    }
-
-    private void reset() throws JMSException
-    {
-        _outgoingTxMessages.clear();
-        _incomingStagedMessages.reset();
     }
 
     public MessageListener getMessageListener() throws JMSException
@@ -403,6 +398,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
 
     public void acknowledgeMessage(NevadoMessage message) throws JMSException
     {
+        checkClosed();
         if (!_transacted) {
             if (_acknowledgeMode == CLIENT_ACKNOWLEDGE)
             {
@@ -417,6 +413,7 @@ public class NevadoSession implements Session, QueueSession, TopicSession {
 
     public void expireMessage(NevadoMessage message) throws JMSException
     {
+        checkClosed();
         deleteMessage(message);
     }
 

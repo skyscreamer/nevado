@@ -104,6 +104,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
 
     public synchronized void close() throws JMSException {
         if (!_closed) {
+            stop();
             for(NevadoSession session : _sessions)
             {
                 session.close();

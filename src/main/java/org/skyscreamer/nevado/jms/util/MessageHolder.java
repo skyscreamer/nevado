@@ -85,6 +85,14 @@ public class MessageHolder {
         _messageIndex.clear();
     }
 
+    public void close() throws JMSException {
+        reset();
+        for(Destination destination : _messageHolder.keySet())
+        {
+            _session.resetMessage(getUnconsumedMessages(destination).toArray(new NevadoMessage[0]));
+        }
+    }
+
     private List<NevadoMessage> getConsumedMessages(Destination destination)
     {
         if (_messageHolder.containsKey(destination))
