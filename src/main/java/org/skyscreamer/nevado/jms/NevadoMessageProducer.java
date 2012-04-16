@@ -11,7 +11,7 @@ import javax.jms.IllegalStateException;
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
-public class NevadoMessageProducer implements MessageProducer, QueueSender {
+public class NevadoMessageProducer implements MessageProducer, QueueSender, TopicPublisher {
     private boolean _closed = false;
     private final NevadoSession _session;
     private final NevadoDestination _destination;
@@ -148,5 +148,40 @@ public class NevadoMessageProducer implements MessageProducer, QueueSender {
         {
             throw new IllegalStateException("This producer has been closed");
         }
+    }
+
+    public Topic getTopic() throws JMSException {
+        if (_destination instanceof Topic)
+        {
+            return (Topic)_destination;
+        }
+        else
+        {
+            throw new IllegalStateException("getTopic() can only be called for a TopicPublisher");
+        }
+    }
+
+    public void publish(Message message) throws JMSException
+    {
+        publish(message, _deliveryMode, _priority, _ttl);
+    }
+
+    public void publish(Message message, int deliveryMode, int priority, long ttl) throws JMSException
+    {
+        send(_destination, message, deliveryMode, priority, ttl);
+    }
+
+    public void publish(Topic topic, Message message) throws JMSException
+    {
+        publish(topic, message, _deliveryMode, _priority, _ttl);
+    }
+
+    public void publish(Topic topic, Message message, int deliveryMode, int priority, long ttl) throws JMSException
+    {
+        if (!(_destination instanceof Topic))
+        {
+            throw new IllegalStateException("Only a TopicPublisher can send messages to a queue");
+        }
+        send((Topic)topic, message, deliveryMode, priority, ttl);
     }
 }
