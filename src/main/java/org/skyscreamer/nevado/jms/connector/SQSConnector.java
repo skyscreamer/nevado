@@ -15,6 +15,7 @@ import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
 import org.skyscreamer.nevado.jms.message.InvalidMessage;
 import org.skyscreamer.nevado.jms.message.NevadoProperty;
+import org.skyscreamer.nevado.jms.util.AWSUtil;
 import org.skyscreamer.nevado.jms.util.SerializeUtil;
 
 import javax.jms.JMSException;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Connector for SQS-only implementation of the Nevado JMS driver.
@@ -129,7 +131,8 @@ public class SQSConnector implements NevadoConnector {
     public void test() throws JMSException {
         try {
             _queueService.listMessageQueues(null);
-        } catch (SQSException e) {
+            _notficationService.listTopics(null);
+        } catch (AWSException e) {
             throw handleAWSException("Connection test failed", e);
         }
     }
@@ -163,6 +166,18 @@ public class SQSConnector implements NevadoConnector {
             queues.add(new NevadoQueue(sqsURL));
         }
         return queues;
+    }
+
+    public void subscribe(NevadoTopic topic, NevadoQueue topicEndpoint) throws JMSException {
+        try {
+            MessageQueue queue = getSQSQueue(topicEndpoint);
+            queue.getQueueAttributes("QueueArn")
+            _notficationService.subscribe(getTopicARN(topic), "sqs",
+                    AWSUtil.convertSQSUrlToARN(.getUrl().toString()));
+            _queueService.
+        } catch (SNSException e) {
+            throw handleAWSException("Unable to subscripe to topic " + topic, e);
+        }
     }
 
     public void resetMessage(NevadoMessage message) throws JMSException {
@@ -318,7 +333,8 @@ public class SQSConnector implements NevadoConnector {
         return (NevadoMessage)deserializedObject;
     }
 
-    private MessageQueue getSQSQueue(NevadoDestination destination) throws JMSException {
+    private MessageQueue getSQSQueue(NevadoDestination destination) throws JMSException
+    {
         if (destination == null) {
             throw new JMSException("Destination is null");
         }

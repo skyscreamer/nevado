@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
+import org.skyscreamer.nevado.jms.destination.NevadoTemporaryQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 import org.skyscreamer.nevado.jms.message.*;
 
@@ -229,19 +230,19 @@ public class NevadoSession implements Session {
         return null;  // TODO
     }
 
-    public TemporaryQueue createTemporaryQueue() throws JMSException
+    public NevadoTemporaryQueue createTemporaryQueue() throws JMSException
     {
         checkClosed();
         return _connection.createTemporaryQueue();
     }
 
-    public Queue createQueue(String s) throws JMSException
+    public NevadoQueue createQueue(String s) throws JMSException
     {
         checkClosed();
         return null;  // TODO
     }
 
-    public Topic createTopic(String s) throws JMSException
+    public NevadoTopic createTopic(String s) throws JMSException
     {
         checkClosed();
         return null;  // TODO
@@ -498,5 +499,9 @@ public class NevadoSession implements Session {
         {
             throw new JMSException("SESSION DELIBERATELY THROWING EXCEPTION - FOR TESTING MODE ONLY");
         }
+    }
+
+    public void subscribe(NevadoTopic topic, NevadoQueue topicEndpoint) throws JMSException {
+        _connection.getSQSConnector().subscribe(topic, topicEndpoint);
     }
 }

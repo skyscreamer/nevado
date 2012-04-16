@@ -1,6 +1,7 @@
 package org.skyscreamer.nevado.jms;
 
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
+import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
 
 import javax.jms.*;
@@ -81,7 +82,7 @@ public class NevadoQueueSession extends NevadoSession implements QueueSession {
 
     // Override topic methods to throw IllegalStateException
     @Override
-    public Topic createTopic(String s) throws JMSException {
+    public NevadoTopic createTopic(String s) throws JMSException {
         throw new IllegalStateException("QueueSession will not perform topic operations");
     }
 

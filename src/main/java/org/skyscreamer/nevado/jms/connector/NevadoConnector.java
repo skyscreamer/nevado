@@ -29,4 +29,6 @@ public interface NevadoConnector {
     NevadoQueue createQueue(String queueName) throws JMSException;
     void deleteQueue(NevadoQueue queue) throws JMSException;
     Collection<NevadoQueue> listQueues(String temporaryQueuePrefix) throws JMSException;
+
+    void subscribe(NevadoTopic topic, NevadoQueue topicEndpoint) throws JMSException;
 }

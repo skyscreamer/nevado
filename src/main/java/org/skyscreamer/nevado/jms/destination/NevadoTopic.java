@@ -13,6 +13,7 @@ import java.net.URL;
  */
 public class NevadoTopic extends NevadoDestination implements Topic {
     private String _arn;
+    private NevadoTemporaryQueue _topicEndpoint;
 
     public NevadoTopic(String name) {
         super(name);
