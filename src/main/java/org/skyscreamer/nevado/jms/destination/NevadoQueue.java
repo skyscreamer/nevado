@@ -13,7 +13,7 @@ import java.net.URL;
  * Date: 3/22/12
  * Time: 3:35 AM
  */
-public class NevadoQueue extends NevadoDestination implements Queue, Serializable {
+public class NevadoQueue extends NevadoDestination implements Queue {
     public NevadoQueue(String name) {
         super(name);
     }
@@ -26,7 +26,7 @@ public class NevadoQueue extends NevadoDestination implements Queue, Serializabl
         super(sqsURL);
     }
 
-    public String getQueueName() throws JMSException {
+    public String getQueueName() {
         return super.getName();
     }
 }

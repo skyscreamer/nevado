@@ -19,7 +19,7 @@ public class JMSTimestampTest extends AbstractJMSTest {
         Message msg = createSession().createMessage();
         Assert.assertEquals(0, msg.getJMSTimestamp());
         Message msgOut = sendAndReceive(msg);
-        Assert.assertEquals(new Date().getTime(), msg.getJMSTimestamp(), 5000);
+        Assert.assertEquals(new Date().getTime(), msgOut.getJMSTimestamp(), 5000);
     }
 
     @Test

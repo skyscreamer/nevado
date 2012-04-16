@@ -7,11 +7,9 @@ import javax.jms.*;
 import javax.jms.IllegalStateException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: cpage
- * Date: 3/21/12
- * Time: 7:17 PM
- * To change this template use File | Settings | File Templates.
+ * Nevado implementation of a MessageProducer.
+ *
+ * @author Carter Page <carter@skyscreamer.org>
  */
 public class NevadoMessageProducer implements MessageProducer, QueueSender {
     private boolean _closed = false;

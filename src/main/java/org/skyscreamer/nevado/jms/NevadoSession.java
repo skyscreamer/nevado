@@ -3,6 +3,8 @@ package org.skyscreamer.nevado.jms;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
+import org.skyscreamer.nevado.jms.destination.NevadoQueue;
+import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 import org.skyscreamer.nevado.jms.message.*;
 
 import javax.jms.*;
@@ -289,6 +291,10 @@ public class NevadoSession implements Session {
 
     public void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException
     {
+        if (destination == null)
+        {
+            throw new NullPointerException("Destination is null");
+        }
         if (_overrideJMSDeliveryMode != null) {
             message.setJMSDeliveryMode(_overrideJMSDeliveryMode);
         }

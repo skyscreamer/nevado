@@ -4,6 +4,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
 import org.skyscreamer.nevado.jms.NevadoSession;
+import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 import org.skyscreamer.nevado.jms.util.RandomData;
 
 import javax.jms.*;
@@ -18,7 +19,7 @@ public class TopicSubscriberTest extends AbstractJMSTest {
     public void testTopics() throws JMSException
     {
         NevadoSession session = createSession();
-        TemporaryTopic testTopic = session.createTemporaryTopic();
+        Topic testTopic = new NevadoTopic("testTopic");
         MessageProducer producer = session.createProducer(testTopic);
         MessageConsumer consumer1 = session.createConsumer(testTopic);
         MessageConsumer consumer2 = session.createConsumer(testTopic);

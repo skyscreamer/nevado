@@ -21,14 +21,14 @@ public class JMSMessageIDTest extends AbstractJMSTest {
     public void testDisable() throws JMSException {
         Session session = createSession();
         Message msg = session.createMessage();
-        Assert.assertNull(msg.getJMSMessageID());
         Queue tempQueue = createTempQueue(session);
         MessageProducer msgProducer = session.createProducer(tempQueue);
         msgProducer.setDisableMessageID(true);
         msgProducer.send(msg);
+        Assert.assertNull(msg.getJMSMessageID());
         Message msgOut = session.createConsumer(tempQueue).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
-        Assert.assertNull(msg.getJMSMessageID());
+        Assert.assertNull(msgOut.getJMSMessageID());
     }
 }
