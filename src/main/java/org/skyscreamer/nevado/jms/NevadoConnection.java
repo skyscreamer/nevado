@@ -134,7 +134,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         return null;  // TODO
     }
 
-    public TopicSession createTopicSession(boolean b, int i) throws JMSException {
+    public TopicSession createTopicSession(boolean transacted, int acknowledgeMode) throws JMSException {
         checkClosed();
         _inUse = true;
         throw new UnsupportedOperationException("Topics are not yet supported"); // TODO

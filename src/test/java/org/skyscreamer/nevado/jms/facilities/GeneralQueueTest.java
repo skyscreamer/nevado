@@ -1,4 +1,4 @@
-package org.skyscreamer.nevado.jms.queue;
+package org.skyscreamer.nevado.jms.facilities;
 
 import junit.framework.Assert;
 import org.junit.Test;
