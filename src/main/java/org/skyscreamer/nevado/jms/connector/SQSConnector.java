@@ -171,8 +171,9 @@ public class SQSConnector implements NevadoConnector {
         try {
             MessageQueue queue = getSQSQueue(topicEndpoint);
             Map<String,String> queueAttrMap = queue.getQueueAttributes(QueueAttribute.QUEUE_ARN);
-            String queueArn = queueAttrMap.get(QueueAttribute.QUEUE_ARN.queryAttribute());
-            Result<String> subscribeResult = _notficationService.subscribe(getTopicARN(topic), "sqs", queueArn);
+            String sqsArn = queueAttrMap.get(QueueAttribute.QUEUE_ARN.queryAttribute());
+            queue.setQueueAttribute("Policy", getPolicy(getTopicARN(topic), sqsArn));
+            Result<String> subscribeResult = _notficationService.subscribe(getTopicARN(topic), "sqs", sqsArn);
             subscriptionArn =  subscribeResult.getResult();
         } catch (AWSException e) {
             throw handleAWSException("Unable to subscripe to topic " + topic, e);
@@ -401,5 +402,24 @@ public class SQSConnector implements NevadoConnector {
             }
         }
         return securityException;
+    }
+
+    private String getPolicy(String snsArn, String sqsArn) {
+        return "{ \n" +
+                "    \"Version\":\"2008-10-17\", \n" +
+                "    \"Id\":\"" + sqsArn + "\", \n" +
+                "    \"Statement\": [ \n" +
+                "        { \n" +
+                "            \"Sid\":\"" + sqsArn + "/statementId\", \n" +
+                "            \"Effect\":\"Allow\", \n" +
+                "            \"Principal\":{\"AWS\":\"*\"}, \n" +
+                "            \"Action\":\"SQS:SendMessage\", \n" +
+                "            \"Resource\": \"" + sqsArn + "\", \n" +
+                "            \"Condition\":{ \n" +
+                "                \"StringEquals\":{\"aws:SourceArn\":\"" + snsArn + "\"} \n" +
+                "            } \n" +
+                "        } \n" +
+                "    ] \n" +
+                "}";
     }
 }
