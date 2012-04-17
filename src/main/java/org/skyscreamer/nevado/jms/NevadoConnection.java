@@ -184,7 +184,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
     }
 
     // Getters & Setters
-    protected NevadoConnector getSQSConnector() {
+    public NevadoConnector getSQSConnector() {
         return _nevadoConnector;
     }
 

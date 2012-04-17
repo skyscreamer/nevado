@@ -238,6 +238,10 @@ public class SQSConnector implements NevadoConnector {
             if (connection.isRunning()) {
                 try {
                     sqsMessage = sqsQueue.receiveMessage();
+                    if (_log.isDebugEnabled())
+                    {
+                        _log.debug("Received message: " + sqsMessage.getMessageBody());
+                    }
                 } catch (SQSException e) {
                     throw handleAWSException("Unable to receive message from '" + destination, e);
                 }
@@ -275,13 +279,17 @@ public class SQSConnector implements NevadoConnector {
             throws JMSException
     {
         try {
+            if (_log.isDebugEnabled())
+            {
+                _log.debug("Sending message: " + serializedMessage);
+            }
             return sqsQueue.sendMessage(serializedMessage);
         } catch (SQSException e) {
             throw handleAWSException("Unable to send message to queue " + sqsQueue.getUrl(), e);
         }
     }
 
-    private void sendSNSMessage(String arn, String serializedMessage) throws JMSException {
+    protected void sendSNSMessage(String arn, String serializedMessage) throws JMSException {
         try {
             _notficationService.publish(arn, serializedMessage, null);
         } catch (SNSException e) {
@@ -334,7 +342,7 @@ public class SQSConnector implements NevadoConnector {
         return (NevadoMessage)deserializedObject;
     }
 
-    private MessageQueue getSQSQueue(NevadoDestination destination) throws JMSException
+    protected MessageQueue getSQSQueue(NevadoDestination destination) throws JMSException
     {
         if (destination == null) {
             throw new JMSException("Destination is null");
@@ -358,7 +366,7 @@ public class SQSConnector implements NevadoConnector {
         }
     }
 
-    private String getTopicARN(NevadoTopic topic) throws JMSException {
+    protected String getTopicARN(NevadoTopic topic) throws JMSException {
         if (topic.getArn() == null)
         {
             Result<String> result;
