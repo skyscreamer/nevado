@@ -501,7 +501,7 @@ public class NevadoSession implements Session {
         }
     }
 
-    public void subscribe(NevadoTopic topic, NevadoQueue topicEndpoint) throws JMSException {
-        _connection.getSQSConnector().subscribe(topic, topicEndpoint);
+    public String subscribe(NevadoTopic topic, NevadoQueue topicEndpoint) throws JMSException {
+        return _connection.getSQSConnector().subscribe(topic, topicEndpoint);
     }
 }

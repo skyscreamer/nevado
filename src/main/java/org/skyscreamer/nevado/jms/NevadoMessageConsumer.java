@@ -14,6 +14,7 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
     private final NevadoDestination _destination;
     private volatile MessageListener _messageListener;
     private final NevadoTemporaryQueue _topicEndpoint;
+    private final String _subscriptionArn;
 
     public NevadoMessageConsumer(NevadoSession session, NevadoDestination destination) throws JMSException {
         _session = session;
@@ -21,11 +22,12 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
         if (destination instanceof NevadoTopic)
         {
             _topicEndpoint = _session.createTemporaryQueue();
-            _session.subscribe((NevadoTopic)destination, _topicEndpoint);
+            _subscriptionArn = _session.subscribe((NevadoTopic)destination, _topicEndpoint);
         }
         else
         {
             _topicEndpoint = null;
+            _subscriptionArn = null;
         }
     }
 
@@ -63,6 +65,7 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
     public synchronized void close() throws JMSException {
         if (!_closed)
         {
+            // TODO - unsubscribe _subscriptionArn
             _messageListener = null;
             _closed = true;
         }

@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Connector for SQS-only implementation of the Nevado JMS driver.
@@ -167,15 +166,18 @@ public class SQSConnector implements NevadoConnector {
         return queues;
     }
 
-    public void subscribe(NevadoTopic topic, NevadoQueue topicEndpoint) throws JMSException {
+    public String subscribe(NevadoTopic topic, NevadoQueue topicEndpoint) throws JMSException {
+        String subscriptionArn;
         try {
             MessageQueue queue = getSQSQueue(topicEndpoint);
             Map<String,String> queueAttrMap = queue.getQueueAttributes(QueueAttribute.QUEUE_ARN);
             String queueArn = queueAttrMap.get(QueueAttribute.QUEUE_ARN.queryAttribute());
-            _notficationService.subscribe(getTopicARN(topic), "sqs", queueArn);
+            Result<String> subscribeResult = _notficationService.subscribe(getTopicARN(topic), "sqs", queueArn);
+            subscriptionArn =  subscribeResult.getResult();
         } catch (AWSException e) {
             throw handleAWSException("Unable to subscripe to topic " + topic, e);
         }
+        return subscriptionArn;
     }
 
     public void resetMessage(NevadoMessage message) throws JMSException {
