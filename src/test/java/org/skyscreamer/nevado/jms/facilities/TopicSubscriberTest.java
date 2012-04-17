@@ -3,6 +3,8 @@ package org.skyscreamer.nevado.jms.facilities;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
+import org.skyscreamer.nevado.jms.NevadoMessageConsumer;
+import org.skyscreamer.nevado.jms.NevadoMessageProducer;
 import org.skyscreamer.nevado.jms.NevadoSession;
 import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 import org.skyscreamer.nevado.jms.util.RandomData;
@@ -20,9 +22,9 @@ public class TopicSubscriberTest extends AbstractJMSTest {
     {
         NevadoSession session = createSession();
         Topic testTopic = new NevadoTopic("testTopic");
-        MessageProducer producer = session.createProducer(testTopic);
-        MessageConsumer consumer1 = session.createConsumer(testTopic);
-        MessageConsumer consumer2 = session.createConsumer(testTopic);
+        NevadoMessageProducer producer = session.createProducer(testTopic);
+        NevadoMessageConsumer consumer1 = session.createConsumer(testTopic);
+        NevadoMessageConsumer consumer2 = session.createConsumer(testTopic);
         TextMessage testMessage = session.createTextMessage(RandomData.readString());
         producer.send(testMessage);;
         TextMessage msgOut1 = (TextMessage)consumer1.receive(1000);

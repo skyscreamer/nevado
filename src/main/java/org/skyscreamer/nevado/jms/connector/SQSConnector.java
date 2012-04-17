@@ -15,7 +15,6 @@ import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
 import org.skyscreamer.nevado.jms.message.InvalidMessage;
 import org.skyscreamer.nevado.jms.message.NevadoProperty;
-import org.skyscreamer.nevado.jms.util.AWSUtil;
 import org.skyscreamer.nevado.jms.util.SerializeUtil;
 
 import javax.jms.JMSException;
@@ -171,11 +170,10 @@ public class SQSConnector implements NevadoConnector {
     public void subscribe(NevadoTopic topic, NevadoQueue topicEndpoint) throws JMSException {
         try {
             MessageQueue queue = getSQSQueue(topicEndpoint);
-            queue.getQueueAttributes("QueueArn")
-            _notficationService.subscribe(getTopicARN(topic), "sqs",
-                    AWSUtil.convertSQSUrlToARN(.getUrl().toString()));
-            _queueService.
-        } catch (SNSException e) {
+            Map<String,String> queueAttrMap = queue.getQueueAttributes(QueueAttribute.QUEUE_ARN);
+            String queueArn = queueAttrMap.get(QueueAttribute.QUEUE_ARN.queryAttribute());
+            _notficationService.subscribe(getTopicARN(topic), "sqs", queueArn);
+        } catch (AWSException e) {
             throw handleAWSException("Unable to subscripe to topic " + topic, e);
         }
     }
