@@ -46,6 +46,7 @@ public class NevadoSession implements Session {
         _asyncConsumerRunner = new AsyncConsumerRunner(_connection);
     }
 
+    @Override
     public BytesMessage createBytesMessage() throws JMSException
     {
         checkClosed();
@@ -54,6 +55,7 @@ public class NevadoSession implements Session {
         return message;
     }
 
+    @Override
     public MapMessage createMapMessage() throws JMSException
     {
         checkClosed();
@@ -62,6 +64,7 @@ public class NevadoSession implements Session {
         return message;
     }
 
+    @Override
     public Message createMessage() throws JMSException
     {
         checkClosed();
@@ -70,6 +73,7 @@ public class NevadoSession implements Session {
         return message;
     }
 
+    @Override
     public NevadoObjectMessage createObjectMessage() throws JMSException
     {
         checkClosed();
@@ -78,6 +82,7 @@ public class NevadoSession implements Session {
         return message;
     }
 
+    @Override
     public ObjectMessage createObjectMessage(Serializable serializable) throws JMSException
     {
         checkClosed();
@@ -86,6 +91,7 @@ public class NevadoSession implements Session {
         return message;
     }
 
+    @Override
     public StreamMessage createStreamMessage() throws JMSException
     {
         checkClosed();
@@ -94,6 +100,7 @@ public class NevadoSession implements Session {
         return message;
     }
 
+    @Override
     public NevadoTextMessage createTextMessage() throws JMSException
     {
         checkClosed();
@@ -102,6 +109,7 @@ public class NevadoSession implements Session {
         return message;
     }
 
+    @Override
     public TextMessage createTextMessage(String text) throws JMSException
     {
         checkClosed();
@@ -110,17 +118,20 @@ public class NevadoSession implements Session {
         return message;
     }
 
+    @Override
     public boolean getTransacted() throws JMSException
     {
         return _transacted;
     }
 
+    @Override
     public int getAcknowledgeMode() throws JMSException
     {
         return _acknowledgeMode;
     }
 
     // TODO - Think about how to handle a failure during commit (a break mid-way would fool atomicity)
+    @Override
     public void commit() throws JMSException
     {
         checkClosed();
@@ -136,6 +147,7 @@ public class NevadoSession implements Session {
         }
     }
 
+    @Override
     public void rollback() throws JMSException
     {
         checkClosed();
@@ -146,6 +158,7 @@ public class NevadoSession implements Session {
         }
     }
 
+    @Override
     public synchronized void close() throws JMSException
     {
         if (!_closed)
@@ -164,6 +177,7 @@ public class NevadoSession implements Session {
         }
     }
 
+    @Override
     public void recover() throws JMSException
     {
         checkClosed();
@@ -172,23 +186,27 @@ public class NevadoSession implements Session {
         }
     }
 
+    @Override
     public MessageListener getMessageListener() throws JMSException
     {
         checkClosed();
         return null;  // TODO
     }
 
+    @Override
     public void setMessageListener(MessageListener messageListener) throws JMSException
     {
         checkClosed();
         // TODO
     }
 
+    @Override
     public void run()
     {
         // TODO
     }
 
+    @Override
     public NevadoMessageProducer createProducer(Destination destination) throws JMSException
     {
         checkClosed();
@@ -197,16 +215,19 @@ public class NevadoSession implements Session {
         return producer;
     }
 
+    @Override
     public NevadoMessageConsumer createConsumer(Destination destination) throws JMSException
     {
         return createConsumer(destination, null);
     }
 
+    @Override
     public NevadoMessageConsumer createConsumer(Destination destination, String selector) throws JMSException
     {
         return createConsumer(destination, selector, false);
     }
 
+    @Override
     public NevadoMessageConsumer createConsumer(Destination destination, String selector, boolean noLocal) throws JMSException
     {
         // TODO - Selector and noLocal currently ignored
@@ -218,72 +239,63 @@ public class NevadoSession implements Session {
         return consumer;
     }
 
+    @Override
     public QueueBrowser createBrowser(Queue queue) throws JMSException
     {
         checkClosed();
         return null;  // TODO
     }
 
+    @Override
     public QueueBrowser createBrowser(Queue queue, String s) throws JMSException
     {
         checkClosed();
         return null;  // TODO
     }
 
+    @Override
     public NevadoTemporaryQueue createTemporaryQueue() throws JMSException
     {
         checkClosed();
         return _connection.createTemporaryQueue();
     }
 
+    @Override
     public NevadoQueue createQueue(String s) throws JMSException
     {
         checkClosed();
         return null;  // TODO
     }
 
+    @Override
     public NevadoTopic createTopic(String s) throws JMSException
     {
         checkClosed();
         return null;  // TODO
     }
 
-    public TopicSubscriber createSubscriber(Topic topic) throws JMSException
-    {
-        checkClosed();
-        return null; // TODO
-    }
-
-    public TopicSubscriber createSubscriber(Topic topic, String s, boolean b) throws JMSException
-    {
-        checkClosed();
-        return null; // TODO
-    }
-
+    @Override
     public TopicSubscriber createDurableSubscriber(Topic topic, String s) throws JMSException
     {
         checkClosed();
         return null;  // TODO
     }
 
+    @Override
     public TopicSubscriber createDurableSubscriber(Topic topic, String s, String s1, boolean b) throws JMSException
     {
         checkClosed();
         return null;  // TODO
     }
 
-    public TopicPublisher createPublisher(Topic topic) throws JMSException
-    {
-        checkClosed();
-        return null; // TODO
-    }
-
+    @Override
     public TemporaryTopic createTemporaryTopic() throws JMSException
     {
         checkClosed();
         return _connection.createTemporaryTopic();
     }
 
+    @Override
     public void unsubscribe(String s) throws JMSException
     {
         checkClosed();
@@ -429,6 +441,10 @@ public class NevadoSession implements Session {
         }
     }
 
+    public String subscribe(NevadoTopic topic, NevadoQueue topicEndpoint) throws JMSException {
+        return _connection.getSQSConnector().subscribe(topic, topicEndpoint);
+    }
+
     public void setOverrideJMSDeliveryMode(Integer jmsDeliveryMode)
     {
         _overrideJMSDeliveryMode = jmsDeliveryMode;
@@ -499,9 +515,5 @@ public class NevadoSession implements Session {
         {
             throw new JMSException("SESSION DELIBERATELY THROWING EXCEPTION - FOR TESTING MODE ONLY");
         }
-    }
-
-    public String subscribe(NevadoTopic topic, NevadoQueue topicEndpoint) throws JMSException {
-        return _connection.getSQSConnector().subscribe(topic, topicEndpoint);
     }
 }

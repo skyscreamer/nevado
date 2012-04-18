@@ -2,6 +2,7 @@ package org.skyscreamer.nevado.jms.connector;
 
 import com.xerox.amazonws.common.AWSError;
 import com.xerox.amazonws.common.AWSException;
+import com.xerox.amazonws.common.ListResult;
 import com.xerox.amazonws.common.Result;
 import com.xerox.amazonws.sns.NotificationService;
 import com.xerox.amazonws.sns.SNSException;
@@ -169,6 +170,22 @@ public class SQSConnector implements NevadoConnector {
         } catch (SNSException e) {
             throw handleAWSException("Unable to delete message topic '" + topic, e);
         }
+    }
+
+    @Override
+    public Collection<NevadoTopic> listTopics() throws JMSException {
+        Collection<NevadoTopic> topics;
+        ListResult<String> results;
+        try {
+            results = _notficationService.listTopics(null);
+        } catch (SNSException e) {
+            throw handleAWSException("Unable to list topics", e);
+        }
+        topics = new HashSet<NevadoTopic>(results.getItems().size());
+        for(String arn : results.getItems()) {
+            topics.add(new NevadoTopic(arn));
+        }
+        return topics;
     }
 
     public Collection<NevadoQueue> listQueues(String temporaryQueuePrefix) throws JMSException {

@@ -17,7 +17,7 @@ public class NevadoTopic extends NevadoDestination implements Topic {
     private final String _subscriptionArn;
 
     public NevadoTopic(String name) {
-        super(name);
+        super(name.startsWith("arn:") ? name.substring(name.lastIndexOf(":") + 1) : name);
         _topicEndpoint = null;
         _subscriptionArn = null;
     }

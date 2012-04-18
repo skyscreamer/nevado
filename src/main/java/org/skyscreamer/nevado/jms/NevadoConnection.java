@@ -212,6 +212,16 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         return temporaryQueues;
     }
 
+    public Collection<TemporaryTopic> listAllTemporaryTopics() throws JMSException {
+        Collection<NevadoTopic> topics = getSQSConnector().listTopics();
+        Collection<TemporaryTopic> temporaryTopics = new HashSet<TemporaryTopic>(topics.size());
+        for(NevadoTopic topic : topics) {
+            if (topic.getTopicName().startsWith(TEMPORARY_DESTINATION_PREFIX))
+                temporaryTopics.add(new NevadoTemporaryTopic(this, topic));
+        }
+        return temporaryTopics;
+    }
+
     // Getters & Setters
     public NevadoConnector getSQSConnector() {
         return _nevadoConnector;

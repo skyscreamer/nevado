@@ -39,37 +39,37 @@ public class NevadoQueueSession extends NevadoSession implements QueueSession {
     @Override
     public NevadoMessageProducer createProducer(Destination destination) throws JMSException {
         checkIsQueue(destination);
-        return super.createProducer(destination);    // TODO
+        return super.createProducer(destination);
     }
 
     @Override
     public NevadoMessageConsumer createConsumer(Destination destination) throws JMSException {
         checkIsQueue(destination);
-        return super.createConsumer(destination);    // TODO
+        return super.createConsumer(destination);
     }
 
     @Override
     public NevadoMessageConsumer createConsumer(Destination destination, String selector) throws JMSException {
         checkIsQueue(destination);
-        return super.createConsumer(destination, selector);    // TODO
+        return super.createConsumer(destination, selector);
     }
 
     @Override
     public NevadoMessageConsumer createConsumer(Destination destination, String selector, boolean noLocal) throws JMSException {
         checkIsQueue(destination);
-        return super.createConsumer(destination, selector, noLocal);    // TODO
+        return super.createConsumer(destination, selector, noLocal);
     }
 
     @Override
     public void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException {
         checkIsQueue(destination);
-        super.sendMessage(destination, message);    // TODO
+        super.sendMessage(destination, message);
     }
 
     @Override
     public Message receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException {
         checkIsQueue(destination);
-        return super.receiveMessage(destination, timeoutMs);    // TODO
+        return super.receiveMessage(destination, timeoutMs);
     }
 
     private void checkIsQueue(Destination destination) throws IllegalStateException {
@@ -83,21 +83,6 @@ public class NevadoQueueSession extends NevadoSession implements QueueSession {
     // Override topic methods to throw IllegalStateException
     @Override
     public NevadoTopic createTopic(String s) throws JMSException {
-        throw new IllegalStateException("QueueSession will not perform topic operations");
-    }
-
-    @Override
-    public TopicSubscriber createSubscriber(Topic topic) throws JMSException {
-        throw new IllegalStateException("QueueSession will not perform topic operations");
-    }
-
-    @Override
-    public TopicSubscriber createSubscriber(Topic topic, String s, boolean b) throws JMSException {
-        throw new IllegalStateException("QueueSession will not perform topic operations");
-    }
-
-    @Override
-    public TopicPublisher createPublisher(Topic topic) throws JMSException {
         throw new IllegalStateException("QueueSession will not perform topic operations");
     }
 
