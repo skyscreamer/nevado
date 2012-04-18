@@ -148,8 +148,27 @@ public class SQSConnector implements NevadoConnector {
         return queue;
     }
 
+    public NevadoTopic createTopic(String topicName) throws JMSException {
+        NevadoTopic topic = new NevadoTopic(topicName);
+        getTopicARN(topic);
+        return topic;
+    }
+
     public void deleteQueue(NevadoQueue queue) throws JMSException {
-        deleteSQSQueue(queue);
+        MessageQueue sqsQueue = getSQSQueue(queue);
+        try {
+            sqsQueue.deleteQueue();
+        } catch (SQSException e) {
+            throw handleAWSException("Unable to delete message queue '" + queue, e);
+        }
+    }
+
+    public void deleteTopic(NevadoTopic topic) throws JMSException {
+        try {
+            _notficationService.deleteTopic(getTopicARN(topic));
+        } catch (SNSException e) {
+            throw handleAWSException("Unable to delete message topic '" + topic, e);
+        }
     }
 
     public Collection<NevadoQueue> listQueues(String temporaryQueuePrefix) throws JMSException {
@@ -377,15 +396,6 @@ public class SQSConnector implements NevadoConnector {
             sqsQueue.setEncoding(false);
         }
         return sqsQueue;
-    }
-
-    private void deleteSQSQueue(NevadoDestination destination) throws JMSException {
-        MessageQueue sqsQueue = getSQSQueue(destination);
-        try {
-            sqsQueue.deleteQueue();
-        } catch (SQSException e) {
-            throw handleAWSException("Unable to delete message queue '" + destination, e);
-        }
     }
 
     protected String getTopicARN(NevadoTopic topic) throws JMSException {

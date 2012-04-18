@@ -281,7 +281,7 @@ public class NevadoSession implements Session {
     public TemporaryTopic createTemporaryTopic() throws JMSException
     {
         checkClosed();
-        return null;  // TODO
+        return _connection.createTemporaryTopic();
     }
 
     public void unsubscribe(String s) throws JMSException
@@ -479,12 +479,12 @@ public class NevadoSession implements Session {
 
     private void checkValidDestination(Destination destination) throws JMSException
     {
-        if (destination instanceof TemporaryQueue)
+        if (destination instanceof TemporaryQueue || destination instanceof TemporaryTopic)
         {
-            if (!_connection.ownsTemporaryQueue((TemporaryQueue)destination))
+            if (!_connection.ownsTemporaryDestination(destination))
             {
-                throw new InvalidDestinationException("Consumers for temporary queues cannot be created outside of " +
-                        "connection where the temporary queue was created.");
+                throw new InvalidDestinationException("Consumers for temporary destinations cannot be created " +
+                        "outside of the connection where the destination was created.");
             }
         }
     }

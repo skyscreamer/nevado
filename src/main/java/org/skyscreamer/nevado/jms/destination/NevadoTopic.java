@@ -22,6 +22,12 @@ public class NevadoTopic extends NevadoDestination implements Topic {
         _subscriptionArn = null;
     }
 
+    protected NevadoTopic(NevadoTopic topic) {
+        super(topic);
+        _topicEndpoint = null;
+        _subscriptionArn = null;
+    }
+
     public NevadoTopic(NevadoTopic topic, NevadoQueue topicEndpoint, String subscriptionArn)
     {
         super(topic);

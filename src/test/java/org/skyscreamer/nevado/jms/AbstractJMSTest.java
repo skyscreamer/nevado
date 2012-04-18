@@ -108,6 +108,10 @@ public abstract class AbstractJMSTest {
         return session.createTemporaryQueue();
     }
 
+    protected Topic createTempTopic(Session session) throws JMSException {
+        return session.createTemporaryTopic();
+    }
+
     protected void deleteQueue(NevadoQueue queue) throws JMSException
     {
         _connection.getSQSConnector().deleteQueue(queue);
