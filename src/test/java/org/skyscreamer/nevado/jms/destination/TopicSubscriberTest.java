@@ -1,4 +1,4 @@
-package org.skyscreamer.nevado.jms.connector;
+package org.skyscreamer.nevado.jms.destination;
 
 import com.xerox.amazonws.sqs2.*;
 import com.xerox.amazonws.sqs2.Message;
@@ -38,25 +38,5 @@ public class TopicSubscriberTest extends AbstractJMSTest {
         TextMessage msgOut2 = (TextMessage)consumer2.receive(1000);
         Assert.assertEquals(testMessage.getText(), msgOut1.getText());
         Assert.assertEquals(testMessage.getText(), msgOut2.getText());
-    }
-
-    @Test
-    public void testRawPubSub() throws JMSException, InterruptedException, SQSException, JSONException {
-        NevadoSession session = createSession();
-        NevadoTopic testTopic = new NevadoTopic("testTopic");
-        NevadoQueue topicEndpoint = session.createTemporaryQueue();
-        String subscriptionArn = session.subscribe((NevadoTopic)testTopic, topicEndpoint);
-
-        SQSConnector sqsConnector = (SQSConnector)getConnection().getSQSConnector();
-        String topicARN = sqsConnector.getTopicARN(testTopic);
-        String testData = RandomData.readString();
-        sqsConnector.sendSNSMessage(topicARN, testData);
-        MessageQueue sqsQueue = sqsConnector.getSQSQueue(topicEndpoint);
-        sqsQueue.setEncoding(false);
-        Thread.sleep(1000);
-        Message sqsMessage = sqsQueue.receiveMessage();
-        JSONObject messsageJSON = new JSONObject(sqsMessage.getMessageBody());
-        String message = messsageJSON.getString("Message");
-        Assert.assertEquals(testData, message);
     }
 }
