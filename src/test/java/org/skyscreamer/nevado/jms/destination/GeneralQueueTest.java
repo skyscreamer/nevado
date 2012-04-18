@@ -1,4 +1,4 @@
-package org.skyscreamer.nevado.jms.facilities;
+package org.skyscreamer.nevado.jms.destination;
 
 import junit.framework.Assert;
 import org.junit.Test;

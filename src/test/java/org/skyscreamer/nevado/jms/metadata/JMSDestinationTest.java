@@ -3,6 +3,7 @@ package org.skyscreamer.nevado.jms.metadata;
 import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
+import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 
 import javax.jms.*;
 
@@ -29,9 +30,10 @@ public class JMSDestinationTest extends AbstractJMSTest {
         Session session = createSession();
         Message msg = session.createMessage();
         Topic tempTopic = createTempTopic(session);
-        session.createProducer(tempTopic).send(msg);
-        Message msgOut = session.createConsumer(tempTopic).receive(1000);
-        Assert.assertNotNull("Got null message back", msgOut);
+        MessageProducer producer = session.createProducer(tempTopic);
+        MessageConsumer consumer = session.createConsumer(tempTopic);
+        producer.send(msg);
+        Message msgOut = consumer.receive(1000);
         msgOut.acknowledge();
         Assert.assertEquals(tempTopic, msg.getJMSDestination());
         Assert.assertEquals(tempTopic, msgOut.getJMSDestination());

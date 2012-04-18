@@ -391,10 +391,10 @@ public class SQSConnector implements NevadoConnector {
         } catch (SQSException e) {
             throw handleAWSException("Unable to get message queue '" + destination, e);
         }
-        if (destination instanceof NevadoTopic)
-        {
-            sqsQueue.setEncoding(false);
-        }
+
+        // We always base64-encode the message already
+        sqsQueue.setEncoding(false);
+
         return sqsQueue;
     }
 
