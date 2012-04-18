@@ -46,7 +46,7 @@ public class SQSConnector implements NevadoConnector {
     public SQSConnector(String awsAccessKey, String awsSecretKey) {
         _queueService = new QueueService(awsAccessKey, awsSecretKey);
         _notficationService = new NotificationService(awsAccessKey, awsSecretKey);
-        _receiveCheckIntervalMs = 1000;
+        _receiveCheckIntervalMs = 200;
     }
 
     public SQSConnector(String awsAccessKey, String awsSecretKey, long receiveCheckIntervalMs) {

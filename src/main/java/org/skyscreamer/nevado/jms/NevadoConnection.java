@@ -41,6 +41,14 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         _nevadoConnector.test();
     }
 
+    public NevadoSession createSession(boolean transacted, int acknowledgeMode) throws JMSException {
+        checkClosed();
+        _inUse = true;
+        NevadoSession nevadoSession = new NevadoSession(this, transacted, acknowledgeMode);
+        initializeSession(nevadoSession);
+        return nevadoSession;
+    }
+
     public synchronized NevadoQueueSession createQueueSession(boolean transacted, int acknowledgeMode) throws JMSException {
         checkClosed();
         _inUse = true;
@@ -49,18 +57,19 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         return nevadoSession;
     }
 
+    public TopicSession createTopicSession(boolean transacted, int acknowledgeMode) throws JMSException {
+        checkClosed();
+        _inUse = true;
+        NevadoTopicSession nevadoSession = new NevadoTopicSession(this, transacted, acknowledgeMode);
+        initializeSession(nevadoSession);
+        return nevadoSession;
+    }
+
+
     public ConnectionConsumer createConnectionConsumer(Queue queue, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
         checkClosed();
         _inUse = true;
         return null;  // TODO
-    }
-
-    public NevadoSession createSession(boolean transacted, int acknowledgeMode) throws JMSException {
-        checkClosed();
-        _inUse = true;
-        NevadoSession nevadoSession = new NevadoSession(this, transacted, acknowledgeMode);
-        initializeSession(nevadoSession);
-        return nevadoSession;
     }
 
     private void initializeSession(NevadoSession nevadoSession) {
@@ -147,22 +156,16 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         return null;  // TODO
     }
 
-    public TopicSession createTopicSession(boolean transacted, int acknowledgeMode) throws JMSException {
-        checkClosed();
-        _inUse = true;
-        throw new UnsupportedOperationException("Topics are not yet supported"); // TODO
-    }
-
     public ConnectionConsumer createConnectionConsumer(Topic topic, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
         checkClosed();
         _inUse = true;
-        throw new UnsupportedOperationException("Topics are not yet supported"); // TODO
+        return null;  // TODO
     }
 
     public ConnectionConsumer createDurableConnectionConsumer(Topic topic, String s, String s1, ServerSessionPool serverSessionPool, int i) throws JMSException {
         checkClosed();
         _inUse = true;
-        throw new UnsupportedOperationException("Topics are not yet supported"); // TODO
+        return null;  // TODO
     }
 
     public TemporaryTopic createTemporaryTopic() throws JMSException {

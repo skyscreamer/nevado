@@ -18,7 +18,7 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
         _session = session;
         if (destination instanceof NevadoTopic)
         {
-            NevadoTemporaryQueue topicEndpoint = _session.createTemporaryQueue();
+            NevadoTemporaryQueue topicEndpoint = _session.getConnection().createTemporaryQueue();
             String subscriptionArn = _session.subscribe((NevadoTopic)destination, topicEndpoint);
             _destination = new NevadoTopic((NevadoTopic)destination, topicEndpoint, subscriptionArn);
         }
