@@ -20,7 +20,7 @@ import org.skyscreamer.nevado.jms.util.RandomData;
 import javax.jms.*;
 
 /**
- * TODO - Add description
+ * Test basic topic calls.
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
