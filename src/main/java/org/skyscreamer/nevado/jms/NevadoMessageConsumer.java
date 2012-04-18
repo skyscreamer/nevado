@@ -13,21 +13,18 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
     private final NevadoSession _session;
     private final NevadoDestination _destination;
     private volatile MessageListener _messageListener;
-    private final NevadoTemporaryQueue _topicEndpoint;
-    private final String _subscriptionArn;
 
     public NevadoMessageConsumer(NevadoSession session, NevadoDestination destination) throws JMSException {
         _session = session;
-        _destination = destination;
         if (destination instanceof NevadoTopic)
         {
-            _topicEndpoint = _session.createTemporaryQueue();
-            _subscriptionArn = _session.subscribe((NevadoTopic)destination, _topicEndpoint);
+            NevadoTemporaryQueue topicEndpoint = _session.createTemporaryQueue();
+            String subscriptionArn = _session.subscribe((NevadoTopic)destination, topicEndpoint);
+            _destination = new NevadoTopic((NevadoTopic)destination, topicEndpoint, subscriptionArn);
         }
         else
         {
-            _topicEndpoint = null;
-            _subscriptionArn = null;
+            _destination = destination;
         }
     }
 
@@ -47,19 +44,19 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
     public Message receive() throws JMSException {
         checkClosed();
         checkAsync();
-        return _session.receiveMessage(receivingDestination(), -1);
+        return _session.receiveMessage(_destination, -1);
     }
 
     public Message receive(long timeoutMs) throws JMSException {
         checkClosed();
         checkAsync();
-        return _session.receiveMessage(receivingDestination(), timeoutMs);
+        return _session.receiveMessage(_destination, timeoutMs);
     }
 
     public Message receiveNoWait() throws JMSException {
         checkClosed();
         checkAsync();
-        return _session.receiveMessage(receivingDestination(), 0);
+        return _session.receiveMessage(_destination, 0);
     }
 
     public synchronized void close() throws JMSException {
@@ -75,7 +72,7 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
     {
         checkClosed();
         boolean messageProcessed = false;
-        Message message = _session.receiveMessage(receivingDestination(), 0);
+        Message message = _session.receiveMessage(_destination, 0);
         if (message != null) {
             getMessageListener().onMessage(message);
             messageProcessed = true;
@@ -85,11 +82,6 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
             }
         }
         return messageProcessed;
-    }
-
-    private NevadoDestination receivingDestination() {
-        NevadoDestination destination = (_destination instanceof NevadoQueue) ? _destination : _topicEndpoint;
-        return destination;
     }
 
     private void checkAsync() throws IllegalStateException

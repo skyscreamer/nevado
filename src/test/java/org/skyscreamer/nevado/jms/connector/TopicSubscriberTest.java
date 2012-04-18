@@ -25,26 +25,19 @@ import javax.jms.*;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class TopicSubscriberTest extends AbstractJMSTest {
-//    @Test
+    @Test
     public void testTopics() throws JMSException, InterruptedException {
         NevadoSession session = createSession();
         NevadoTopic testTopic = new NevadoTopic("testTopic");
         NevadoMessageProducer producer = session.createProducer(testTopic);
         NevadoMessageConsumer consumer1 = session.createConsumer(testTopic);
         NevadoMessageConsumer consumer2 = session.createConsumer(testTopic);
-        SQSConnector sqsConnector = (SQSConnector)getConnection().getSQSConnector();
-        String topicARN = sqsConnector.getTopicARN(testTopic);
-        String testData = RandomData.readString();
-        sqsConnector.sendSNSMessage(topicARN, testData);
-
-
         TextMessage testMessage = session.createTextMessage(RandomData.readString());
-        Thread.sleep(5000);
-        producer.send(testMessage);;
+        producer.send(testMessage);
         TextMessage msgOut1 = (TextMessage)consumer1.receive(1000);
         TextMessage msgOut2 = (TextMessage)consumer2.receive(1000);
-        Assert.assertEquals(testMessage, msgOut1);
-        Assert.assertEquals(testMessage, msgOut2);
+        Assert.assertEquals(testMessage.getText(), msgOut1.getText());
+        Assert.assertEquals(testMessage.getText(), msgOut2.getText());
     }
 
     @Test
