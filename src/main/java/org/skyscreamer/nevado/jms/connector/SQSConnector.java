@@ -2,12 +2,15 @@ package org.skyscreamer.nevado.jms.connector;
 
 import com.xerox.amazonws.common.AWSError;
 import com.xerox.amazonws.common.AWSException;
+import com.xerox.amazonws.common.ListResult;
 import com.xerox.amazonws.common.Result;
 import com.xerox.amazonws.sns.NotificationService;
 import com.xerox.amazonws.sns.SNSException;
 import com.xerox.amazonws.sqs2.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.skyscreamer.nevado.jms.NevadoConnection;
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
@@ -43,7 +46,7 @@ public class SQSConnector implements NevadoConnector {
     public SQSConnector(String awsAccessKey, String awsSecretKey) {
         _queueService = new QueueService(awsAccessKey, awsSecretKey);
         _notficationService = new NotificationService(awsAccessKey, awsSecretKey);
-        _receiveCheckIntervalMs = 1000;
+        _receiveCheckIntervalMs = 200;
     }
 
     public SQSConnector(String awsAccessKey, String awsSecretKey, long receiveCheckIntervalMs) {
@@ -114,7 +117,7 @@ public class SQSConnector implements NevadoConnector {
         if (sqsMessage != null) {
             _log.info("Received message " + sqsMessage.getMessageId());
         }
-        return sqsMessage != null ? convertSqsMessage(sqsMessage) : null;
+        return sqsMessage != null ? convertSqsMessage(destination, sqsMessage) : null;
     }
 
     public void deleteMessage(NevadoMessage message) throws JMSException {
@@ -146,8 +149,43 @@ public class SQSConnector implements NevadoConnector {
         return queue;
     }
 
+    public NevadoTopic createTopic(String topicName) throws JMSException {
+        NevadoTopic topic = new NevadoTopic(topicName);
+        getTopicARN(topic);
+        return topic;
+    }
+
     public void deleteQueue(NevadoQueue queue) throws JMSException {
-        deleteSQSQueue(queue);
+        MessageQueue sqsQueue = getSQSQueue(queue);
+        try {
+            sqsQueue.deleteQueue();
+        } catch (SQSException e) {
+            throw handleAWSException("Unable to delete message queue '" + queue, e);
+        }
+    }
+
+    public void deleteTopic(NevadoTopic topic) throws JMSException {
+        try {
+            _notficationService.deleteTopic(getTopicARN(topic));
+        } catch (SNSException e) {
+            throw handleAWSException("Unable to delete message topic '" + topic, e);
+        }
+    }
+
+    @Override
+    public Collection<NevadoTopic> listTopics() throws JMSException {
+        Collection<NevadoTopic> topics;
+        ListResult<String> results;
+        try {
+            results = _notficationService.listTopics(null);
+        } catch (SNSException e) {
+            throw handleAWSException("Unable to list topics", e);
+        }
+        topics = new HashSet<NevadoTopic>(results.getItems().size());
+        for(String arn : results.getItems()) {
+            topics.add(new NevadoTopic(arn));
+        }
+        return topics;
     }
 
     public Collection<NevadoQueue> listQueues(String temporaryQueuePrefix) throws JMSException {
@@ -171,8 +209,9 @@ public class SQSConnector implements NevadoConnector {
         try {
             MessageQueue queue = getSQSQueue(topicEndpoint);
             Map<String,String> queueAttrMap = queue.getQueueAttributes(QueueAttribute.QUEUE_ARN);
-            String queueArn = queueAttrMap.get(QueueAttribute.QUEUE_ARN.queryAttribute());
-            Result<String> subscribeResult = _notficationService.subscribe(getTopicARN(topic), "sqs", queueArn);
+            String sqsArn = queueAttrMap.get(QueueAttribute.QUEUE_ARN.queryAttribute());
+            queue.setQueueAttribute("Policy", getPolicy(getTopicARN(topic), sqsArn));
+            Result<String> subscribeResult = _notficationService.subscribe(getTopicARN(topic), "sqs", sqsArn);
             subscriptionArn =  subscribeResult.getResult();
         } catch (AWSException e) {
             throw handleAWSException("Unable to subscripe to topic " + topic, e);
@@ -213,20 +252,35 @@ public class SQSConnector implements NevadoConnector {
     }
 
 
-    private NevadoMessage convertSqsMessage(Message sqsMessage) throws JMSException {
+    private NevadoMessage convertSqsMessage(NevadoDestination destination, Message sqsMessage) throws JMSException {
         NevadoMessage message;
+        String messageBody;
+        if (destination instanceof NevadoQueue)
+        {
+            messageBody = sqsMessage.getMessageBody();
+        }
+        else
+        {
+            try {
+                messageBody = new JSONObject(sqsMessage.getMessageBody()).getString("Message");
+            } catch (JSONException e) {
+                throw new JMSException("Unable to parse JSON from message body: " + sqsMessage.getMessageBody());
+            }
+        }
         try {
-            message = deserializeMessage(sqsMessage.getMessageBody());
+            message = deserializeMessage(messageBody);
         } catch (JMSException e) {
             message = new InvalidMessage(e);
         }
 
-        if (!message.nevadoPropertyExists(NevadoProperty.DisableMessageID)
-                || !(Boolean)message.getNevadoProperty(NevadoProperty.DisableMessageID))
+        if (!(message.nevadoPropertyExists(NevadoProperty.DisableMessageID)
+                && (Boolean)message.getNevadoProperty(NevadoProperty.DisableMessageID))
+            && message.getJMSMessageID() == null)
         {
             message.setJMSMessageID("ID:" + sqsMessage.getMessageId());
         }
         message.setNevadoProperty(NevadoProperty.SQSReceiptHandle, sqsMessage.getReceiptHandle());
+        message.setJMSDestination(destination);
 
         return message;
     }
@@ -267,6 +321,10 @@ public class SQSConnector implements NevadoConnector {
                 _log.warn("Wait time between receive checks interrupted", e);
             }
         }
+        if (_log.isDebugEnabled())
+        {
+            _log.debug("Received message: " + ((sqsMessage != null) ? sqsMessage.getMessageBody() : null));
+        }
         return sqsMessage;
     }
 
@@ -274,13 +332,17 @@ public class SQSConnector implements NevadoConnector {
             throws JMSException
     {
         try {
+            if (_log.isDebugEnabled())
+            {
+                _log.debug("Sending message: " + serializedMessage);
+            }
             return sqsQueue.sendMessage(serializedMessage);
         } catch (SQSException e) {
             throw handleAWSException("Unable to send message to queue " + sqsQueue.getUrl(), e);
         }
     }
 
-    private void sendSNSMessage(String arn, String serializedMessage) throws JMSException {
+    protected void sendSNSMessage(String arn, String serializedMessage) throws JMSException {
         try {
             _notficationService.publish(arn, serializedMessage, null);
         } catch (SNSException e) {
@@ -333,31 +395,28 @@ public class SQSConnector implements NevadoConnector {
         return (NevadoMessage)deserializedObject;
     }
 
-    private MessageQueue getSQSQueue(NevadoDestination destination) throws JMSException
+    protected MessageQueue getSQSQueue(NevadoDestination destination) throws JMSException
     {
         if (destination == null) {
             throw new JMSException("Destination is null");
         }
 
+        NevadoQueue queue = (destination instanceof NevadoQueue) ? (NevadoQueue)destination
+                : ((NevadoTopic)destination).getTopicEndpoint();
         MessageQueue sqsQueue;
         try {
-            sqsQueue = _queueService.getOrCreateMessageQueue(destination.getName());
+            sqsQueue = _queueService.getOrCreateMessageQueue(queue.getName());
         } catch (SQSException e) {
             throw handleAWSException("Unable to get message queue '" + destination, e);
         }
+
+        // We always base64-encode the message already
+        sqsQueue.setEncoding(false);
+
         return sqsQueue;
     }
 
-    private void deleteSQSQueue(NevadoDestination destination) throws JMSException {
-        MessageQueue sqsQueue = getSQSQueue(destination);
-        try {
-            sqsQueue.deleteQueue();
-        } catch (SQSException e) {
-            throw handleAWSException("Unable to delete message queue '" + destination, e);
-        }
-    }
-
-    private String getTopicARN(NevadoTopic topic) throws JMSException {
+    protected String getTopicARN(NevadoTopic topic) throws JMSException {
         if (topic.getArn() == null)
         {
             Result<String> result;
@@ -401,5 +460,24 @@ public class SQSConnector implements NevadoConnector {
             }
         }
         return securityException;
+    }
+
+    private String getPolicy(String snsArn, String sqsArn) {
+        return "{ \n" +
+                "    \"Version\":\"2008-10-17\", \n" +
+                "    \"Id\":\"" + sqsArn + "\", \n" +
+                "    \"Statement\": [ \n" +
+                "        { \n" +
+                "            \"Sid\":\"" + sqsArn + "/statementId\", \n" +
+                "            \"Effect\":\"Allow\", \n" +
+                "            \"Principal\":{\"AWS\":\"*\"}, \n" +
+                "            \"Action\":\"SQS:SendMessage\", \n" +
+                "            \"Resource\": \"" + sqsArn + "\", \n" +
+                "            \"Condition\":{ \n" +
+                "                \"StringEquals\":{\"aws:SourceArn\":\"" + snsArn + "\"} \n" +
+                "            } \n" +
+                "        } \n" +
+                "    ] \n" +
+                "}";
     }
 }

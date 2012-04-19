@@ -1,10 +1,11 @@
-package org.skyscreamer.nevado.jms.facilities;
+package org.skyscreamer.nevado.jms.destination;
 
 import junit.framework.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.*;
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
+import org.skyscreamer.nevado.jms.util.RandomData;
 
 import javax.jms.*;
 import java.util.HashSet;
@@ -51,7 +52,8 @@ public class GeneralQueueTest extends AbstractJMSTest {
         Assert.assertTrue(ConnectionFactory.class.isAssignableFrom(NevadoConnectionFactory.class));
         Assert.assertTrue(QueueConnectionFactory.class.isAssignableFrom(NevadoConnectionFactory.class));
         Assert.assertTrue(Connection.class.isAssignableFrom(NevadoConnection.class));
-        Assert.assertTrue(QueueConnection.class.isAssignableFrom(NevadoConnection.class));
+        Assert.assertTrue(QueueConnection.class.isAssignableFrom(NevadoQueueConnection.class));
+        Assert.assertTrue(NevadoConnection.class.isAssignableFrom(NevadoQueueConnection.class));
         Assert.assertTrue(Queue.class.isAssignableFrom(NevadoQueue.class));
         Assert.assertTrue(NevadoDestination.class.isAssignableFrom(NevadoQueue.class));
         Assert.assertTrue(Destination.class.isAssignableFrom(NevadoDestination.class));
@@ -64,4 +66,21 @@ public class GeneralQueueTest extends AbstractJMSTest {
         Assert.assertTrue(QueueReceiver.class.isAssignableFrom(NevadoMessageConsumer.class));
     }
 
+    @Test
+    public void testQueueFacilities() throws JMSException
+    {
+        QueueConnectionFactory connectionFactory = new NevadoConnectionFactory();
+        QueueConnection connection = createQueueConnection(connectionFactory);
+        connection.start();
+        QueueSession session = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
+        TemporaryQueue queue = session.createTemporaryQueue();
+        QueueSender sender = session.createSender(queue);
+        QueueReceiver receiver = session.createReceiver(queue);
+        TextMessage testMessage = session.createTextMessage(RandomData.readString());
+        sender.send(testMessage);
+        Message msgOut = receiver.receive(1000);
+        Assert.assertNotNull(msgOut);
+        Assert.assertTrue(msgOut instanceof TextMessage);
+        Assert.assertEquals(testMessage, (TextMessage)msgOut);
+    }
 }

@@ -13,18 +13,27 @@ import java.net.URL;
  */
 public class NevadoTopic extends NevadoDestination implements Topic {
     private String _arn;
-    private NevadoTemporaryQueue _topicEndpoint;
+    private final NevadoQueue _topicEndpoint;
+    private final String _subscriptionArn;
 
     public NevadoTopic(String name) {
-        super(name);
+        super(name.startsWith("arn:") ? name.substring(name.lastIndexOf(":") + 1) : name);
+        _topicEndpoint = null;
+        _subscriptionArn = null;
     }
 
-    protected NevadoTopic(NevadoDestination destination) {
-        super(destination);
+    protected NevadoTopic(NevadoTopic topic) {
+        super(topic);
+        _topicEndpoint = null;
+        _subscriptionArn = null;
     }
 
-    public NevadoTopic(URL sqsURL) {
-        super(sqsURL);
+    public NevadoTopic(NevadoTopic topic, NevadoQueue topicEndpoint, String subscriptionArn)
+    {
+        super(topic);
+        _arn = topic.getArn();
+        _topicEndpoint = topicEndpoint;
+        _subscriptionArn = subscriptionArn;
     }
 
     public String getTopicName() {
@@ -37,5 +46,13 @@ public class NevadoTopic extends NevadoDestination implements Topic {
 
     public void setArn(String arn) {
         _arn = arn;
+    }
+
+    public NevadoQueue getTopicEndpoint() {
+        return _topicEndpoint;
+    }
+
+    public String getSubscriptionArn() {
+        return _subscriptionArn;
     }
 }

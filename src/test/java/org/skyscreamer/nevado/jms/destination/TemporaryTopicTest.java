@@ -10,18 +10,20 @@ import javax.jms.*;
 import java.util.Collection;
 
 /**
- * TODO - Description
+ * Test temporary topics
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
-public class TemporaryQueueTest extends AbstractJMSTest {
+public class TemporaryTopicTest extends AbstractJMSTest {
     @Test
-    public void testTemporaryQueue() throws Exception {
+    public void testTemporaryTopic() throws Exception {
         NevadoSession session = createSession();
-        TemporaryQueue temporaryQueue = session.createTemporaryQueue();
+        TemporaryTopic temporaryTopic = session.createTemporaryTopic();
         TextMessage testMessage = session.createTextMessage(RandomData.readString());
-        session.createProducer(temporaryQueue).send(testMessage);
-        Message msgOut = session.createConsumer(temporaryQueue).receive();
+        MessageProducer producer = session.createProducer(temporaryTopic);
+        MessageConsumer consumer = session.createConsumer(temporaryTopic);
+        producer.send(testMessage);
+        Message msgOut = consumer.receive();
         Assert.assertTrue(msgOut instanceof TextMessage);
         Assert.assertEquals("Message body not equal", testMessage.getText(), ((TextMessage) msgOut).getText());
     }
@@ -30,25 +32,25 @@ public class TemporaryQueueTest extends AbstractJMSTest {
     public void testTemporaryQueueAcrossConnections() throws Exception
     {
         NevadoSession session = createSession();
-        TemporaryQueue temporaryQueue = session.createTemporaryQueue();
+        TemporaryTopic temporaryTopic = session.createTemporaryTopic();
         Connection theWrongConnection = createConnection(getConnectionFactory());
         Session theWrongSession = theWrongConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        MessageConsumer consumer = theWrongSession.createConsumer(temporaryQueue);
+        theWrongSession.createConsumer(temporaryTopic);
     }
 
-    // Because the queues returned by SQS ListQueues is not synchronous with creation and deletion of queues, it is
+    // Because the queues returned by SNS ListTopics is not synchronous with creation and deletion of topics, it is
     // too flaky to test in a quick, automated fashion.  This could be done with thie very slow test
     // but we'll leave it disabled so our overall suite can remain fast.
-    @Test
-    public void testTemporaryQueueDeletion() throws Exception {
+    //@Test
+    public void testTemporaryTopicDeletion() throws Exception {
         NevadoSession session = createSession();
-        TemporaryQueue temporaryQueue = session.createTemporaryQueue();
+        TemporaryTopic temporaryTopic = session.createTemporaryTopic();
         Thread.sleep(15000);
-        Collection<TemporaryQueue> allTemporaryQueues = getConnection().listAllTemporaryQueues();
-        Assert.assertTrue("Temporary queue should exist", allTemporaryQueues.contains(temporaryQueue));
+        Collection<TemporaryTopic> allTemporaryTopics = getConnection().listAllTemporaryTopics();
+        Assert.assertTrue("Temporary topic should exist", allTemporaryTopics.contains(temporaryTopic));
         getConnection().close();
         Thread.sleep(60000);
-        allTemporaryQueues = getConnection().listAllTemporaryQueues();
-        Assert.assertFalse("Temporary queue should not exist", allTemporaryQueues.contains(temporaryQueue));
+        allTemporaryTopics = getConnection().listAllTemporaryTopics();
+        Assert.assertFalse("Temporary topic should not exist", allTemporaryTopics.contains(temporaryTopic));
     }
 }
