@@ -53,6 +53,18 @@ public abstract class AbstractJMSTest {
         return (NevadoConnection)connectionFactory.createConnection(_awsAccessKey, _awsSecretKey);
     }
 
+    protected NevadoQueueConnection createQueueConnection(QueueConnectionFactory connectionFactory)
+            throws JMSException
+    {
+        return (NevadoQueueConnection)connectionFactory.createQueueConnection(_awsAccessKey, _awsSecretKey);
+    }
+
+    protected NevadoTopicConnection createTopicConnection(TopicConnectionFactory connectionFactory)
+            throws JMSException
+    {
+        return (NevadoTopicConnection)connectionFactory.createTopicConnection(_awsAccessKey, _awsSecretKey);
+    }
+
     protected Message sendAndReceive(Message msg) throws JMSException {
         Session session = createSession();
         Queue testQueue = createTempQueue(session);

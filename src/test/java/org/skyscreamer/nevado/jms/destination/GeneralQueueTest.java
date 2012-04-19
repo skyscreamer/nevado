@@ -52,7 +52,8 @@ public class GeneralQueueTest extends AbstractJMSTest {
         Assert.assertTrue(ConnectionFactory.class.isAssignableFrom(NevadoConnectionFactory.class));
         Assert.assertTrue(QueueConnectionFactory.class.isAssignableFrom(NevadoConnectionFactory.class));
         Assert.assertTrue(Connection.class.isAssignableFrom(NevadoConnection.class));
-        Assert.assertTrue(QueueConnection.class.isAssignableFrom(NevadoConnection.class));
+        Assert.assertTrue(QueueConnection.class.isAssignableFrom(NevadoQueueConnection.class));
+        Assert.assertTrue(NevadoConnection.class.isAssignableFrom(NevadoQueueConnection.class));
         Assert.assertTrue(Queue.class.isAssignableFrom(NevadoQueue.class));
         Assert.assertTrue(NevadoDestination.class.isAssignableFrom(NevadoQueue.class));
         Assert.assertTrue(Destination.class.isAssignableFrom(NevadoDestination.class));
@@ -69,7 +70,7 @@ public class GeneralQueueTest extends AbstractJMSTest {
     public void testQueueFacilities() throws JMSException
     {
         QueueConnectionFactory connectionFactory = new NevadoConnectionFactory();
-        QueueConnection connection = createConnection(connectionFactory);
+        QueueConnection connection = createQueueConnection(connectionFactory);
         connection.start();
         QueueSession session = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         TemporaryQueue queue = session.createTemporaryQueue();

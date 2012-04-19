@@ -21,32 +21,43 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     private Long _jmsTTL;
     private Integer _jmsPriority;
 
-    public QueueConnection createQueueConnection() throws JMSException {
-        return createNevadoConnection(_awsAccessKey, _awsSecretKey);
+    public NevadoQueueConnection createQueueConnection() throws JMSException {
+        NevadoQueueConnection connection = new NevadoQueueConnection(_awsAccessKey, _awsSecretKey);
+        initializeConnection(connection);
+        return connection;
     }
 
-    public QueueConnection createQueueConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
-        return createNevadoConnection(awsAccessKey, awsSecretKey);
+    public NevadoQueueConnection createQueueConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
+        NevadoQueueConnection connection = new NevadoQueueConnection(awsAccessKey, awsSecretKey);
+        initializeConnection(connection);
+        return connection;
     }
 
-    public Connection createConnection() throws JMSException {
-        return createNevadoConnection(_awsAccessKey, _awsSecretKey);
+    public NevadoConnection createConnection() throws JMSException {
+        NevadoConnection connection = new NevadoConnection(_awsAccessKey, _awsSecretKey);
+        initializeConnection(connection);
+        return connection;
     }
 
-    public Connection createConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
-        return createNevadoConnection(awsAccessKey, awsSecretKey);
+    public NevadoConnection createConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
+        NevadoConnection connection = new NevadoConnection(awsAccessKey, awsSecretKey);
+        initializeConnection(connection);
+        return connection;
     }
 
-    public TopicConnection createTopicConnection() throws JMSException {
-        return createNevadoConnection(_awsAccessKey, _awsSecretKey);
+    public NevadoTopicConnection createTopicConnection() throws JMSException {
+        NevadoTopicConnection connection = new NevadoTopicConnection(_awsAccessKey, _awsSecretKey);
+        initializeConnection(connection);
+        return connection;
     }
 
     public TopicConnection createTopicConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
-        return createNevadoConnection(awsAccessKey, awsSecretKey);
+        NevadoTopicConnection connection = new NevadoTopicConnection(awsAccessKey, awsSecretKey);
+        initializeConnection(connection);
+        return connection;
     }
 
-    private NevadoConnection createNevadoConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
-        NevadoConnection connection = new NevadoConnection(awsAccessKey, awsSecretKey);
+    private void initializeConnection(NevadoConnection connection) throws javax.jms.IllegalStateException {
         if (StringUtils.isNotEmpty(_clientID))
         {
             connection.setClientID(_clientID);
@@ -54,7 +65,6 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
         connection.setOverrideJMSDeliveryMode(_jmsDeliveryMode);
         connection.setOverrideJMSPriority(_jmsPriority);
         connection.setOverrideJMSTTL(_jmsTTL);
-        return connection;
     }
 
     // Getters & Setters

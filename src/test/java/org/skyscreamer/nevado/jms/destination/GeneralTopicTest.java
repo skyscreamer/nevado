@@ -19,7 +19,8 @@ public class GeneralTopicTest extends AbstractJMSTest {
         Assert.assertTrue(ConnectionFactory.class.isAssignableFrom(NevadoConnectionFactory.class));
         Assert.assertTrue(TopicConnectionFactory.class.isAssignableFrom(NevadoConnectionFactory.class));
         Assert.assertTrue(Connection.class.isAssignableFrom(NevadoConnection.class));
-        Assert.assertTrue(TopicConnection.class.isAssignableFrom(NevadoConnection.class));
+        Assert.assertTrue(TopicConnection.class.isAssignableFrom(NevadoTopicConnection.class));
+        Assert.assertTrue(NevadoConnection.class.isAssignableFrom(NevadoTopicConnection.class));
         Assert.assertTrue(Topic.class.isAssignableFrom(NevadoTopic.class));
         Assert.assertTrue(NevadoDestination.class.isAssignableFrom(NevadoTopic.class));
         Assert.assertTrue(Destination.class.isAssignableFrom(NevadoDestination.class));
@@ -36,7 +37,7 @@ public class GeneralTopicTest extends AbstractJMSTest {
     public void testTopicFacilities() throws JMSException
     {
         TopicConnectionFactory connectionFactory = new NevadoConnectionFactory();
-        TopicConnection connection = createConnection(connectionFactory);
+        TopicConnection connection = createTopicConnection(connectionFactory);
         connection.start();
         TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
         TemporaryTopic topic = session.createTemporaryTopic();

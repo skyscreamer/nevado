@@ -273,8 +273,9 @@ public class SQSConnector implements NevadoConnector {
             message = new InvalidMessage(e);
         }
 
-        if (!message.nevadoPropertyExists(NevadoProperty.DisableMessageID)
-                || !(Boolean)message.getNevadoProperty(NevadoProperty.DisableMessageID))
+        if (!(message.nevadoPropertyExists(NevadoProperty.DisableMessageID)
+                && (Boolean)message.getNevadoProperty(NevadoProperty.DisableMessageID))
+            && message.getJMSMessageID() == null)
         {
             message.setJMSMessageID("ID:" + sqsMessage.getMessageId());
         }

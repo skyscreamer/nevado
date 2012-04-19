@@ -19,13 +19,13 @@ import java.util.concurrent.CopyOnWriteArraySet;
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
-public class NevadoConnection implements Connection, QueueConnection, TopicConnection {
+public class NevadoConnection implements Connection {
     public static final String TEMPORARY_DESTINATION_PREFIX = "nevado_temp";
 
     private final Log _log = LogFactory.getLog(getClass());
 
     private boolean _closed = false;
-    private boolean _inUse = false;
+    protected boolean _inUse = false;
     private final NevadoConnector _nevadoConnector;
     private String _clientID;
     private Integer _jmsDeliveryMode;
@@ -41,6 +41,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         _nevadoConnector.test();
     }
 
+    @Override
     public NevadoSession createSession(boolean transacted, int acknowledgeMode) throws JMSException {
         checkClosed();
         _inUse = true;
@@ -49,30 +50,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         return nevadoSession;
     }
 
-    public synchronized NevadoQueueSession createQueueSession(boolean transacted, int acknowledgeMode) throws JMSException {
-        checkClosed();
-        _inUse = true;
-        NevadoQueueSession nevadoSession = new NevadoQueueSession(this, transacted, acknowledgeMode);
-        initializeSession(nevadoSession);
-        return nevadoSession;
-    }
-
-    public TopicSession createTopicSession(boolean transacted, int acknowledgeMode) throws JMSException {
-        checkClosed();
-        _inUse = true;
-        NevadoTopicSession nevadoSession = new NevadoTopicSession(this, transacted, acknowledgeMode);
-        initializeSession(nevadoSession);
-        return nevadoSession;
-    }
-
-
-    public ConnectionConsumer createConnectionConsumer(Queue queue, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
-        checkClosed();
-        _inUse = true;
-        return null;  // TODO
-    }
-
-    private void initializeSession(NevadoSession nevadoSession) {
+    protected void initializeSession(NevadoSession nevadoSession) {
         nevadoSession.setOverrideJMSDeliveryMode(_jmsDeliveryMode);
         nevadoSession.setOverrideJMSTTL(_jmsTTL);
         nevadoSession.setOverrideJMSPriority(_jmsPriority);
@@ -83,19 +61,23 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         }
     }
 
+    @Override
     public NevadoConnectionMetaData getMetaData() throws JMSException {
         return NevadoConnectionMetaData.getInstance();
     }
 
+    @Override
     public ExceptionListener getExceptionListener() {
         return _exceptionListener;
     }
 
+    @Override
     public void setExceptionListener(ExceptionListener exceptionListener) throws IllegalStateException {
         checkClosed();
         _exceptionListener = exceptionListener;
     }
 
+    @Override
     public synchronized void start() throws JMSException
     {
         checkClosed();
@@ -107,6 +89,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         }
     }
 
+    @Override
     public synchronized void stop() throws JMSException
     {
         checkClosed();
@@ -117,6 +100,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         }
     }
 
+    @Override
     public synchronized void close() throws JMSException {
         if (!_closed) {
             stop();
@@ -150,25 +134,21 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         }
     }
 
+    @Override
     public ConnectionConsumer createConnectionConsumer(Destination destination, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
         checkClosed();
         _inUse = true;
         return null;  // TODO
     }
 
-    public ConnectionConsumer createConnectionConsumer(Topic topic, String s, ServerSessionPool serverSessionPool, int i) throws JMSException {
-        checkClosed();
-        _inUse = true;
-        return null;  // TODO
-    }
-
+    @Override
     public ConnectionConsumer createDurableConnectionConsumer(Topic topic, String s, String s1, ServerSessionPool serverSessionPool, int i) throws JMSException {
         checkClosed();
         _inUse = true;
         return null;  // TODO
     }
 
-    public TemporaryTopic createTemporaryTopic() throws JMSException {
+    protected TemporaryTopic createTemporaryTopic() throws JMSException {
         checkClosed();
         String tempTopicName = TEMPORARY_DESTINATION_PREFIX + UUID.randomUUID();
         NevadoTopic topic = getSQSConnector().createTopic(tempTopicName);
@@ -184,7 +164,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         _temporaryDestinations.remove(temporaryTopic);
     }
 
-    public NevadoTemporaryQueue createTemporaryQueue() throws JMSException
+    protected NevadoTemporaryQueue createTemporaryQueue() throws JMSException
     {
         checkClosed();
         String tempQueueName = TEMPORARY_DESTINATION_PREFIX + UUID.randomUUID();
@@ -201,7 +181,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         _temporaryDestinations.remove(temporaryQueue);
     }
 
-    public boolean ownsTemporaryDestination(Destination temporaryDestination)
+    protected boolean ownsTemporaryDestination(Destination temporaryDestination)
     {
         return _temporaryDestinations.contains(temporaryDestination);
     }
@@ -230,10 +210,12 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         return _nevadoConnector;
     }
 
+    @Override
     public String getClientID() {
         return _clientID;
     }
 
+    @Override
     public void setClientID(String clientID) throws IllegalStateException {
         checkClosed();
         if (_clientID != null) {
@@ -268,7 +250,7 @@ public class NevadoConnection implements Connection, QueueConnection, TopicConne
         return _closed;
     }
 
-    private void checkClosed() throws IllegalStateException {
+    protected void checkClosed() throws IllegalStateException {
         if (_closed)
         {
             throw new IllegalStateException("Connection is closed");
