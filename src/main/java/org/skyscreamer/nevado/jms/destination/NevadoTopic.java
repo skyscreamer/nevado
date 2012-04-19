@@ -15,25 +15,29 @@ public class NevadoTopic extends NevadoDestination implements Topic {
     private String _arn;
     private final NevadoQueue _topicEndpoint;
     private final String _subscriptionArn;
+    private final boolean _durable;
 
     public NevadoTopic(String name) {
         super(name.startsWith("arn:") ? name.substring(name.lastIndexOf(":") + 1) : name);
         _topicEndpoint = null;
         _subscriptionArn = null;
+        _durable = false;
     }
 
     protected NevadoTopic(NevadoTopic topic) {
         super(topic);
         _topicEndpoint = null;
         _subscriptionArn = null;
+        _durable = false;
     }
 
-    public NevadoTopic(NevadoTopic topic, NevadoQueue topicEndpoint, String subscriptionArn)
+    public NevadoTopic(NevadoTopic topic, NevadoQueue topicEndpoint, String subscriptionArn, boolean durable)
     {
         super(topic);
         _arn = topic.getArn();
         _topicEndpoint = topicEndpoint;
         _subscriptionArn = subscriptionArn;
+        _durable = durable;
     }
 
     public String getTopicName() {
@@ -54,5 +58,9 @@ public class NevadoTopic extends NevadoDestination implements Topic {
 
     public String getSubscriptionArn() {
         return _subscriptionArn;
+    }
+
+    public boolean isDurable() {
+        return _durable;
     }
 }

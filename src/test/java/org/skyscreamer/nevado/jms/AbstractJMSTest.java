@@ -7,6 +7,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
+import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 import org.skyscreamer.nevado.jms.util.TestExceptionListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -120,7 +121,7 @@ public abstract class AbstractJMSTest {
         return session.createTemporaryQueue();
     }
 
-    protected Topic createTempTopic(Session session) throws JMSException {
+    protected NevadoTopic createTempTopic(NevadoSession session) throws JMSException {
         return session.createTemporaryTopic();
     }
 

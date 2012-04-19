@@ -20,8 +20,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class NevadoConnection implements Connection {
-    public static final String TEMPORARY_DESTINATION_PREFIX = "nevado_temp";
-
     private final Log _log = LogFactory.getLog(getClass());
 
     private boolean _closed = false;
@@ -148,9 +146,9 @@ public class NevadoConnection implements Connection {
         return null;  // TODO
     }
 
-    protected TemporaryTopic createTemporaryTopic() throws JMSException {
+    protected NevadoTemporaryTopic createTemporaryTopic() throws JMSException {
         checkClosed();
-        String tempTopicName = TEMPORARY_DESTINATION_PREFIX + UUID.randomUUID();
+        String tempTopicName = "" + NevadoProviderQueuePrefix.TEMPORARY_DESTINATION_PREFIX + UUID.randomUUID();
         NevadoTopic topic = getSQSConnector().createTopic(tempTopicName);
         NevadoTemporaryTopic temporaryTopic = new NevadoTemporaryTopic(this, topic);
         _temporaryDestinations.add(temporaryTopic);
@@ -167,7 +165,7 @@ public class NevadoConnection implements Connection {
     protected NevadoTemporaryQueue createTemporaryQueue() throws JMSException
     {
         checkClosed();
-        String tempQueueName = TEMPORARY_DESTINATION_PREFIX + UUID.randomUUID();
+        String tempQueueName = "" + NevadoProviderQueuePrefix.TEMPORARY_DESTINATION_PREFIX + UUID.randomUUID();
         NevadoQueue queue = getSQSConnector().createQueue(tempQueueName);
         NevadoTemporaryQueue temporaryQueue = new NevadoTemporaryQueue(this, queue);
         _temporaryDestinations.add(temporaryQueue);
@@ -187,7 +185,8 @@ public class NevadoConnection implements Connection {
     }
 
     public Collection<TemporaryQueue> listAllTemporaryQueues() throws JMSException {
-        Collection<NevadoQueue> queues = getSQSConnector().listQueues(TEMPORARY_DESTINATION_PREFIX);
+        Collection<NevadoQueue> queues = getSQSConnector()
+                .listQueues(NevadoProviderQueuePrefix.TEMPORARY_DESTINATION_PREFIX + "");
         Collection<TemporaryQueue> temporaryQueues = new HashSet<TemporaryQueue>(queues.size());
         for(NevadoQueue queue : queues) {
             temporaryQueues.add(new NevadoTemporaryQueue(this, queue));
@@ -199,10 +198,18 @@ public class NevadoConnection implements Connection {
         Collection<NevadoTopic> topics = getSQSConnector().listTopics();
         Collection<TemporaryTopic> temporaryTopics = new HashSet<TemporaryTopic>(topics.size());
         for(NevadoTopic topic : topics) {
-            if (topic.getTopicName().startsWith(TEMPORARY_DESTINATION_PREFIX))
+            if (topic.getTopicName().startsWith(NevadoProviderQueuePrefix.TEMPORARY_DESTINATION_PREFIX + ""))
                 temporaryTopics.add(new NevadoTemporaryTopic(this, topic));
         }
         return temporaryTopics;
+    }
+
+    public String subscribe(NevadoTopic topic, NevadoQueue topicEndpoint) throws JMSException {
+        return getSQSConnector().subscribe(topic, topicEndpoint);
+    }
+
+    public void unsubscribe(NevadoTopic topic) throws JMSException {
+        getSQSConnector().unsubscribe(topic);
     }
 
     // Getters & Setters

@@ -1,9 +1,6 @@
 package org.skyscreamer.nevado.jms;
 
-import org.skyscreamer.nevado.jms.destination.NevadoDestination;
-import org.skyscreamer.nevado.jms.destination.NevadoQueue;
-import org.skyscreamer.nevado.jms.destination.NevadoTemporaryQueue;
-import org.skyscreamer.nevado.jms.destination.NevadoTopic;
+import org.skyscreamer.nevado.jms.destination.*;
 
 import javax.jms.*;
 import javax.jms.IllegalStateException;
@@ -19,13 +16,23 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
         if (destination instanceof NevadoTopic)
         {
             NevadoTemporaryQueue topicEndpoint = _session.getConnection().createTemporaryQueue();
-            String subscriptionArn = _session.subscribe((NevadoTopic)destination, topicEndpoint);
-            _destination = new NevadoTopic((NevadoTopic)destination, topicEndpoint, subscriptionArn);
+            String subscriptionArn = _session.getConnection().subscribe((NevadoTopic)destination, topicEndpoint);
+            _destination = new NevadoTopic((NevadoTopic)destination, topicEndpoint, subscriptionArn, false);
         }
         else
         {
             _destination = destination;
         }
+    }
+
+    public NevadoMessageConsumer(NevadoSession session, NevadoTopic topic, String durableSubscriptionName)
+            throws JMSException
+    {
+        _session = session;
+        NevadoQueue topicEndpoint = _session.createQueue("" + NevadoProviderQueuePrefix.DURABLE_SUBSCRIPTION_PREFIX
+                + durableSubscriptionName);
+        String subscriptionArn = _session.getConnection().subscribe(topic, topicEndpoint);
+        _destination = new NevadoTopic(topic, topicEndpoint, subscriptionArn, false);
     }
 
     public String getMessageSelector() throws JMSException {
@@ -62,7 +69,10 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
     public synchronized void close() throws JMSException {
         if (!_closed)
         {
-            // TODO - unsubscribe _subscriptionArn
+            if (_destination instanceof NevadoTopic && !((NevadoTopic)_destination).isDurable())
+            {
+                _session.getConnection().unsubscribe((NevadoTopic)_destination);
+            }
             _messageListener = null;
             _closed = true;
         }

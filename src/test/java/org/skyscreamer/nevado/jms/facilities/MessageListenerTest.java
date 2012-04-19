@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
 import org.skyscreamer.nevado.jms.util.RandomData;
 import org.skyscreamer.nevado.jms.util.TestMessageListener;
+import org.skyscreamer.nevado.jms.util.TestMessageListenerRuntimeException;
 
 import javax.jms.*;
 import javax.jms.IllegalStateException;
@@ -56,5 +57,75 @@ public class MessageListenerTest extends AbstractJMSTest{
         consumer.setMessageListener(messageListener);
         consumer.setMessageListener(null);
         consumer.receiveNoWait();
+    }
+
+//    The result of a listener throwing a RuntimeException depends on the session's acknowledgement mode.
+//
+//    AUTO_ACKNOWLEDGEMENT or DUPS_OK_ACKNOWLEDGE - the message will be immediately redelivered. The number of attempts is provider-dependent. The JMSRedelivered header will be set.
+//    CLIENT_ACKNOWLEDGE - The next message for the listener is delivered. In this case the client must manually recover.
+//    Transacted Session - The next message for the listener is delivered. RuntimeException does not automatically rollback the session, and the client must do it explicitly.
+
+    @Test
+    public void testThrowRuntimeAutoAck() throws JMSException {
+        TestMessageListenerRuntimeException messageListener = new TestMessageListenerRuntimeException();
+        Session session = getConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);
+        Queue tempQueue = createTempQueue(session);
+        MessageConsumer consumer = session.createConsumer(tempQueue);
+        consumer.setMessageListener(messageListener);
+        TextMessage msg1 = session.createTextMessage(RandomData.readString());
+        TextMessage msg2 = session.createTextMessage(RandomData.readString());
+        MessageProducer producer = session.createProducer(tempQueue);
+        producer.send(msg1);
+        producer.send(msg2);
+        Assert.assertEquals(msg1, messageListener.getMessage(1000));
+        Assert.assertEquals(msg1, messageListener.getFirstMessage());
+    }
+
+    @Test
+    public void testThrowRuntimeDupsOk() throws JMSException {
+        TestMessageListener messageListener = new TestMessageListenerRuntimeException();
+        Session session = getConnection().createSession(false, Session.DUPS_OK_ACKNOWLEDGE);
+        Queue tempQueue = createTempQueue(session);
+        MessageConsumer consumer = session.createConsumer(tempQueue);
+        consumer.setMessageListener(messageListener);
+        TextMessage msg1 = session.createTextMessage(RandomData.readString());
+        TextMessage msg2 = session.createTextMessage(RandomData.readString());
+        MessageProducer producer = session.createProducer(tempQueue);
+        producer.send(msg1);
+        producer.send(msg2);
+        Assert.assertEquals(msg1, messageListener.getMessage(1000));
+        Assert.assertEquals(msg1, messageListener.getMessage(1000));
+    }
+
+    @Test
+    public void testThrowRuntimeClientAck() throws JMSException {
+        TestMessageListener messageListener = new TestMessageListenerRuntimeException();
+        Session session = getConnection().createSession(false, Session.CLIENT_ACKNOWLEDGE);
+        Queue tempQueue = createTempQueue(session);
+        MessageConsumer consumer = session.createConsumer(tempQueue);
+        consumer.setMessageListener(messageListener);
+        TextMessage msg1 = session.createTextMessage(RandomData.readString());
+        TextMessage msg2 = session.createTextMessage(RandomData.readString());
+        MessageProducer producer = session.createProducer(tempQueue);
+        producer.send(msg1);
+        producer.send(msg2);
+        Assert.assertEquals(msg2, messageListener.getMessage(1000));
+        Assert.assertEquals(msg1, messageListener.getMessage(1000));
+    }
+
+    @Test
+    public void testThrowRuntimeTransacted() throws JMSException {
+        TestMessageListener messageListener = new TestMessageListenerRuntimeException();
+        Session session = getConnection().createSession(true, Session.SESSION_TRANSACTED);
+        Queue tempQueue = createTempQueue(session);
+        MessageConsumer consumer = session.createConsumer(tempQueue);
+        consumer.setMessageListener(messageListener);
+        TextMessage msg1 = session.createTextMessage(RandomData.readString());
+        TextMessage msg2 = session.createTextMessage(RandomData.readString());
+        MessageProducer producer = session.createProducer(tempQueue);
+        producer.send(msg1);
+        producer.send(msg2);
+        Assert.assertEquals(msg2, messageListener.getMessage(1000));
+        Assert.assertEquals(msg1, messageListener.getMessage(1000));
     }
 }

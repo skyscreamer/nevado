@@ -92,6 +92,19 @@ public class MessageHolder {
         }
     }
 
+    public List<NevadoMessage> getConsumedMessages()
+    {
+        List<NevadoMessage> consumedMessages = new ArrayList<NevadoMessage>();
+        for(Destination destination : _messageHolder.keySet())
+        {
+            for(NevadoMessage msg : getConsumedMessages(destination))
+            {
+                consumedMessages.add(msg);
+            }
+        }
+        return consumedMessages;
+    }
+
     private List<NevadoMessage> getConsumedMessages(Destination destination)
     {
         if (_messageHolder.containsKey(destination))

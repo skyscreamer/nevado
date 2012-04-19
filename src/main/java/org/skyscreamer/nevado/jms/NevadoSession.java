@@ -2,10 +2,7 @@ package org.skyscreamer.nevado.jms;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.skyscreamer.nevado.jms.destination.NevadoDestination;
-import org.skyscreamer.nevado.jms.destination.NevadoQueue;
-import org.skyscreamer.nevado.jms.destination.NevadoTemporaryQueue;
-import org.skyscreamer.nevado.jms.destination.NevadoTopic;
+import org.skyscreamer.nevado.jms.destination.*;
 import org.skyscreamer.nevado.jms.message.*;
 
 import javax.jms.*;
@@ -264,6 +261,10 @@ public class NevadoSession implements Session {
     public NevadoQueue createQueue(String name) throws JMSException
     {
         checkClosed();
+        if (!NevadoProviderQueuePrefix.isValidQueueName(name))
+        {
+            throw new InvalidDestinationException("Queue name is not valid: " + name);
+        }
         return new NevadoQueue(name);
     }
 
@@ -289,17 +290,45 @@ public class NevadoSession implements Session {
     }
 
     @Override
-    public TemporaryTopic createTemporaryTopic() throws JMSException
+    public NevadoTemporaryTopic createTemporaryTopic() throws JMSException
     {
         checkClosed();
         return _connection.createTemporaryTopic();
     }
 
     @Override
-    public void unsubscribe(String s) throws JMSException
+    public void unsubscribe(String name) throws JMSException
     {
         checkClosed();
-        // TODO
+        String queueName = NevadoProviderQueuePrefix.DURABLE_SUBSCRIPTION_PREFIX + name;
+
+        // Are there any active subscribers?
+        for(NevadoMessageConsumer consumer : _consumers)
+        {
+            if (consumer.getDestination() != null && (consumer.getDestination() instanceof NevadoTopic)
+                && ((NevadoTopic)consumer.getDestination()).isDurable()
+                    && queueName.equals(((NevadoTopic)consumer.getDestination()).getTopicEndpoint().getQueueName()))
+            {
+                throw new JMSException("Cannot unsubscribe durable topic-subscription '"
+                        + name + "': There is an active TopicSubscriber");
+            }
+            for (NevadoMessage message : _incomingStagedMessages.getConsumedMessages())
+            {
+                if (message.getJMSDestination() instanceof NevadoTopic)
+                {
+                    NevadoTopic topic = (NevadoTopic)message.getJMSDestination();
+                    if (topic.isDurable() && queueName
+                            .equals(((NevadoTopic) consumer.getDestination()).getTopicEndpoint().getQueueName()))
+                    {
+                        throw new JMSException("Cannot unsubscribe durable topic-subscription '"
+                                + name + "': There is an unacknowledged or uncommitted message from the topic");
+                    }
+                }
+            }
+        }
+        NevadoQueue durableQueue = new NevadoQueue(queueName);
+        _connection.getSQSConnector().unsubscribeDurableQueueFromTopic(durableQueue);
+        _connection.getSQSConnector().deleteQueue(durableQueue);
     }
 
     public void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException
@@ -439,10 +468,6 @@ public class NevadoSession implements Session {
         {
             _connection.getSQSConnector().resetMessage(message);
         }
-    }
-
-    public String subscribe(NevadoTopic topic, NevadoQueue topicEndpoint) throws JMSException {
-        return _connection.getSQSConnector().subscribe(topic, topicEndpoint);
     }
 
     public void setOverrideJMSDeliveryMode(Integer jmsDeliveryMode)

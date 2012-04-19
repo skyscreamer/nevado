@@ -219,6 +219,26 @@ public class SQSConnector implements NevadoConnector {
         return subscriptionArn;
     }
 
+    public void unsubscribe(NevadoTopic topic) throws JMSException {
+        if (topic == null) {
+            throw new NullPointerException();
+        }
+        if (topic.getSubscriptionArn() == null) {
+            throw new IllegalArgumentException("Topic doesn't have a subscription");
+        }
+        try {
+            _notficationService.unsubscribe(topic.getSubscriptionArn());
+        } catch (SNSException e) {
+            throw handleAWSException("Unable to subscribe topic " + topic + " with sub ARN "
+                    + topic.getSubscriptionArn(), e);
+        }
+    }
+
+    @Override
+    public void unsubscribeDurableQueueFromTopic(NevadoQueue queue) {
+        // TODO
+    }
+
     public void resetMessage(NevadoMessage message) throws JMSException {
         String sqsReceiptHandle = (String)message.getNevadoProperty(NevadoProperty.SQSReceiptHandle);
         if (sqsReceiptHandle == null)

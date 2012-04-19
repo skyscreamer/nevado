@@ -72,8 +72,9 @@ public class AsyncConsumerRunner implements Runnable {
                 if (consumer.processAsyncMessage()) {
                     messageProcessed = true;
                 }
-            } catch (JMSException e) {
-                _log.error("Unable to process message for consumer on " + consumer.getDestination(), e);
+            } catch (Throwable t) {
+                String errorMessage = "Unable to process message for consumer on " + consumer.getDestination();
+                _log.error(errorMessage, t);
                 ExceptionListener exceptionListener = null;
                 try {
                     exceptionListener = _connection.getExceptionListener();
@@ -82,6 +83,8 @@ public class AsyncConsumerRunner implements Runnable {
                 }
                 if (exceptionListener != null)
                 {
+                    JMSException e = (t instanceof JMSException) ? (JMSException)t
+                            : new JMSException(errorMessage + ": " + t.getMessage());
                     exceptionListener.onException(e);
                 }
             }
