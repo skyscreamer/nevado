@@ -261,17 +261,17 @@ public class NevadoSession implements Session {
     }
 
     @Override
-    public NevadoQueue createQueue(String s) throws JMSException
+    public NevadoQueue createQueue(String name) throws JMSException
     {
         checkClosed();
-        return null;  // TODO
+        return new NevadoQueue(name);
     }
 
     @Override
-    public NevadoTopic createTopic(String s) throws JMSException
+    public NevadoTopic createTopic(String name) throws JMSException
     {
         checkClosed();
-        return null;  // TODO
+        return new NevadoTopic(name);
     }
 
     @Override
