@@ -18,8 +18,8 @@ public class NevadoQueue extends NevadoDestination implements Queue {
         super(name);
     }
 
-    protected NevadoQueue(NevadoQueue queue) {
-        super(queue);
+    protected NevadoQueue(Queue queue) throws JMSException {
+        super(queue.getQueueName());
     }
 
     public NevadoQueue(URL sqsURL) {

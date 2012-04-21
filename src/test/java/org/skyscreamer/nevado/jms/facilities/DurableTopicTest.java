@@ -20,8 +20,8 @@ public class DurableTopicTest extends AbstractJMSTest {
     public void testDurableTopic() throws JMSException {
         String durableTopicName = "testTopicSub" + RandomData.readShort();
         String testTopicName = "testTopic" + RandomData.readShort();
-        Session session = createSession();
-        NevadoTopic topic = (NevadoTopic)session.createTopic(testTopicName);
+        NevadoSession session = createSession();
+        NevadoTopic topic = session.createTopic(testTopicName);
         TopicSubscriber subscriber = session.createDurableSubscriber(topic, durableTopicName);
         TextMessage msg1 = session.createTextMessage(RandomData.readString());
         TextMessage msg2 = session.createTextMessage(RandomData.readString());
@@ -37,16 +37,31 @@ public class DurableTopicTest extends AbstractJMSTest {
         conn.start();
         session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
         subscriber = session.createDurableSubscriber(topic, durableTopicName);
-        Assert.assertEquals(msg2, subscriber.receive(1000));
+        Message msgOut = subscriber.receive(1000);
+        Assert.assertNotNull(msgOut);
+        if (!msg2.equals(msgOut) && !msg3.equals(msgOut))
+        {
+            Assert.fail("Got " + msgOut + " ; expected " + msg2 + " or " + msg3);
+        }
         subscriber.close();
         session.unsubscribe(durableTopicName);
-        session.close();
 
-        subscriber = session.createDurableSubscriber(topic, durableTopicName);
-        Assert.assertNull(subscriber.receive(500));
+        boolean exceptionThrown = false;
+        Message msgAfterUnsubscribe = null;
+        try {
+            subscriber = session.createDurableSubscriber(topic, durableTopicName);
+            msgAfterUnsubscribe = subscriber.receive(500);
+        }
+        catch (JMSException e) {
+            exceptionThrown = true;
+        }
+        if (!exceptionThrown && msgAfterUnsubscribe != null) {
+            Assert.fail("Should not have been able to get message after unsubscribing from topic: "
+                    + msgAfterUnsubscribe);
+        }
 
         conn.getSQSConnector().deleteTopic(topic);
-
+        conn.close();
     }
 
     @Test

@@ -13,7 +13,7 @@ import javax.jms.TemporaryTopic;
 public class NevadoTemporaryTopic extends NevadoTopic implements TemporaryTopic {
     private transient NevadoConnection _connection;
 
-    public NevadoTemporaryTopic(NevadoConnection connection, NevadoTopic topic) {
+    public NevadoTemporaryTopic(NevadoConnection connection, NevadoTopic topic) throws JMSException {
         super(topic);
         _connection = connection;
     }

@@ -4,7 +4,6 @@ import javax.jms.*;
 import javax.jms.IllegalStateException;
 import java.io.Serializable;
 import java.net.URL;
-import java.util.Queue;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,7 +42,7 @@ public abstract class NevadoDestination implements Destination, Serializable {
         return _name;
     }
 
-    public static NevadoDestination getInstance(Destination destination) throws IllegalStateException {
+    public static NevadoDestination getInstance(Destination destination) throws JMSException {
         NevadoDestination nevadoDestination = null;
 
         if (destination != null) {
@@ -58,10 +57,10 @@ public abstract class NevadoDestination implements Destination, Serializable {
                     throw new IllegalStateException("TemporaryDestinations cannot be copied");
                 }
                 else if (destination instanceof Queue) {
-                    // Create new NevadoQueue - TODO
+                    nevadoDestination = new NevadoQueue((Queue)destination);
                 }
                 else if (destination instanceof Topic) {
-                    // Create new NevadoTopic - TODO
+                    nevadoDestination = new NevadoTopic((Topic)destination);
                 }
             }
         }

@@ -3,6 +3,7 @@ package org.skyscreamer.nevado.jms.metadata;
 import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
+import org.skyscreamer.nevado.jms.NevadoSession;
 import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 
 import javax.jms.*;
@@ -27,7 +28,7 @@ public class JMSDestinationTest extends AbstractJMSTest {
 
     @Test
     public void testTopic() throws JMSException {
-        Session session = createSession();
+        NevadoSession session = createSession();
         Message msg = session.createMessage();
         Topic tempTopic = createTempTopic(session);
         MessageProducer producer = session.createProducer(tempTopic);

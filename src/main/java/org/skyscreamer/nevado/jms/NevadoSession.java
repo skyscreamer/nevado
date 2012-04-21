@@ -260,11 +260,16 @@ public class NevadoSession implements Session {
     @Override
     public NevadoQueue createQueue(String name) throws JMSException
     {
-        checkClosed();
         if (!NevadoProviderQueuePrefix.isValidQueueName(name))
         {
             throw new InvalidDestinationException("Queue name is not valid: " + name);
         }
+        return createInternalQueue(name);
+    }
+
+    protected NevadoQueue createInternalQueue(String name) throws JMSException
+    {
+        checkClosed();
         return new NevadoQueue(name);
     }
 
@@ -276,17 +281,22 @@ public class NevadoSession implements Session {
     }
 
     @Override
-    public TopicSubscriber createDurableSubscriber(Topic topic, String s) throws JMSException
+    public TopicSubscriber createDurableSubscriber(Topic topic, String name) throws JMSException
     {
         checkClosed();
-        return null;  // TODO
+        return createDurableSubscriber(topic, name, null, false);
     }
 
     @Override
-    public TopicSubscriber createDurableSubscriber(Topic topic, String s, String s1, boolean b) throws JMSException
+    public TopicSubscriber createDurableSubscriber(Topic topic, String name, String selector, boolean noLocal) throws JMSException
     {
+        // TODO - Selector and noLocal currently ignored
         checkClosed();
-        return null;  // TODO
+        checkValidDestination(topic);
+        NevadoMessageConsumer consumer = new NevadoMessageConsumer(this, NevadoTopic.getInstance(topic), name);
+        _asyncConsumerRunner.addAsyncConsumer(consumer);
+        _consumers.add(consumer);
+        return consumer;
     }
 
     @Override

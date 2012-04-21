@@ -14,7 +14,7 @@ import javax.jms.TemporaryQueue;
 public class NevadoTemporaryQueue extends NevadoQueue implements TemporaryQueue {
     private transient NevadoConnection _connection;
 
-    public NevadoTemporaryQueue(NevadoConnection connection, NevadoQueue queue) {
+    public NevadoTemporaryQueue(NevadoConnection connection, NevadoQueue queue) throws JMSException {
         super(queue);
         _connection = connection;
     }

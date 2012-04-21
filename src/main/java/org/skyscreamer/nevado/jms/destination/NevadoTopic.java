@@ -1,10 +1,10 @@
 package org.skyscreamer.nevado.jms.destination;
 
-import javax.jms.JMSException;
-import javax.jms.Queue;
-import javax.jms.Topic;
+import javax.jms.*;
+import javax.jms.IllegalStateException;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.*;
 
 /**
  * Nevado implementation of a topic
@@ -24,8 +24,8 @@ public class NevadoTopic extends NevadoDestination implements Topic {
         _durable = false;
     }
 
-    protected NevadoTopic(NevadoTopic topic) {
-        super(topic);
+    protected NevadoTopic(Topic topic) throws JMSException {
+        super(topic.getTopicName());
         _topicEndpoint = null;
         _subscriptionArn = null;
         _durable = false;
@@ -38,6 +38,24 @@ public class NevadoTopic extends NevadoDestination implements Topic {
         _topicEndpoint = topicEndpoint;
         _subscriptionArn = subscriptionArn;
         _durable = durable;
+    }
+
+    public static NevadoTopic getInstance(Topic topic) throws JMSException {
+        NevadoTopic nevadoTopic = null;
+
+        if (topic != null) {
+            if (topic instanceof NevadoTopic) {
+                nevadoTopic = (NevadoTopic) topic;
+            }
+            else if (topic instanceof TemporaryTopic) {
+                throw new IllegalStateException("TemporaryDestinations cannot be copied");
+            }
+            else if (topic instanceof Topic) {
+                nevadoTopic = new NevadoTopic(topic);
+            }
+        }
+
+        return nevadoTopic;
     }
 
     public String getTopicName() {
