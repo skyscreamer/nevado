@@ -454,8 +454,7 @@ public class SQSConnector implements NevadoConnector {
         JMSException jmsException;
         String exMessage = message + ": " + e.getMessage();
         _log.error(exMessage, e);
-        boolean securityException = isSecurityException(e);
-        if (securityException)
+        if (isSecurityException(e))
         {
             jmsException = new JMSSecurityException(exMessage);
         }

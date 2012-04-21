@@ -32,7 +32,7 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
         NevadoQueue topicEndpoint = _session.createInternalQueue("" + NevadoProviderQueuePrefix.DURABLE_SUBSCRIPTION_PREFIX
                 + durableSubscriptionName);
         String subscriptionArn = _session.getConnection().subscribe(topic, topicEndpoint);
-        _destination = new NevadoTopic(topic, topicEndpoint, subscriptionArn, false);
+        _destination = new NevadoTopic(topic, topicEndpoint, subscriptionArn, true);
     }
 
     public String getMessageSelector() throws JMSException {

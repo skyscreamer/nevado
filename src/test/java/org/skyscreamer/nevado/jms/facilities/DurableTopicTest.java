@@ -79,9 +79,12 @@ public class DurableTopicTest extends AbstractJMSTest {
         }
 
         // Clean up
-        subscriber.close();
-        session.unsubscribe(durableTopicName);
-        if (!throwsException)
+        if (throwsException)
+        {
+            subscriber.close();
+            session.unsubscribe(durableTopicName);
+        }
+        else
         {
             Assert.fail("Expected exception to be thrown when trying to unsubscribe an active topic subscription");
         }
@@ -103,10 +106,14 @@ public class DurableTopicTest extends AbstractJMSTest {
             throwsException = true;
         }
 
-        // Clean up
-        subscriber.close();
-        session.unsubscribe(durableTopicName);
-        if (!throwsException)
+        if (throwsException)
+        {
+            // Clean up
+            session.recover();
+            subscriber.close();
+            session.unsubscribe(durableTopicName);
+        }
+        else
         {
             Assert.fail("Expected exception to be thrown when trying to unsubscribe a topic with an unacked msg");
         }
@@ -126,10 +133,13 @@ public class DurableTopicTest extends AbstractJMSTest {
             throwsException = true;
         }
 
-        // Clean up
-        subscriber.close();
-        session.unsubscribe(durableTopicName);
-        if (!throwsException)
+        if (throwsException)
+        {
+            // Clean up
+            subscriber.close();
+            session.unsubscribe(durableTopicName);
+        }
+        else
         {
             Assert.fail("Expected exception to be thrown when trying to double-subscribe an durable topic");
         }

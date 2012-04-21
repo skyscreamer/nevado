@@ -293,6 +293,10 @@ public class NevadoSession implements Session {
         // TODO - Selector and noLocal currently ignored
         checkClosed();
         checkValidDestination(topic);
+        if (hasActiveDurableSubscriber(name))
+        {
+            throw new JMSException("There is already a durable subscriber with name " + name);
+        }
         NevadoMessageConsumer consumer = new NevadoMessageConsumer(this, NevadoTopic.getInstance(topic), name);
         _asyncConsumerRunner.addAsyncConsumer(consumer);
         _consumers.add(consumer);
@@ -310,35 +314,50 @@ public class NevadoSession implements Session {
     public void unsubscribe(String name) throws JMSException
     {
         checkClosed();
-        String queueName = NevadoProviderQueuePrefix.DURABLE_SUBSCRIPTION_PREFIX + name;
 
-        // Are there any active subscribers?
-        for(NevadoMessageConsumer consumer : _consumers)
+        if (hasActiveDurableSubscriber(name))
         {
-            if (consumer.getDestination() != null && (consumer.getDestination() instanceof NevadoTopic)
-                && ((NevadoTopic)consumer.getDestination()).isDurable()
-                    && queueName.equals(((NevadoTopic)consumer.getDestination()).getTopicEndpoint().getQueueName()))
+            throw new JMSException("Cannot unsubscribe durable topic-subscription '"
+                    + name + "': There is an active TopicSubscriber");
+        }
+
+        // Check for unacknowledged/uncommitted messaages
+        String queueName = NevadoProviderQueuePrefix.DURABLE_SUBSCRIPTION_PREFIX + name;
+        for (NevadoMessage message : _incomingStagedMessages.getConsumedMessages())
+        {
+            if (message.getJMSDestination() instanceof NevadoTopic)
             {
-                throw new JMSException("Cannot unsubscribe durable topic-subscription '"
-                        + name + "': There is an active TopicSubscriber");
-            }
-            for (NevadoMessage message : _incomingStagedMessages.getConsumedMessages())
-            {
-                if (message.getJMSDestination() instanceof NevadoTopic)
+                NevadoTopic topic = (NevadoTopic)message.getJMSDestination();
+                if (topic.isDurable() && queueName.equals(topic.getTopicEndpoint().getQueueName()))
                 {
-                    NevadoTopic topic = (NevadoTopic)message.getJMSDestination();
-                    if (topic.isDurable() && queueName
-                            .equals(((NevadoTopic) consumer.getDestination()).getTopicEndpoint().getQueueName()))
-                    {
-                        throw new JMSException("Cannot unsubscribe durable topic-subscription '"
-                                + name + "': There is an unacknowledged or uncommitted message from the topic");
-                    }
+                    throw new JMSException("Cannot unsubscribe durable topic-subscription '"
+                            + name + "': There is an unacknowledged or uncommitted message from the topic");
                 }
             }
         }
+
         NevadoQueue durableQueue = new NevadoQueue(queueName);
         _connection.getSQSConnector().unsubscribeDurableQueueFromTopic(durableQueue);
         _connection.getSQSConnector().deleteQueue(durableQueue);
+    }
+
+    private boolean hasActiveDurableSubscriber(String name) throws JMSException {
+        String queueName = NevadoProviderQueuePrefix.DURABLE_SUBSCRIPTION_PREFIX + name;
+        for(NevadoMessageConsumer consumer : _consumers)
+        {
+            if (consumer.isClosed() || consumer.getDestination() == null
+                    || !(consumer.getDestination() instanceof NevadoTopic))
+            {
+                continue;
+            }
+
+            NevadoTopic topic = (NevadoTopic)consumer.getDestination();
+            if (topic.isDurable() && queueName.equals(topic.getTopicEndpoint().getQueueName()))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException
