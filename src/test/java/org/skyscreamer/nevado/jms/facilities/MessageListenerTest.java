@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
-public class MessageListenerTest extends AbstractJMSTest{
+public class MessageListenerTest extends AbstractJMSTest {
     @Test
     public void testMessageListener() throws JMSException, InterruptedException {
         TestMessageListener messageListener = new TestMessageListener();
@@ -66,9 +66,11 @@ public class MessageListenerTest extends AbstractJMSTest{
 //    Transacted Session - The next message for the listener is delivered. RuntimeException does not automatically rollback the session, and the client must do it explicitly.
 
     @Test
-    public void testThrowRuntimeAutoAck() throws JMSException {
+    public void testThrowRuntimeAutoAck() throws JMSException, InterruptedException {
         TestMessageListenerRuntimeException messageListener = new TestMessageListenerRuntimeException();
-        Session session = getConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);
+        Connection connection = createConnection(getConnectionFactory());
+        connection.start();
+        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Queue tempQueue = createTempQueue(session);
         MessageConsumer consumer = session.createConsumer(tempQueue);
         consumer.setMessageListener(messageListener);
@@ -76,15 +78,19 @@ public class MessageListenerTest extends AbstractJMSTest{
         TextMessage msg2 = session.createTextMessage(RandomData.readString());
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(msg1);
+        Thread.sleep(200);
         producer.send(msg2);
-        Assert.assertEquals(msg1, messageListener.getMessage(1000));
-        Assert.assertEquals(msg1, messageListener.getFirstMessage());
+        Message msgOut = messageListener.getMessage(1000);
+        Assert.assertEquals("Messages arrived out of order", msg1, messageListener.getFirstMessage());
+        Assert.assertEquals(msg1, msgOut);
     }
 
     @Test
-    public void testThrowRuntimeDupsOk() throws JMSException {
-        TestMessageListener messageListener = new TestMessageListenerRuntimeException();
-        Session session = getConnection().createSession(false, Session.DUPS_OK_ACKNOWLEDGE);
+    public void testThrowRuntimeDupsOk() throws JMSException, InterruptedException {
+        TestMessageListenerRuntimeException messageListener = new TestMessageListenerRuntimeException();
+        Connection connection = createConnection(getConnectionFactory());
+        connection.start();
+        Session session = connection.createSession(false, Session.DUPS_OK_ACKNOWLEDGE);
         Queue tempQueue = createTempQueue(session);
         MessageConsumer consumer = session.createConsumer(tempQueue);
         consumer.setMessageListener(messageListener);
@@ -92,15 +98,19 @@ public class MessageListenerTest extends AbstractJMSTest{
         TextMessage msg2 = session.createTextMessage(RandomData.readString());
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(msg1);
+        Thread.sleep(200);
         producer.send(msg2);
-        Assert.assertEquals(msg1, messageListener.getMessage(1000));
-        Assert.assertEquals(msg1, messageListener.getMessage(1000));
+        Message msgOut = messageListener.getMessage(1000);
+        Assert.assertEquals("Messages arrived out of order", msg1, messageListener.getFirstMessage());
+        Assert.assertEquals(msg1, msgOut);
     }
 
     @Test
-    public void testThrowRuntimeClientAck() throws JMSException {
-        TestMessageListener messageListener = new TestMessageListenerRuntimeException();
-        Session session = getConnection().createSession(false, Session.CLIENT_ACKNOWLEDGE);
+    public void testThrowRuntimeClientAck() throws JMSException, InterruptedException {
+        TestMessageListenerRuntimeException messageListener = new TestMessageListenerRuntimeException();
+        Connection connection = createConnection(getConnectionFactory());
+        connection.start();
+        Session session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
         Queue tempQueue = createTempQueue(session);
         MessageConsumer consumer = session.createConsumer(tempQueue);
         consumer.setMessageListener(messageListener);
@@ -108,15 +118,19 @@ public class MessageListenerTest extends AbstractJMSTest{
         TextMessage msg2 = session.createTextMessage(RandomData.readString());
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(msg1);
+        Thread.sleep(200);
         producer.send(msg2);
-        Assert.assertEquals(msg2, messageListener.getMessage(1000));
-        Assert.assertEquals(msg1, messageListener.getMessage(1000));
+        Message msgOut = messageListener.getMessage(1000);
+        Assert.assertEquals("Messages arrived out of order", msg1, messageListener.getFirstMessage());
+        Assert.assertEquals(msg2, msgOut);
     }
 
     @Test
-    public void testThrowRuntimeTransacted() throws JMSException {
-        TestMessageListener messageListener = new TestMessageListenerRuntimeException();
-        Session session = getConnection().createSession(true, Session.SESSION_TRANSACTED);
+    public void testThrowRuntimeTransacted() throws JMSException, InterruptedException {
+        TestMessageListenerRuntimeException messageListener = new TestMessageListenerRuntimeException();
+        Connection connection = createConnection(getConnectionFactory());
+        connection.start();
+        Session session = connection.createSession(true, Session.SESSION_TRANSACTED);
         Queue tempQueue = createTempQueue(session);
         MessageConsumer consumer = session.createConsumer(tempQueue);
         consumer.setMessageListener(messageListener);
@@ -124,8 +138,10 @@ public class MessageListenerTest extends AbstractJMSTest{
         TextMessage msg2 = session.createTextMessage(RandomData.readString());
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(msg1);
+        Thread.sleep(200);
         producer.send(msg2);
-        Assert.assertEquals(msg2, messageListener.getMessage(1000));
-        Assert.assertEquals(msg1, messageListener.getMessage(1000));
+        Message msgOut = messageListener.getMessage(1000);
+        Assert.assertEquals("Messages arrived out of order", msg1, messageListener.getFirstMessage());
+        Assert.assertEquals(msg2, msgOut);
     }
 }

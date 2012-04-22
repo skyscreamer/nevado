@@ -11,13 +11,12 @@
         </layout>
     </appender>
 
-    <!-- Root Logger -->
     <logger name="org.skyscreamer">
         <!-- level debug logs -->
         <level value="debug" />
-        <appender-ref ref="console"/>
     </logger>
 
+    <!-- Root Logger -->
     <root>
         <priority value="info" />
         <appender-ref ref="console"/>

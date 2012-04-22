@@ -132,27 +132,29 @@ public class NevadoSession implements Session {
     public void commit() throws JMSException
     {
         checkClosed();
-        if (_transacted)
+        if (!_transacted)
         {
-            for(NevadoDestination destination : _outgoingTxMessages.keySet())
-            {
-                List<NevadoMessage> outgoingMessages = _outgoingTxMessages.get(destination);
-                _connection.getSQSConnector().sendMessages(destination, outgoingMessages);
-            }
-            _outgoingTxMessages.clear();
-            _incomingStagedMessages.acknowledgeConsumedMessages();
+            throw new IllegalStateException("Cannot commit an untransacted session");
         }
+        for(NevadoDestination destination : _outgoingTxMessages.keySet())
+        {
+            List<NevadoMessage> outgoingMessages = _outgoingTxMessages.get(destination);
+            _connection.getSQSConnector().sendMessages(destination, outgoingMessages);
+        }
+        _outgoingTxMessages.clear();
+        _incomingStagedMessages.acknowledgeConsumedMessages();
     }
 
     @Override
     public void rollback() throws JMSException
     {
         checkClosed();
-        if (_transacted)
+        if (!_transacted)
         {
-            _outgoingTxMessages.clear();
-            _incomingStagedMessages.reset();
+            throw new IllegalStateException("Cannot rollback an untransacted session");
         }
+        _outgoingTxMessages.clear();
+        _incomingStagedMessages.reset();
     }
 
     @Override

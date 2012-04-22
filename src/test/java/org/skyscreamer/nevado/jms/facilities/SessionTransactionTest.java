@@ -3,11 +3,13 @@ package org.skyscreamer.nevado.jms.facilities;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
+import org.skyscreamer.nevado.jms.NevadoSession;
 import org.skyscreamer.nevado.jms.message.NevadoTextMessage;
 import org.skyscreamer.nevado.jms.util.RandomData;
 import org.skyscreamer.nevado.jms.util.TestMessageListener;
 
 import javax.jms.*;
+import javax.jms.IllegalStateException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -115,5 +117,12 @@ public class SessionTransactionTest extends AbstractJMSTest {
         TextMessage rollbackMsg3 = (NevadoTextMessage) txConsumer.receive(500);
         Assert.assertEquals(msg3.getText(), rollbackMsg3.getText());
         txSession.commit();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testCommitNoTx() throws JMSException
+    {
+        NevadoSession session = createSession();
+        session.commit();
     }
 }
