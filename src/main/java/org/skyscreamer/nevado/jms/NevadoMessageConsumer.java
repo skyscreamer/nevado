@@ -49,22 +49,23 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
         _messageListener = messageListener;
     }
 
-    public Message receive() throws JMSException {
-        checkClosed();
-        checkAsync();
-        return _session.receiveMessage(_destination, -1);
+    @Override
+    public NevadoMessage receive() throws JMSException {
+        return receive(-1);
     }
 
-    public Message receive(long timeoutMs) throws JMSException {
+    @Override
+    public NevadoMessage receive(long timeoutMs) throws JMSException {
         checkClosed();
         checkAsync();
-        return _session.receiveMessage(_destination, timeoutMs);
+        NevadoMessage message = _session.receiveMessage(_destination, timeoutMs);
+        tryAutoAck(message);
+        return message;
     }
 
+    @Override
     public Message receiveNoWait() throws JMSException {
-        checkClosed();
-        checkAsync();
-        return _session.receiveMessage(_destination, 0);
+        return receive(0);
     }
 
     public synchronized void close() throws JMSException {
@@ -87,6 +88,8 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
         if (message != null) {
             try {
                 getMessageListener().onMessage(message);
+                tryAutoAck(message);
+                messageProcessed = true;
             }
             catch(Throwable t) {
                 if (_session.getAcknowledgeMode() == Session.AUTO_ACKNOWLEDGE
@@ -95,9 +98,15 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
                     _session.resetMessage(message);
                 }
             }
-            messageProcessed = true;
         }
         return messageProcessed;
+    }
+
+    private void tryAutoAck(NevadoMessage message) throws JMSException {
+        if (message != null && _session.getAcknowledgeMode() == Session.AUTO_ACKNOWLEDGE)
+        {
+            message.acknowledge();
+        }
     }
 
     private void checkAsync() throws IllegalStateException

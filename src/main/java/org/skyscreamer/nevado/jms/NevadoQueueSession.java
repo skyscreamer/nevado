@@ -61,18 +61,6 @@ public class NevadoQueueSession extends NevadoSession implements QueueSession {
         return super.createConsumer(destination, selector, noLocal);
     }
 
-    @Override
-    public void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException {
-        checkIsQueue(destination);
-        super.sendMessage(destination, message);
-    }
-
-    @Override
-    public NevadoMessage receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException {
-        checkIsQueue(destination);
-        return super.receiveMessage(destination, timeoutMs);
-    }
-
     private void checkIsQueue(Destination destination) throws IllegalStateException {
         if (!(destination instanceof Queue))
         {

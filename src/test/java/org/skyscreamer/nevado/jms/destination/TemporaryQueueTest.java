@@ -39,7 +39,7 @@ public class TemporaryQueueTest extends AbstractJMSTest {
     // Because the queues returned by SQS ListQueues is not synchronous with creation and deletion of queues, it is
     // too flaky to test in a quick, automated fashion.  This could be done with thie very slow test
     // but we'll leave it disabled so our overall suite can remain fast.
-    @Test
+    //@Test
     public void testTemporaryQueueDeletion() throws Exception {
         NevadoSession session = createSession();
         TemporaryQueue temporaryQueue = session.createTemporaryQueue();

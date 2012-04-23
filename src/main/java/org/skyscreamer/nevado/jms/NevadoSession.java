@@ -362,7 +362,7 @@ public class NevadoSession implements Session {
         return false;
     }
 
-    public void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException
+    protected void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException
     {
         if (destination == null)
         {
@@ -392,7 +392,7 @@ public class NevadoSession implements Session {
         }
     }
 
-    public NevadoMessage receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException
+    protected NevadoMessage receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException
     {
         testBreak();
         NevadoMessage message = getUnfilteredMessage(destination, timeoutMs);
@@ -405,12 +405,6 @@ public class NevadoSession implements Session {
             _log.info("Skipped expired message (" + message.getJMSMessageID() + ")");
 
             message = getUnfilteredMessage(destination, timeoutMs);
-        }
-
-        // Auto-ack
-        if (message != null && _acknowledgeMode == Session.AUTO_ACKNOWLEDGE)
-        {
-            message.acknowledge();
         }
 
         // Set session and destination
