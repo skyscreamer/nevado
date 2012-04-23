@@ -138,8 +138,10 @@ public class MessageListenerTest extends AbstractJMSTest {
         TextMessage msg2 = session.createTextMessage(RandomData.readString());
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(msg1);
+        session.commit();
         Thread.sleep(200);
         producer.send(msg2);
+        session.commit();
         Message msgOut = messageListener.getMessage(1000);
         Assert.assertEquals("Messages arrived out of order", msg1, messageListener.getFirstMessage());
         Assert.assertEquals(msg2, msgOut);

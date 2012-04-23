@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.skyscreamer.nevado.jms.destination.*;
 import org.skyscreamer.nevado.jms.message.*;
+import org.skyscreamer.nevado.jms.util.MessageIdUtil;
 
 import javax.jms.*;
 import javax.jms.IllegalStateException;
@@ -383,6 +384,11 @@ public class NevadoSession implements Session {
             if (!_outgoingTxMessages.containsKey(destination))
             {
                 _outgoingTxMessages.put(destination, new ArrayList<NevadoMessage>());
+            }
+            // We aren't calling SQS yet, so we'll need to create our own message ID
+            if (!message.isDisableMessageID())
+            {
+                message.setJMSMessageID(MessageIdUtil.createMessageId());
             }
             _outgoingTxMessages.get(destination).add(message.copyOf());
         }

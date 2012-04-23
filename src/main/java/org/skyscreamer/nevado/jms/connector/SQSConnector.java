@@ -18,6 +18,7 @@ import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
 import org.skyscreamer.nevado.jms.message.InvalidMessage;
 import org.skyscreamer.nevado.jms.message.NevadoProperty;
+import org.skyscreamer.nevado.jms.util.MessageIdUtil;
 import org.skyscreamer.nevado.jms.util.SerializeUtil;
 
 import javax.jms.JMSException;
@@ -79,7 +80,7 @@ public class SQSConnector implements NevadoConnector {
             MessageQueue sqsQueue = getSQSQueue(destination);
             String serializedMessage = serializeMessage(message);
             String sqsMessageId = sendSQSMessage(sqsQueue, serializedMessage);
-            if (!message.isDisableMessageID())
+            if (!message.isDisableMessageID() && message.getJMSMessageID() == null)
             {
                 message.setJMSMessageID("ID:" + sqsMessageId);
             }
@@ -88,10 +89,9 @@ public class SQSConnector implements NevadoConnector {
         else if (destination instanceof NevadoTopic)
         {
             String arn = getTopicARN((NevadoTopic)destination);
-            String messageID = UUID.randomUUID().toString();
-            if (!message.isDisableMessageID())
+            if (!message.isDisableMessageID() && message.getJMSMessageID() == null)
             {
-                message.setJMSMessageID("ID:" + messageID);
+                message.setJMSMessageID("ID:" + MessageIdUtil.createMessageId());
             }
             String serializedMessage = serializeMessage(message);
             sendSNSMessage(arn, serializedMessage);
@@ -100,6 +100,10 @@ public class SQSConnector implements NevadoConnector {
         {
             throw new IllegalStateException("Invalid destination: " + destination.getClass().getName());
         }
+    }
+
+    private String createMessageId() {
+        return "nevado-" + UUID.randomUUID().toString();
     }
 
     // TODO - Typica 1.7 doesn't support batch send :-(
@@ -273,6 +277,7 @@ public class SQSConnector implements NevadoConnector {
 
 
     private NevadoMessage convertSqsMessage(NevadoDestination destination, Message sqsMessage) throws JMSException {
+        // Get the message
         NevadoMessage message;
         String messageBody;
         if (destination instanceof NevadoQueue)
@@ -293,12 +298,19 @@ public class SQSConnector implements NevadoConnector {
             message = new InvalidMessage(e);
         }
 
-        if (!(message.nevadoPropertyExists(NevadoProperty.DisableMessageID)
-                && (Boolean)message.getNevadoProperty(NevadoProperty.DisableMessageID))
-            && message.getJMSMessageID() == null)
+        // Set the JMS Message ID
+        if (message.nevadoPropertyExists(NevadoProperty.DisableMessageID)
+            && (Boolean)message.getNevadoProperty(NevadoProperty.DisableMessageID))
+        {
+            message.setJMSMessageID(null);
+        }
+        else if (message.getJMSMessageID() == null)
         {
             message.setJMSMessageID("ID:" + sqsMessage.getMessageId());
+
         }
+
+        // Set the receipt handle and the destination
         message.setNevadoProperty(NevadoProperty.SQSReceiptHandle, sqsMessage.getReceiptHandle());
         message.setJMSDestination(destination);
 
