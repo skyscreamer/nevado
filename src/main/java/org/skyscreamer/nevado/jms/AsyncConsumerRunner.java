@@ -17,7 +17,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
-public class AsyncConsumerRunner implements Runnable {
+public class  AsyncConsumerRunner implements Runnable {
     private final Log _log = LogFactory.getLog(getClass());
     private final Connection _connection;
     private final Set<NevadoMessageConsumer> _asyncConsumers = new CopyOnWriteArraySet<NevadoMessageConsumer>();

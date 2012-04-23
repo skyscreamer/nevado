@@ -97,7 +97,7 @@ public class DurableTopicTest extends AbstractJMSTest {
         NevadoTopic topic = createTempTopic(session);
         TopicSubscriber subscriber = session.createDurableSubscriber(topic, durableTopicName);
         session.createProducer(topic).send(session.createMessage());
-        subscriber.receive(1000); // Don't acknowledge
+        Message message = subscriber.receive(1000); // Don't acknowledge
         boolean throwsException = false;
         try {
             session.unsubscribe(durableTopicName);
@@ -109,7 +109,7 @@ public class DurableTopicTest extends AbstractJMSTest {
         if (throwsException)
         {
             // Clean up
-            session.recover();
+            message.acknowledge();
             subscriber.close();
             session.unsubscribe(durableTopicName);
         }
