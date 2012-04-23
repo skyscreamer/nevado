@@ -1,6 +1,7 @@
 package org.skyscreamer.nevado.jms;
 
 import org.skyscreamer.nevado.jms.destination.*;
+import org.skyscreamer.nevado.jms.message.NevadoMessage;
 
 import javax.jms.*;
 import javax.jms.IllegalStateException;
@@ -82,14 +83,19 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
     {
         checkClosed();
         boolean messageProcessed = false;
-        Message message = _session.receiveMessage(_destination, 0);
+        NevadoMessage message = _session.receiveMessage(_destination, 0);
         if (message != null) {
-            getMessageListener().onMessage(message);
-            messageProcessed = true;
-            if (_session.getAcknowledgeMode() == Session.AUTO_ACKNOWLEDGE)
-            {
-                message.acknowledge();
+            try {
+                getMessageListener().onMessage(message);
             }
+            catch(Throwable t) {
+                if (_session.getAcknowledgeMode() == Session.AUTO_ACKNOWLEDGE
+                        || _session.getAcknowledgeMode() == Session.DUPS_OK_ACKNOWLEDGE)
+                {
+                    _session.resetMessage(message);
+                }
+            }
+            messageProcessed = true;
         }
         return messageProcessed;
     }

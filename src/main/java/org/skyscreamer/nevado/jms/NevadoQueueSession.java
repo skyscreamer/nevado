@@ -68,7 +68,7 @@ public class NevadoQueueSession extends NevadoSession implements QueueSession {
     }
 
     @Override
-    public Message receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException {
+    public NevadoMessage receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException {
         checkIsQueue(destination);
         return super.receiveMessage(destination, timeoutMs);
     }

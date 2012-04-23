@@ -71,7 +71,7 @@ public class NevadoTopicSession extends NevadoSession implements TopicSession {
     }
 
     @Override
-    public Message receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException {
+    public NevadoMessage receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException {
         checkIsTopic(destination);
         return super.receiveMessage(destination, timeoutMs);
     }

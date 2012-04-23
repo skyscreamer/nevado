@@ -392,7 +392,7 @@ public class NevadoSession implements Session {
         }
     }
 
-    public Message receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException
+    public NevadoMessage receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException
     {
         testBreak();
         NevadoMessage message = getUnfilteredMessage(destination, timeoutMs);
