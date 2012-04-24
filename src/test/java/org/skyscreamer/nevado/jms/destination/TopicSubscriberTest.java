@@ -59,7 +59,7 @@ public class TopicSubscriberTest extends AbstractJMSTest {
         TextMessage testMessage2 = session2.createTextMessage(RandomData.readString());
         producer2.send(testMessage2);
 
-        Assert.assertEquals(testMessage2, (TextMessage)consumer1.receive(60000));
+        Assert.assertEquals(testMessage2, (TextMessage)consumer1.receive(1000));
         Assert.assertNull((TextMessage)consumer1.receive(200));
         Assert.assertEquals(testMessage1, (TextMessage)consumer2.receive(1000));
         Assert.assertNull((TextMessage)consumer2.receive(200));
