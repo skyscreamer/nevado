@@ -4,14 +4,13 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
 import org.skyscreamer.nevado.jms.NevadoSession;
+import org.skyscreamer.nevado.jms.message.NevadoMessage;
 import org.skyscreamer.nevado.jms.message.NevadoTextMessage;
+import org.skyscreamer.nevado.jms.message.TestBrokenMessage;
 import org.skyscreamer.nevado.jms.util.RandomData;
-import org.skyscreamer.nevado.jms.util.TestMessageListener;
 
 import javax.jms.*;
 import javax.jms.IllegalStateException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Tests transactional behavior for sessions, per JMS 1.1 Sec. 4.4.7
@@ -124,5 +123,39 @@ public class SessionTransactionTest extends AbstractJMSTest {
     {
         NevadoSession session = createSession();
         session.commit();
+    }
+
+    // Really nasty edge case, part 1
+    //@Test - TODO need bulk send to work
+    public void testAmbiguousWriteCommit() throws JMSException
+    {
+        NevadoSession readerSession = createSession();
+        NevadoSession session = getConnection().createSession(true, Session.SESSION_TRANSACTED);
+        Queue testQueue = createTempQueue(session);
+        NevadoMessage msg1 = session.createTextMessage(RandomData.readString());
+        NevadoMessage msg2 = new TestBrokenMessage(session.createTextMessage(RandomData.readString()));
+        MessageProducer producer = session.createProducer(testQueue);
+        producer.send(msg1);
+        producer.send(msg2);
+        boolean exceptionThrown = false;
+        try {
+            session.commit();
+        }
+        catch (Throwable t)
+        {
+            exceptionThrown = true;
+        }
+        Assert.assertTrue("Bomb message didn't work", exceptionThrown);
+
+        MessageConsumer consumer = readerSession.createConsumer(testQueue);
+        Assert.assertNull("Got a message, but shouldn't have gotten one after ambiguous commit", consumer.receive(500));
+        session.rollback();
+        TextMessage msg3 = session.createTextMessage(RandomData.readString());
+        producer.send(msg3);
+        session.commit();
+
+        TextMessage msgOut = (TextMessage)consumer.receive(1000);
+        Assert.assertNotNull(msgOut);
+        Assert.assertEquals(msg3, msgOut);
     }
 }

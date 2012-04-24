@@ -1,5 +1,7 @@
 package org.skyscreamer.nevado.jms;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
 
 import javax.jms.Destination;
@@ -12,6 +14,8 @@ import java.util.*;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class MessageHolder {
+    private final Log _log = LogFactory.getLog(getClass());
+
     private final NevadoSession _session;
     private final Map<Destination, List<NevadoMessage>> _messageHolder
             = new HashMap<Destination, List<NevadoMessage>>();

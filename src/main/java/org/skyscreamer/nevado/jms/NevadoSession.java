@@ -45,7 +45,7 @@ public class NevadoSession implements Session {
     }
 
     @Override
-    public BytesMessage createBytesMessage() throws JMSException
+    public NevadoBytesMessage createBytesMessage() throws JMSException
     {
         checkClosed();
         NevadoBytesMessage message = new NevadoBytesMessage();
@@ -54,7 +54,7 @@ public class NevadoSession implements Session {
     }
 
     @Override
-    public MapMessage createMapMessage() throws JMSException
+    public NevadoMapMessage createMapMessage() throws JMSException
     {
         checkClosed();
         NevadoMapMessage message = new NevadoMapMessage();
@@ -63,7 +63,7 @@ public class NevadoSession implements Session {
     }
 
     @Override
-    public Message createMessage() throws JMSException
+    public NevadoMessage createMessage() throws JMSException
     {
         checkClosed();
         NevadoMessage message = new NevadoBlankMessage();
@@ -81,7 +81,7 @@ public class NevadoSession implements Session {
     }
 
     @Override
-    public ObjectMessage createObjectMessage(Serializable serializable) throws JMSException
+    public NevadoObjectMessage createObjectMessage(Serializable serializable) throws JMSException
     {
         checkClosed();
         NevadoObjectMessage message = createObjectMessage();
@@ -90,7 +90,7 @@ public class NevadoSession implements Session {
     }
 
     @Override
-    public StreamMessage createStreamMessage() throws JMSException
+    public NevadoStreamMessage createStreamMessage() throws JMSException
     {
         checkClosed();
         NevadoStreamMessage message = new NevadoStreamMessage();
@@ -108,7 +108,7 @@ public class NevadoSession implements Session {
     }
 
     @Override
-    public TextMessage createTextMessage(String text) throws JMSException
+    public NevadoTextMessage createTextMessage(String text) throws JMSException
     {
         checkClosed();
         NevadoTextMessage message = createTextMessage();
@@ -528,11 +528,19 @@ public class NevadoSession implements Session {
         }
     }
 
-    protected void resetMessage(NevadoMessage... messages) throws JMSException
+    protected void resetMessage(NevadoMessage... messages)
     {
         for(NevadoMessage message : messages)
         {
-            _connection.getSQSConnector().resetMessage(message);
+            try {
+                _connection.getSQSConnector().resetMessage(message);
+            }
+            catch(Throwable t) {
+                // Not worth breaking over, since this is typically called in recovery or commit mode, and
+                // it will eventually reset on its own.  Worst case is that messages will be delayed or mis-sequenced
+                // in certain cases where the specification does not define specific behavior.
+                _log.warn("Unable to reset message: " + message, t);
+            }
         }
     }
 
