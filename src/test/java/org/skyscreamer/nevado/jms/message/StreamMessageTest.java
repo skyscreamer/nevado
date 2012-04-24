@@ -16,6 +16,25 @@ import java.util.Arrays;
  * Time: 8:11 AM
  */
 public class StreamMessageTest extends AbstractJMSTest {
+    @Test(expected = MessageNotWriteableException.class)
+    public void testMessageNotWritableException() throws JMSException
+    {
+        StreamMessage msg = createSession().createStreamMessage();
+        msg.writeChar('a');
+        msg.writeChar('b');
+        StreamMessage msgOut = (StreamMessage)sendAndReceive(msg);
+        Assert.assertEquals('a', msg.readChar());
+        msg.writeChar('c');
+    }
+
+    @Test(expected = MessageNotReadableException.class)
+    public void testMessageNotReadableException() throws JMSException
+    {
+        StreamMessage msg = createSession().createStreamMessage();
+        msg.writeChar('x');
+        msg.readChar();
+    }
+
     @Test
     public void testStreamMessage() throws JMSException {
         StreamMessage msg = createSession().createStreamMessage();

@@ -6,9 +6,7 @@ import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
 import org.skyscreamer.nevado.jms.util.RandomData;
 
-import javax.jms.BytesMessage;
-import javax.jms.JMSException;
-import javax.jms.MessageEOFException;
+import javax.jms.*;
 import java.util.Arrays;
 
 /**
@@ -18,6 +16,25 @@ import java.util.Arrays;
  * Time: 6:53 PM
  */
 public class BytesMessageTest extends AbstractJMSTest {
+    @Test(expected = MessageNotWriteableException.class)
+    public void testMessageNotWritableException() throws JMSException
+    {
+        BytesMessage msg = createSession().createBytesMessage();
+        msg.writeChar('a');
+        msg.writeChar('b');
+        BytesMessage msgOut = (BytesMessage)sendAndReceive(msg);
+        Assert.assertEquals('a', msg.readChar());
+        msg.writeChar('c');
+    }
+
+    @Test(expected = MessageNotReadableException.class)
+    public void testMessageNotReadableException() throws JMSException
+    {
+        BytesMessage msg = createSession().createBytesMessage();
+        msg.writeChar('x');
+        msg.readChar();
+    }
+
     @Test
     public void testBytesMessage() throws JMSException {
         BytesMessage msg = createSession().createBytesMessage();
