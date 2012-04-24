@@ -125,8 +125,8 @@ public class SessionTransactionTest extends AbstractJMSTest {
         session.commit();
     }
 
-    // Really nasty edge case, part 1
-    //@Test - TODO need bulk send to work
+    // Really nasty edge case to test sec 4.4.13, part 1
+    //@Test - TODO - need bulk send to work
     public void testAmbiguousWriteCommit() throws JMSException
     {
         NevadoSession readerSession = createSession();
