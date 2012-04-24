@@ -57,7 +57,7 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
         return connection;
     }
 
-    private void initializeConnection(NevadoConnection connection) throws javax.jms.IllegalStateException {
+    private void initializeConnection(NevadoConnection connection) throws JMSException {
         if (StringUtils.isNotEmpty(_clientID))
         {
             connection.setClientID(_clientID);

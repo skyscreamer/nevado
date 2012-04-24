@@ -223,13 +223,17 @@ public class NevadoConnection implements Connection {
     }
 
     @Override
-    public void setClientID(String clientID) throws IllegalStateException {
+    public void setClientID(String clientID) throws JMSException {
         checkClosed();
         if (_clientID != null) {
             throw new IllegalStateException("Client ID has already been set");
         }
         if (_inUse) {
             throw new IllegalStateException("Client ID cannot be set after the connection is in use");
+        }
+        if (clientID != null && !clientID.matches("^[\\w\\-_]+$"))
+        {
+            throw new InvalidClientIDException("Client ID can only include alphanumeric characters, hyphens, or underscores");
         }
         _clientID = clientID;
     }

@@ -65,6 +65,47 @@ public class DurableTopicTest extends AbstractJMSTest {
     }
 
     @Test
+    public void testDurableTopicDifferentClientIDs() throws JMSException {
+        getConnection().close(); // Don't use the provided connection
+        String durableTopicName = "testTopicSub" + RandomData.readShort();
+        String testTopicName = "testTopic" + RandomData.readShort();
+
+        NevadoConnection conn = createConnection(getConnectionFactory());
+        conn.setClientID("abc");
+        conn.start();
+        NevadoSession session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        NevadoTopic topic = session.createTopic(testTopicName);
+        TopicSubscriber subscriber = session.createDurableSubscriber(topic, durableTopicName);
+        TextMessage msg1 = session.createTextMessage(RandomData.readString());
+        MessageProducer producer = session.createProducer(topic);
+        producer.send(msg1);
+        conn.close();
+
+        conn = createConnection(getConnectionFactory());
+        conn.setClientID("def");
+        conn.start();
+        session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        subscriber = session.createDurableSubscriber(topic, durableTopicName);
+        Message msgOut = subscriber.receive(1000);
+        Assert.assertNull(msgOut);
+        subscriber.close();
+        session.unsubscribe(durableTopicName);
+
+        conn = createConnection(getConnectionFactory());
+        conn.setClientID("abc");
+        conn.start();
+        session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        subscriber = session.createDurableSubscriber(topic, durableTopicName);
+        msgOut = subscriber.receive(1000);
+        Assert.assertEquals(msg1, msgOut);
+        subscriber.close();
+        session.unsubscribe(durableTopicName);
+
+        conn.getSQSConnector().deleteTopic(topic);
+        conn.close();
+    }
+
+    @Test
     public void testUnsubscribeWithActiveSubscriber() throws JMSException {
         String durableTopicName = "testTopicSub" + RandomData.readShort();
         NevadoSession session = createSession();

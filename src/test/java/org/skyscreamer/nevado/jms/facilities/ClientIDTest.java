@@ -56,4 +56,9 @@ public class ClientIDTest extends AbstractJMSTest {
         conn.setClientID(TEST_CLIENT_ID);
     }
 
+    @Test(expected = InvalidClientIDException.class)
+    public void testBadClientID() throws JMSException {
+        Connection conn = createConnection(getConnectionFactory());
+        conn.setClientID("[here's a bad id]");
+    }
 }

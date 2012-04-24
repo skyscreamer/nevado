@@ -296,7 +296,8 @@ public class NevadoSession implements Session {
         // TODO - Selector and noLocal currently ignored
         checkClosed();
         checkValidDestination(topic);
-        if (hasActiveDurableSubscriber(name))
+        String queueName = getDurableEndpointQueueName(name);
+        if (hasActiveDurableSubscriber(queueName))
         {
             throw new JMSException("There is already a durable subscriber with name " + name);
         }
@@ -318,14 +319,14 @@ public class NevadoSession implements Session {
     {
         checkClosed();
 
-        if (hasActiveDurableSubscriber(name))
+        String queueName = getDurableEndpointQueueName(name);
+        if (hasActiveDurableSubscriber(queueName))
         {
             throw new JMSException("Cannot unsubscribe durable topic-subscription '"
                     + name + "': There is an active TopicSubscriber");
         }
 
         // Check for unacknowledged/uncommitted messaages
-        String queueName = NevadoProviderQueuePrefix.DURABLE_SUBSCRIPTION_PREFIX + name;
         for (NevadoMessage message : _incomingStagedMessages.getConsumedMessages())
         {
             if (message.getJMSDestination() instanceof NevadoTopic)
@@ -344,8 +345,16 @@ public class NevadoSession implements Session {
         _connection.getSQSConnector().deleteQueue(durableQueue);
     }
 
-    private boolean hasActiveDurableSubscriber(String name) throws JMSException {
-        String queueName = NevadoProviderQueuePrefix.DURABLE_SUBSCRIPTION_PREFIX + name;
+    protected String getDurableEndpointQueueName(String durableSubscriptionName) {
+        String queueName = NevadoProviderQueuePrefix.DURABLE_SUBSCRIPTION_PREFIX + durableSubscriptionName;
+        if (_connection.getClientID() != null)
+        {
+            queueName += "_client-" + _connection.getClientID() + "";
+        }
+        return queueName;
+    }
+
+    private boolean hasActiveDurableSubscriber(String queueName) throws JMSException {
         for(NevadoMessageConsumer consumer : _consumers)
         {
             if (consumer.isClosed() || consumer.getDestination() == null
