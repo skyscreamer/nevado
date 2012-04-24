@@ -2,6 +2,7 @@ package org.skyscreamer.nevado.jms;
 
 import org.skyscreamer.nevado.jms.destination.*;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
+import org.skyscreamer.nevado.jms.message.NevadoProperty;
 
 import javax.jms.*;
 import javax.jms.IllegalStateException;
@@ -10,9 +11,13 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
     private boolean _closed = false;
     private final NevadoSession _session;
     private final NevadoDestination _destination;
+    private final String _selector;
+    private final boolean _noLocal;
     private volatile MessageListener _messageListener;
 
-    public NevadoMessageConsumer(NevadoSession session, NevadoDestination destination) throws JMSException {
+    public NevadoMessageConsumer(NevadoSession session, NevadoDestination destination, String selector, boolean noLocal)
+            throws JMSException
+    {
         _session = session;
         if (destination instanceof NevadoTopic)
         {
@@ -24,9 +29,12 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
         {
             _destination = destination;
         }
+        _selector = selector;
+        _noLocal = noLocal;
     }
 
-    public NevadoMessageConsumer(NevadoSession session, NevadoTopic topic, String durableSubscriptionName)
+    public NevadoMessageConsumer(NevadoSession session, NevadoTopic topic, String durableSubscriptionName,
+                                 String selector, boolean noLocal)
             throws JMSException
     {
         _session = session;
@@ -34,6 +42,8 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
                 = _session.createInternalQueue(_session.getDurableEndpointQueueName(durableSubscriptionName));
         String subscriptionArn = _session.getConnection().subscribe(topic, topicEndpoint);
         _destination = new NevadoTopic(topic, topicEndpoint, subscriptionArn, true);
+        _selector = selector;
+        _noLocal = noLocal;
     }
 
     public String getMessageSelector() throws JMSException {
@@ -58,7 +68,7 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
     public NevadoMessage receive(long timeoutMs) throws JMSException {
         checkClosed();
         checkAsync();
-        NevadoMessage message = _session.receiveMessage(_destination, timeoutMs);
+        NevadoMessage message = _session.receiveMessage(_destination, timeoutMs, _noLocal);
         tryAutoAck(message);
         return message;
     }
@@ -84,7 +94,7 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
     {
         checkClosed();
         boolean messageProcessed = false;
-        NevadoMessage message = _session.receiveMessage(_destination, 0);
+        NevadoMessage message = _session.receiveMessage(_destination, 0, _noLocal);
         if (message != null) {
             try {
                 getMessageListener().onMessage(message);

@@ -26,6 +26,7 @@ public class NevadoConnection implements Connection {
     protected boolean _inUse = false;
     private final NevadoConnector _nevadoConnector;
     private String _clientID;
+    private String _connectionID = UUID.randomUUID().toString();
     private Integer _jmsDeliveryMode;
     private Long _jmsTTL;
     private Integer _jmsPriority;
@@ -225,6 +226,10 @@ public class NevadoConnection implements Connection {
     @Override
     public void setClientID(String clientID) throws JMSException {
         checkClosed();
+        if (clientID == null || clientID.trim().length() == 0)
+        {
+            throw new InvalidClientIDException("Client ID is empty");
+        }
         if (_clientID != null) {
             throw new IllegalStateException("Client ID has already been set");
         }
@@ -236,6 +241,7 @@ public class NevadoConnection implements Connection {
             throw new InvalidClientIDException("Client ID can only include alphanumeric characters, hyphens, or underscores");
         }
         _clientID = clientID;
+        _connectionID = clientID;
     }
 
     public void setOverrideJMSDeliveryMode(Integer jmsDeliveryMode) throws IllegalStateException {
@@ -266,5 +272,9 @@ public class NevadoConnection implements Connection {
         {
             throw new IllegalStateException("Connection is closed");
         }
+    }
+
+    public String getConnectionID() {
+        return _connectionID;
     }
 }

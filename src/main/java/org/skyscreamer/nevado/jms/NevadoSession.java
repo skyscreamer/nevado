@@ -230,10 +230,10 @@ public class NevadoSession implements Session {
     @Override
     public NevadoMessageConsumer createConsumer(Destination destination, String selector, boolean noLocal) throws JMSException
     {
-        // TODO - Selector and noLocal currently ignored
         checkClosed();
         checkValidDestination(destination);
-        NevadoMessageConsumer consumer = new NevadoMessageConsumer(this, NevadoDestination.getInstance(destination));
+        NevadoMessageConsumer consumer = new NevadoMessageConsumer(this, NevadoDestination.getInstance(destination),
+                selector, noLocal);
         _asyncConsumerRunner.addAsyncConsumer(consumer);
         _consumers.add(consumer);
         return consumer;
@@ -293,7 +293,6 @@ public class NevadoSession implements Session {
     @Override
     public TopicSubscriber createDurableSubscriber(Topic topic, String name, String selector, boolean noLocal) throws JMSException
     {
-        // TODO - Selector and noLocal currently ignored
         checkClosed();
         checkValidDestination(topic);
         String queueName = getDurableEndpointQueueName(name);
@@ -301,7 +300,8 @@ public class NevadoSession implements Session {
         {
             throw new JMSException("There is already a durable subscriber with name " + name);
         }
-        NevadoMessageConsumer consumer = new NevadoMessageConsumer(this, NevadoTopic.getInstance(topic), name);
+        NevadoMessageConsumer consumer = new NevadoMessageConsumer(this, NevadoTopic.getInstance(topic), name, selector,
+                noLocal);
         _asyncConsumerRunner.addAsyncConsumer(consumer);
         _consumers.add(consumer);
         return consumer;
@@ -378,6 +378,10 @@ public class NevadoSession implements Session {
         {
             throw new NullPointerException("Destination is null");
         }
+        if (destination instanceof NevadoTopic)
+        {
+            message.setNevadoProperty(NevadoProperty.ConnectionID, _connection.getConnectionID());
+        }
         if (_overrideJMSDeliveryMode != null) {
             message.setJMSDeliveryMode(_overrideJMSDeliveryMode);
         }
@@ -407,26 +411,47 @@ public class NevadoSession implements Session {
         }
     }
 
-    protected NevadoMessage receiveMessage(NevadoDestination destination, long timeoutMs) throws JMSException
+    protected NevadoMessage receiveMessage(NevadoDestination destination, long timeoutMs, boolean noLocal)
+            throws JMSException
     {
         testBreak();
-        NevadoMessage message = getUnfilteredMessage(destination, timeoutMs);
+        long startTime = System.currentTimeMillis();
+        NevadoMessage message = null;
+        boolean firstPass = true;
+        long elapsed = 0;
 
-        // Filter expired messages
-        while(message != null && message.getJMSExpiration() > 0
-                && System.currentTimeMillis() > message.getJMSExpiration())
+        while(firstPass
+                || (message == null
+                    && (timeoutMs < 0 || (elapsed = System.currentTimeMillis() - startTime) < timeoutMs)))
         {
-            message.expire();
-            _log.info("Skipped expired message (" + message.getJMSMessageID() + ")");
+            firstPass = false;
+            long adjustedTimeout = timeoutMs < 0 ? timeoutMs : (timeoutMs - elapsed);
+            message = getUnfilteredMessage(destination, adjustedTimeout);
 
-            message = getUnfilteredMessage(destination, timeoutMs);
+            // Filter expired messages
+            if (message != null && message.getJMSExpiration() > 0
+                    && System.currentTimeMillis() > message.getJMSExpiration())
+            {
+                message.expire();
+                _log.info("Skipped expired message (" + message.getJMSMessageID() + ")");
+                message = null;
+            }
+
+            // Filter noLocal matches
+            if (message != null && destination instanceof NevadoTopic && noLocal && _connection.getConnectionID()
+                    .equals(message.getNevadoProperty(NevadoProperty.ConnectionID)))
+            {
+                deleteMessage(message);
+                message = null;
+            }
         }
 
         // Set session and destination
         return message;
     }
 
-    private NevadoMessage getUnfilteredMessage(NevadoDestination destination, long timeoutMs) throws JMSException
+    private NevadoMessage getUnfilteredMessage(NevadoDestination destination, long timeoutMs)
+            throws JMSException
     {
         NevadoMessage message = null;
 
@@ -462,6 +487,7 @@ public class NevadoSession implements Session {
                 message.setJMSXProperty(JMSXProperty.JMSXDeliveryCount, 1);
             }
         }
+
         return message;
     }
 

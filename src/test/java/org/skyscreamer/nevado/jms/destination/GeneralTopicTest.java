@@ -50,5 +50,4 @@ public class GeneralTopicTest extends AbstractJMSTest {
         Assert.assertTrue(msgOut instanceof TextMessage);
         Assert.assertEquals(testMessage, (TextMessage)msgOut);
     }
-
 }

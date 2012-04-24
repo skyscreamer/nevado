@@ -7,7 +7,7 @@ package org.skyscreamer.nevado.jms.message;
  * Time: 2:42 PM
  */
 public enum NevadoProperty {
-    SQSReceiptHandle(String.class), DisableMessageID(Boolean.class);
+    SQSReceiptHandle(String.class), DisableMessageID(Boolean.class), ConnectionID(String.class);
 
     public static final String PROVIDER_PREFIX = "JMS_nevado";
     private final Class _propertyType;
