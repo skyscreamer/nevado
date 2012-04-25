@@ -13,7 +13,7 @@
 
     <logger name="org.skyscreamer">
         <!-- level debug logs -->
-        <level value="debug" />
+        <level value="info" />
     </logger>
 
     <!-- Root Logger -->

@@ -15,6 +15,7 @@ public class BackoffSleeper {
     private final long _minWait;
     private final long _maxWait;
     private final double _backoffMultiplier;
+    private final Object _waiter = new Object();
 
     public BackoffSleeper(long minWait, long maxWait, double backoffMultiplier) {
         if (minWait <= 0)
@@ -41,7 +42,9 @@ public class BackoffSleeper {
 
     public void sleep() {
         try {
-            Thread.sleep(_wait);
+            synchronized (_waiter) {
+                _waiter.wait(_wait);
+            }
         } catch (InterruptedException e) {
             _log.warn("Sleep interrupted", e);
         }
@@ -50,6 +53,12 @@ public class BackoffSleeper {
             if (_wait > _maxWait) {
                 _wait = _maxWait;
             }
+        }
+    }
+
+    public void interrupt() {
+        synchronized (_waiter) {
+            _waiter.notifyAll();
         }
     }
 }

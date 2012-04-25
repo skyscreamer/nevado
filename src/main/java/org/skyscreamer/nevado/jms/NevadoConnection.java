@@ -13,6 +13,7 @@ import javax.jms.Queue;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Nevado's implementation of JMS Connection.
@@ -22,15 +23,16 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class NevadoConnection implements Connection {
     private final Log _log = LogFactory.getLog(getClass());
 
-    private boolean _closed = false;
-    protected boolean _inUse = false;
+    private final AtomicBoolean _closed = new AtomicBoolean(false);
+    private final AtomicBoolean _running = new AtomicBoolean(false);
+
+    protected volatile boolean _inUse = false;
     private final NevadoConnector _nevadoConnector;
-    private String _clientID;
-    private String _connectionID = UUID.randomUUID().toString();
-    private Integer _jmsDeliveryMode;
-    private Long _jmsTTL;
-    private Integer _jmsPriority;
-    private boolean _running = false;
+    private volatile String _clientID;
+    private volatile String _connectionID = UUID.randomUUID().toString();
+    private volatile Integer _jmsDeliveryMode;
+    private volatile Long _jmsTTL;
+    private volatile Integer _jmsPriority;
     private volatile ExceptionListener _exceptionListener;
     private final List<NevadoSession> _sessions = new CopyOnWriteArrayList<NevadoSession>();
     private final Set<NevadoDestination> _temporaryDestinations = new CopyOnWriteArraySet<NevadoDestination>();
@@ -53,10 +55,12 @@ public class NevadoConnection implements Connection {
         nevadoSession.setOverrideJMSDeliveryMode(_jmsDeliveryMode);
         nevadoSession.setOverrideJMSTTL(_jmsTTL);
         nevadoSession.setOverrideJMSPriority(_jmsPriority);
-        _sessions.add(nevadoSession);
-        if (_running)
-        {
-            nevadoSession.start();
+        synchronized (_running) {
+            _sessions.add(nevadoSession);
+            if (_running.get())
+            {
+                nevadoSession.start();
+            }
         }
     }
 
@@ -77,59 +81,65 @@ public class NevadoConnection implements Connection {
     }
 
     @Override
-    public synchronized void start() throws JMSException
+    public void start() throws JMSException
     {
         checkClosed();
         _inUse = true;
-        _running = true;
-        for(NevadoSession session : _sessions)
-        {
-            session.start();
-        }
-    }
-
-    @Override
-    public synchronized void stop() throws JMSException
-    {
-        checkClosed();
-        _running = false;
-        for(NevadoSession session : _sessions)
-        {
-            session.stop();
-        }
-    }
-
-    @Override
-    public synchronized void close() throws JMSException {
-        if (!_closed) {
-            stop();
+        synchronized (_running) {
+            _running.set(true);
             for(NevadoSession session : _sessions)
             {
-                session.close();
+                session.start();
             }
-            for(NevadoDestination temporaryDestination : new ArrayList<NevadoDestination>(_temporaryDestinations)) {
-                try {
-                    if (temporaryDestination instanceof NevadoTemporaryQueue)
-                    {
-                        deleteTemporaryQueue((NevadoTemporaryQueue)temporaryDestination);
-                    }
-                    else if (temporaryDestination instanceof NevadoTemporaryTopic)
-                    {
-                        deleteTemporaryTopic((NevadoTemporaryTopic) temporaryDestination);
-                    }
-                    else
-                    {
-                        throw new IllegalStateException("Unexpected temporary destination of type: "
-                                + temporaryDestination.getClass().getName());
-                    }
+        }
+    }
 
-                } catch (JMSException e) {
-                    // Log but continue
-                    _log.error("Unable to delete temporary destination " + temporaryDestination, e);
-                }
+    @Override
+    public void stop() throws JMSException
+    {
+        checkClosed();
+        synchronized (_running) {
+            _running.set(false);
+            for(NevadoSession session : _sessions)
+            {
+                session.stop();
             }
-            _temporaryDestinations.clear();
-            _closed = true;
+        }
+    }
+
+    @Override
+    public void close() throws JMSException {
+        synchronized (_closed) {
+            if (!_closed.get()) {
+                stop();
+                for(NevadoSession session : _sessions)
+                {
+                    session.close();
+                }
+                for(NevadoDestination temporaryDestination : new ArrayList<NevadoDestination>(_temporaryDestinations)) {
+                    try {
+                        if (temporaryDestination instanceof NevadoTemporaryQueue)
+                        {
+                            deleteTemporaryQueue((NevadoTemporaryQueue)temporaryDestination);
+                        }
+                        else if (temporaryDestination instanceof NevadoTemporaryTopic)
+                        {
+                            deleteTemporaryTopic((NevadoTemporaryTopic) temporaryDestination);
+                        }
+                        else
+                        {
+                            throw new IllegalStateException("Unexpected temporary destination of type: "
+                                    + temporaryDestination.getClass().getName());
+                        }
+
+                    } catch (JMSException e) {
+                        // Log but continue
+                        _log.error("Unable to delete temporary destination " + temporaryDestination, e);
+                    }
+                }
+                _temporaryDestinations.clear();
+                _closed.set(true);
+            }
         }
     }
 
@@ -260,15 +270,21 @@ public class NevadoConnection implements Connection {
     }
 
     public boolean isRunning() {
-        return _running;
+        return _running.get();
     }
 
+    /**
+     * Tell whether the connection is closed.  If the connection is in the process of closing, this
+     * will return true until complete.
+     *
+     * @return true if closed, otherwise false
+     */
     public boolean isClosed() {
-        return _closed;
+        return _closed.get();
     }
 
     protected void checkClosed() throws IllegalStateException {
-        if (_closed)
+        if (_closed.get())
         {
             throw new IllegalStateException("Connection is closed");
         }

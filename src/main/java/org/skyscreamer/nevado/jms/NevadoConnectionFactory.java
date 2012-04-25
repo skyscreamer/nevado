@@ -14,12 +14,12 @@ import java.io.Serializable;
 public class NevadoConnectionFactory implements ConnectionFactory, QueueConnectionFactory, TopicConnectionFactory,
         Serializable
 {
-    private String _awsAccessKey;
-    private String _awsSecretKey;
-    private String _clientID;
-    private Integer _jmsDeliveryMode;
-    private Long _jmsTTL;
-    private Integer _jmsPriority;
+    private volatile String _awsAccessKey;
+    private volatile String _awsSecretKey;
+    private volatile String _clientID;
+    private volatile Integer _jmsDeliveryMode;
+    private volatile Long _jmsTTL;
+    private volatile Integer _jmsPriority;
 
     public NevadoQueueConnection createQueueConnection() throws JMSException {
         NevadoQueueConnection connection = new NevadoQueueConnection(_awsAccessKey, _awsSecretKey);
