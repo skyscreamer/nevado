@@ -6,12 +6,12 @@ import javax.jms.JMSException;
 import javax.jms.TemporaryTopic;
 
 /**
- * TODO - Add description
+ * Nevado implementation of a temporary topic
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class NevadoTemporaryTopic extends NevadoTopic implements TemporaryTopic {
-    private transient NevadoConnection _connection;
+    private final transient NevadoConnection _connection;
 
     public NevadoTemporaryTopic(NevadoConnection connection, NevadoTopic topic) throws JMSException {
         super(topic);

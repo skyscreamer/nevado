@@ -7,12 +7,12 @@ import javax.jms.JMSException;
 import javax.jms.TemporaryQueue;
 
 /**
- * TODO - Description
+ * Nevado implementation of a temporary queue
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class NevadoTemporaryQueue extends NevadoQueue implements TemporaryQueue {
-    private transient NevadoConnection _connection;
+    private final transient NevadoConnection _connection;
 
     public NevadoTemporaryQueue(NevadoConnection connection, NevadoQueue queue) throws JMSException {
         super(queue);

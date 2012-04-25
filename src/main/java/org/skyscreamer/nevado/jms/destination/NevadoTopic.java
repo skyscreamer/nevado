@@ -12,7 +12,7 @@ import java.util.*;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class NevadoTopic extends NevadoDestination implements Topic {
-    private String _arn;
+    private volatile String _arn;
     private final NevadoQueue _topicEndpoint;
     private final String _subscriptionArn;
     private final boolean _durable;
