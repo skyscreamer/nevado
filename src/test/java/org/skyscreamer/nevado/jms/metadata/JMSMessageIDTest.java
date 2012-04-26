@@ -3,6 +3,7 @@ package org.skyscreamer.nevado.jms.metadata;
 import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
+import org.skyscreamer.nevado.jms.NevadoSession;
 
 import javax.jms.*;
 
@@ -19,7 +20,7 @@ public class JMSMessageIDTest extends AbstractJMSTest {
     
     @Test
     public void testDisable() throws JMSException {
-        Session session = createSession();
+        NevadoSession session = createSession();
         Message msg = session.createMessage();
         Queue tempQueue = createTempQueue(session);
         MessageProducer msgProducer = session.createProducer(tempQueue);

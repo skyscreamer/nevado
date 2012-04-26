@@ -3,7 +3,9 @@ package org.skyscreamer.nevado.jms.metadata;
 import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
+import org.skyscreamer.nevado.jms.NevadoConnection;
 import org.skyscreamer.nevado.jms.NevadoConnectionFactory;
+import org.skyscreamer.nevado.jms.NevadoSession;
 
 import javax.jms.*;
 import java.io.IOException;
@@ -15,18 +17,15 @@ import java.io.IOException;
  * Time: 8:43 AM
  */
 public class JMSHeaderOverrideTest extends AbstractJMSTest {
-    private NevadoConnectionFactory _overriddenConnectionFactory;
-    private Session _overriddenSession;
-
     @Test
     public void testOverride() throws JMSException, IOException {
-        _overriddenConnectionFactory = new NevadoConnectionFactory();
+        NevadoConnectionFactory _overriddenConnectionFactory = new NevadoConnectionFactory();
         _overriddenConnectionFactory.setOverrideJMSDeliveryMode(DeliveryMode.NON_PERSISTENT);
         _overriddenConnectionFactory.setOverrideJMSPriority(9);
         _overriddenConnectionFactory.setOverrideJMSTTL(60000L);
-        Connection conn = createConnection(_overriddenConnectionFactory);
+        NevadoConnection conn = createConnection(_overriddenConnectionFactory);
         conn.start();
-        _overriddenSession = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        NevadoSession _overriddenSession = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
         Message msg = _overriddenSession.createMessage();
 

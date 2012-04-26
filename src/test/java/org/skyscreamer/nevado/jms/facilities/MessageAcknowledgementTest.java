@@ -3,6 +3,8 @@ package org.skyscreamer.nevado.jms.facilities;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
+import org.skyscreamer.nevado.jms.NevadoConnection;
+import org.skyscreamer.nevado.jms.NevadoSession;
 import org.skyscreamer.nevado.jms.message.JMSXProperty;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
 import org.skyscreamer.nevado.jms.message.NevadoTextMessage;
@@ -19,8 +21,8 @@ import javax.jms.*;
 public class MessageAcknowledgementTest extends AbstractJMSTest {
     @Test
     public void testAutoAcknowledge() throws JMSException {
-        Connection connection = getConnection();
-        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        NevadoConnection connection = getConnection();
+        NevadoSession session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Message msg = session.createMessage();
         Queue tempQueue = createTempQueue(session);
         session.createProducer(tempQueue).send(msg);
@@ -30,8 +32,8 @@ public class MessageAcknowledgementTest extends AbstractJMSTest {
 
     @Test
     public void testAsyncAutoAcknowledge() throws JMSException, InterruptedException {
-        Connection connection = getConnection();
-        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        NevadoConnection connection = getConnection();
+        NevadoSession session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Message msg = session.createMessage();
         Queue tempQueue = createTempQueue(session);
         session.createProducer(tempQueue).send(msg);
@@ -46,8 +48,8 @@ public class MessageAcknowledgementTest extends AbstractJMSTest {
 
     @Test
     public void testDupsOkayAcknowledge() throws JMSException {
-        Connection connection = getConnection();
-        Session session = connection.createSession(false, Session.DUPS_OK_ACKNOWLEDGE);
+        NevadoConnection connection = getConnection();
+        NevadoSession session = connection.createSession(false, Session.DUPS_OK_ACKNOWLEDGE);
         Message msg = session.createMessage();
         Queue tempQueue = createTempQueue(session);
         session.createProducer(tempQueue).send(msg);
@@ -59,8 +61,8 @@ public class MessageAcknowledgementTest extends AbstractJMSTest {
     @Test
     public void testClientAcknowledge() throws JMSException {
         // Send messages
-        Connection connection = getConnection();
-        Session session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
+        NevadoConnection connection = getConnection();
+        NevadoSession session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
         TextMessage msg1 = session.createTextMessage(RandomData.readString());
         TextMessage msg2 = session.createTextMessage(RandomData.readString());
         TextMessage msg3 = session.createTextMessage(RandomData.readString());
@@ -109,8 +111,8 @@ public class MessageAcknowledgementTest extends AbstractJMSTest {
     @Test
     public void testPartialClientAcknowledge() throws JMSException {
         // Send messages
-        Connection connection = getConnection();
-        Session session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
+        NevadoConnection connection = getConnection();
+        NevadoSession session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
         TextMessage msg1 = session.createTextMessage(RandomData.readString());
         TextMessage msg2 = session.createTextMessage(RandomData.readString());
         TextMessage msg3 = session.createTextMessage(RandomData.readString());

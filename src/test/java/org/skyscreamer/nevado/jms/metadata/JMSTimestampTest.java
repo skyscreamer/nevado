@@ -3,6 +3,7 @@ package org.skyscreamer.nevado.jms.metadata;
 import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
+import org.skyscreamer.nevado.jms.NevadoSession;
 
 import javax.jms.*;
 import java.util.Date;
@@ -24,7 +25,7 @@ public class JMSTimestampTest extends AbstractJMSTest {
 
     @Test
     public void testDisable() throws JMSException {
-        Session session = createSession();
+        NevadoSession session = createSession();
         Message msg = session.createMessage();
         Assert.assertEquals(0, msg.getJMSTimestamp());
         Queue tempQueue = createTempQueue(session);

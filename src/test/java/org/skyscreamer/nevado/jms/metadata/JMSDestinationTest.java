@@ -14,7 +14,7 @@ import javax.jms.*;
 public class JMSDestinationTest extends AbstractJMSTest {
     @Test
     public void testAssign() throws JMSException {
-        Session session = createSession();
+        NevadoSession session = createSession();
         Message msg = session.createMessage();
         Assert.assertNull(msg.getJMSMessageID());
         Queue tempQueue = createTempQueue(session);

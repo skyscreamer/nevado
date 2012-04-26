@@ -3,6 +3,8 @@ package org.skyscreamer.nevado.jms.facilities;
 import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
+import org.skyscreamer.nevado.jms.NevadoConnection;
+import org.skyscreamer.nevado.jms.NevadoSession;
 import org.skyscreamer.nevado.jms.util.RandomData;
 import org.skyscreamer.nevado.jms.util.TestMessageListener;
 
@@ -17,8 +19,8 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
     @Test
     public void testClientStart() throws Exception {
         // Set up session for sync messages
-        Connection conn = createConnection(getConnectionFactory());
-        Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        NevadoConnection conn = createConnection(getConnectionFactory());
+        NevadoSession session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Queue tempQueue = createTempQueue(session);
         MessageProducer producer = session.createProducer(tempQueue);
         String testBody = RandomData.readString();
@@ -39,8 +41,8 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
     @Test
     public void testAsyncClientStart() throws Exception {
         // Set up session for async messages
-        Connection conn = createConnection(getConnectionFactory());
-        Session asyncSession = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        NevadoConnection conn = createConnection(getConnectionFactory());
+        NevadoSession asyncSession = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
         TestMessageListener messageListener = new TestMessageListener();
         Queue tempQueue = createTempQueue(asyncSession);
         asyncSession.createConsumer(tempQueue).setMessageListener(messageListener);
@@ -60,8 +62,8 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
     @Test
     public void testClientPause() throws Exception {
         // Set up and send two messages
-        Connection conn = getConnection();
-        Session session = createSession();
+        NevadoConnection conn = getConnection();
+        NevadoSession session = createSession();
         String testBody1 = RandomData.readString();
         String testBody2 = RandomData.readString();
         Queue tempQueue = createTempQueue(session);
@@ -105,8 +107,8 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
     @Test(timeout = 10000)
     public void testAsyncClientPause() throws Exception {
         // Set up listener
-        Connection conn = getConnection();
-        Session session = createSession();
+        NevadoConnection conn = getConnection();
+        NevadoSession session = createSession();
         TextMessage testMsg1 = session.createTextMessage(RandomData.readString());
         TextMessage testMsg2 = session.createTextMessage(RandomData.readString());
         Queue tempQueue = createTempQueue(session);

@@ -1,5 +1,7 @@
 package org.skyscreamer.nevado.jms;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.skyscreamer.nevado.jms.destination.*;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
 import org.skyscreamer.nevado.jms.message.NevadoProperty;
@@ -8,6 +10,8 @@ import javax.jms.*;
 import javax.jms.IllegalStateException;
 
 public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, TopicSubscriber {
+    private final Log _log = LogFactory.getLog(getClass());
+
     private boolean _closed = false;
     private final NevadoSession _session;
     private final NevadoDestination _destination;
@@ -106,6 +110,11 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
                         || _session.getAcknowledgeMode() == Session.DUPS_OK_ACKNOWLEDGE)
                 {
                     _session.resetMessage(message);
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        _log.warn(e);
+                    }
                 }
             }
         }

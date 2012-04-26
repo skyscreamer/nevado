@@ -7,6 +7,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
+import org.skyscreamer.nevado.jms.destination.NevadoTemporaryQueue;
+import org.skyscreamer.nevado.jms.destination.NevadoTemporaryTopic;
 import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 import org.skyscreamer.nevado.jms.util.TestExceptionListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +69,7 @@ public abstract class AbstractJMSTest {
     }
 
     protected Message sendAndReceive(Message msg) throws JMSException {
-        Session session = createSession();
+        NevadoSession session = createSession();
         Queue testQueue = createTempQueue(session);
         session.createProducer(testQueue).send(msg);
         Message msgOut = createSession().createConsumer(testQueue).receive();
@@ -116,12 +118,12 @@ public abstract class AbstractJMSTest {
         return (NevadoSession)_connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
     }
 
-    protected Queue createTempQueue(Session session) throws JMSException
+    protected NevadoTemporaryQueue createTempQueue(NevadoSession session) throws JMSException
     {
         return session.createTemporaryQueue();
     }
 
-    protected NevadoTopic createTempTopic(NevadoSession session) throws JMSException {
+    protected NevadoTemporaryTopic createTempTopic(NevadoSession session) throws JMSException {
         return session.createTemporaryTopic();
     }
 
