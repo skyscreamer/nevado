@@ -1,7 +1,13 @@
 package org.skyscreamer.nevado.jms.destination;
 
+import org.skyscreamer.nevado.jms.resource.NevadoReferencableFactory;
+
 import javax.jms.*;
 import javax.jms.IllegalStateException;
+import javax.naming.NamingException;
+import javax.naming.Reference;
+import javax.naming.Referenceable;
+import javax.naming.StringRefAddr;
 import java.io.Serializable;
 import java.net.URL;
 
@@ -11,7 +17,9 @@ import java.net.URL;
  * Date: 3/24/12
  * Time: 10:22 AM
  */
-public abstract class NevadoDestination implements Destination, Serializable {
+public abstract class NevadoDestination implements Destination, Serializable, Referenceable {
+    public static final String JNDI_DESTINATION_NAME = "name";
+
     private final String _name;
 
     protected NevadoDestination(String name) {
@@ -67,7 +75,16 @@ public abstract class NevadoDestination implements Destination, Serializable {
 
         return nevadoDestination;
     }
-    
+
+    @Override
+    public Reference getReference() throws NamingException {
+        Reference reference = new Reference(getClass().getName(),
+                new StringRefAddr(JNDI_DESTINATION_NAME, _name),
+                NevadoReferencableFactory.class.getName(), null);
+        return reference;
+    }
+
+    @Override
     public String toString() {
         return _name;
     }

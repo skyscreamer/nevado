@@ -4,6 +4,8 @@ import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 
 import javax.jms.JMSException;
 import javax.jms.Queue;
+import javax.naming.NamingException;
+import javax.naming.Reference;
 import java.io.Serializable;
 import java.net.URL;
 

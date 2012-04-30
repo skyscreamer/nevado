@@ -1,6 +1,9 @@
 package org.skyscreamer.nevado.jms.resource;
 
 import org.skyscreamer.nevado.jms.NevadoConnectionFactory;
+import org.skyscreamer.nevado.jms.destination.NevadoDestination;
+import org.skyscreamer.nevado.jms.destination.NevadoQueue;
+import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 
 import javax.naming.Context;
 import javax.naming.Name;
@@ -45,6 +48,12 @@ public class NevadoReferencableFactory implements ObjectFactory {
                     connectionFactory.setOverrideJMSTTL(Long.parseLong(jmsTtl));
                 }
                 instance = connectionFactory;
+            }
+            else if (ref.getClassName().equals(NevadoQueue.class.getName())) {
+                instance = new NevadoQueue(getRefContent(ref, NevadoDestination.JNDI_DESTINATION_NAME));
+            }
+            else if (ref.getClassName().equals(NevadoTopic.class.getName())) {
+                instance = new NevadoTopic(getRefContent(ref, NevadoDestination.JNDI_DESTINATION_NAME));
             }
             else {
                 throw new IllegalArgumentException("This factory does not support objects of type "

@@ -44,11 +44,7 @@ public class ReferencableTest extends AbstractJMSTest {
         connectionFactory.setOverrideJMSDeliveryMode(TEST_DELIVERY_MODE);
         connectionFactory.setOverrideJMSPriority(TEST_PRIORITY);
         connectionFactory.setOverrideJMSTTL(TEST_TTL);
-        Hashtable env = new Hashtable();
-        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.fscontext.RefFSContextFactory");
-        env.put(Context.PROVIDER_URL, folder.getRoot().toURI().toURL().toString());
-        Context ctx = new InitialContext(env);
-        Assert.assertNotNull(ctx);
+        Context ctx = getContext();
         try {
             ctx.bind("testConnectionFactory", connectionFactory);
             NevadoConnectionFactory testConnectionFactory = (NevadoConnectionFactory)ctx.lookup("testConnectionFactory");
@@ -64,35 +60,44 @@ public class ReferencableTest extends AbstractJMSTest {
         }
     }
 
+    private Context getContext() throws MalformedURLException, NamingException {
+        Hashtable env = new Hashtable();
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.fscontext.RefFSContextFactory");
+        env.put(Context.PROVIDER_URL, folder.getRoot().toURI().toURL().toString());
+        Context ctx = new InitialContext(env);
+        Assert.assertNotNull(ctx);
+        return ctx;
+    }
+
     @Test
-    public void testQueue() throws NamingException {
+    public void testQueue() throws NamingException, MalformedURLException {
         NevadoQueue queue = new NevadoQueue("testQueue");
-        Context ctx = new SimpleNamingContext();
+        Context ctx = getContext();
         ctx.bind("testQueue", queue);
         Queue testQueue = (Queue)ctx.lookup("testQueue");
         Assert.assertEquals(queue, testQueue);
     }
 
     @Test
-    public void testTopic() throws NamingException {
+    public void testTopic() throws NamingException, MalformedURLException {
         NevadoTopic topic = new NevadoTopic("testTopic");
-        Context ctx = new SimpleNamingContext();
+        Context ctx = getContext();
         ctx.bind("testTopic", topic);
         Topic testTopic = (Topic)ctx.lookup("testTopic");
         Assert.assertEquals(topic, testTopic);
     }
 
     @Test(expected = NamingException.class)
-    public void testTemporaryQueue() throws JMSException, NamingException {
+    public void testTemporaryQueue() throws JMSException, NamingException, MalformedURLException {
         TemporaryQueue temporaryQueue = createTempQueue(createSession());
-        Context ctx = new SimpleNamingContext();
+        Context ctx = getContext();
         ctx.bind("tempQueue", temporaryQueue);
     }
 
     @Test(expected = NamingException.class)
-    public void testTemporaryTopic() throws JMSException, NamingException {
+    public void testTemporaryTopic() throws JMSException, NamingException, MalformedURLException {
         TemporaryTopic temporaryTopic = createTempTopic(createSession());
-        Context ctx = new SimpleNamingContext();
+        Context ctx = getContext();
         ctx.bind("tempTopic", temporaryTopic);
     }
 }

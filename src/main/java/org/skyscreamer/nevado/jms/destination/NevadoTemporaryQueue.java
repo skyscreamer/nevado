@@ -5,6 +5,8 @@ import org.skyscreamer.nevado.jms.NevadoSession;
 
 import javax.jms.JMSException;
 import javax.jms.TemporaryQueue;
+import javax.naming.NamingException;
+import javax.naming.Reference;
 
 /**
  * Nevado implementation of a temporary queue
@@ -23,5 +25,11 @@ public class NevadoTemporaryQueue extends NevadoQueue implements TemporaryQueue 
         if (_connection != null) {
             _connection.deleteTemporaryQueue(this);
         }
+    }
+
+    @Override
+    public Reference getReference() throws NamingException {
+        throw new NamingException("NevadoTemporaryQueue is not supported.  Temporary destinations must remain within " +
+                "the connection that created them.");
     }
 }
