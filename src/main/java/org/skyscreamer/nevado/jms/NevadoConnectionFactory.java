@@ -129,9 +129,9 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     }
 
     public Reference getReference() throws NamingException {
-        Reference reference = new Reference(NevadoConnectionFactory.class.getName(), null,
+        Reference reference = new Reference(NevadoConnectionFactory.class.getName(),
+                new StringRefAddr(JNDI_AWS_ACCESS_KEY, _awsAccessKey),
                 NevadoReferencableFactory.class.getName(), null);
-        reference.add(new StringRefAddr(JNDI_AWS_ACCESS_KEY, _awsAccessKey));
         reference.add(new StringRefAddr(JNDI_AWS_SECRET_KEY, _awsSecretKey));
         if (_clientID != null)
         {

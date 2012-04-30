@@ -23,7 +23,7 @@ public class NevadoReferencableFactory implements ObjectFactory {
             if (ref.getClassName().equals(NevadoConnectionFactory.class.getName())) {
                 NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory();
                 connectionFactory.setAwsAccessKey(getRefContent(ref, NevadoConnectionFactory.JNDI_AWS_ACCESS_KEY));
-                connectionFactory.setAwsSecretKey(getRefContent(ref, NevadoConnectionFactory.JNDI_AWS_ACCESS_KEY));
+                connectionFactory.setAwsSecretKey(getRefContent(ref, NevadoConnectionFactory.JNDI_AWS_SECRET_KEY));
                 String clientId = getRefContent(ref, NevadoConnectionFactory.JNDI_CLIENT_ID);
                 if (clientId != null)
                 {
