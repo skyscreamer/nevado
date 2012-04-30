@@ -45,19 +45,15 @@ public class ReferencableTest extends AbstractJMSTest {
         connectionFactory.setOverrideJMSPriority(TEST_PRIORITY);
         connectionFactory.setOverrideJMSTTL(TEST_TTL);
         Context ctx = getContext();
-        try {
-            ctx.bind("testConnectionFactory", connectionFactory);
-            NevadoConnectionFactory testConnectionFactory = (NevadoConnectionFactory)ctx.lookup("testConnectionFactory");
-            Assert.assertEquals(connectionFactory.getAwsAccessKey(), testConnectionFactory.getAwsAccessKey());
-            Assert.assertEquals(connectionFactory.getAwsSecretKey(), testConnectionFactory.getAwsSecretKey());
-            Assert.assertEquals(connectionFactory.getClientID(), testConnectionFactory.getClientID());
-            Assert.assertEquals(connectionFactory.getJMSDeliveryMode(), testConnectionFactory.getJMSDeliveryMode());
-            Assert.assertEquals(connectionFactory.getJMSPriority(), testConnectionFactory.getJMSPriority());
-            Assert.assertEquals(connectionFactory.getJMSTTL(), testConnectionFactory.getJMSTTL());
-        }
-        finally {
-            ctx.close();
-        }
+        ctx.bind("testConnectionFactory", connectionFactory);
+        NevadoConnectionFactory testConnectionFactory = (NevadoConnectionFactory)ctx.lookup("testConnectionFactory");
+        Assert.assertEquals(connectionFactory.getAwsAccessKey(), testConnectionFactory.getAwsAccessKey());
+        Assert.assertEquals(connectionFactory.getAwsSecretKey(), testConnectionFactory.getAwsSecretKey());
+        Assert.assertEquals(connectionFactory.getClientID(), testConnectionFactory.getClientID());
+        Assert.assertEquals(connectionFactory.getJMSDeliveryMode(), testConnectionFactory.getJMSDeliveryMode());
+        Assert.assertEquals(connectionFactory.getJMSPriority(), testConnectionFactory.getJMSPriority());
+        Assert.assertEquals(connectionFactory.getJMSTTL(), testConnectionFactory.getJMSTTL());
+        ctx.close();
     }
 
     private Context getContext() throws MalformedURLException, NamingException {
@@ -76,6 +72,7 @@ public class ReferencableTest extends AbstractJMSTest {
         ctx.bind("testQueue", queue);
         Queue testQueue = (Queue)ctx.lookup("testQueue");
         Assert.assertEquals(queue, testQueue);
+        ctx.close();
     }
 
     @Test
@@ -85,6 +82,7 @@ public class ReferencableTest extends AbstractJMSTest {
         ctx.bind("testTopic", topic);
         Topic testTopic = (Topic)ctx.lookup("testTopic");
         Assert.assertEquals(topic, testTopic);
+        ctx.close();
     }
 
     @Test(expected = NamingException.class)
