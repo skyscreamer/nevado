@@ -243,14 +243,14 @@ public class NevadoSession implements Session {
     public QueueBrowser createBrowser(Queue queue) throws JMSException
     {
         checkClosed();
-        return null;  // TODO
+        return createBrowser(queue, null);
     }
 
     @Override
     public QueueBrowser createBrowser(Queue queue, String s) throws JMSException
     {
         checkClosed();
-        return null;  // TODO
+        return new NevadoQueueBrowser(this, (NevadoQueue)NevadoDestination.getInstance(queue));
     }
 
     @Override

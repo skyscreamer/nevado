@@ -4,6 +4,7 @@ import org.skyscreamer.nevado.jms.NevadoSession;
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 
 import javax.jms.*;
+import javax.jms.IllegalStateException;
 import javax.jms.Message;
 import java.util.Enumeration;
 
@@ -25,6 +26,7 @@ public abstract class NevadoMessage extends AbstractMessage<NevadoMessage> imple
     private transient boolean _acknowledged = false;
     private transient boolean _disableMessageID = false;
     private transient boolean _disableTimestamp = false;
+    private transient boolean _readOnly = false;
 
     public NevadoMessage() {}
 
@@ -79,13 +81,21 @@ public abstract class NevadoMessage extends AbstractMessage<NevadoMessage> imple
     }
 
     public void acknowledge() throws JMSException {
+        checkReadOnly();
         if (!_acknowledged) {
             _nevadoSession.acknowledgeMessage(this);
             _acknowledged = true;
         }
     }
 
+    private void checkReadOnly() throws IllegalStateException {
+        if (_readOnly) {
+            throw new IllegalStateException("This message is only for browsing and cannot be acknowledged");
+        }
+    }
+
     public void expire() throws JMSException {
+        checkReadOnly();
         _nevadoSession.expireMessage(this);
     }
 
@@ -155,5 +165,9 @@ public abstract class NevadoMessage extends AbstractMessage<NevadoMessage> imple
 
     public void setDisableTimestamp(boolean _disableTimestamp) {
         this._disableTimestamp = _disableTimestamp;
+    }
+
+    public void setReadOnly(boolean readOnly) {
+        _readOnly = readOnly;
     }
 }
