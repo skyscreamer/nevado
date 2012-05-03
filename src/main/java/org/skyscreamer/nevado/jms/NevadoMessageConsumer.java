@@ -78,7 +78,7 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
     }
 
     @Override
-    public Message receiveNoWait() throws JMSException {
+    public NevadoMessage receiveNoWait() throws JMSException {
         return receive(0);
     }
 

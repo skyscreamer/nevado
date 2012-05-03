@@ -21,7 +21,7 @@ import java.util.Vector;
 public class NevadoQueueBrowser implements QueueBrowser {
     private final NevadoSession _session;
     private final NevadoQueue _queue;
-    private int NUM_MESSAGES_TO_BROWSE = 100;
+    private int NUM_MESSAGES_TO_BROWSE = 10;
 
     public NevadoQueueBrowser(NevadoSession session, NevadoQueue queue) {
         _session = session;
