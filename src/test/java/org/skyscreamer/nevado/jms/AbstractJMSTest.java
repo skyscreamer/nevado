@@ -102,7 +102,10 @@ public abstract class AbstractJMSTest {
     @After
     public void tearDown() throws JMSException {
         Assert.assertEquals("Exception listener caught some exceptions", 0, _exceptionListener.getExceptions().size());
-        _connection.close();
+        if (_connection != null)
+        {
+            _connection.close();
+        }
     }
 
     public ConnectionFactory getConnectionFactory() {

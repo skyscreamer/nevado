@@ -24,9 +24,11 @@ import org.skyscreamer.nevado.jms.util.SerializeUtil;
 import javax.jms.InvalidDestinationException;
 import javax.jms.JMSException;
 import javax.jms.JMSSecurityException;
+import javax.jms.ResourceAllocationException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.*;
 
 /**
@@ -476,7 +478,11 @@ public class SQSConnector implements NevadoConnector {
         JMSException jmsException;
         String exMessage = message + ": " + e.getMessage();
         _log.error(exMessage, e);
-        if (isSecurityException(e))
+        if (UnknownHostException.class.equals(e.getCause().getClass()))
+        {
+            jmsException = new ResourceAllocationException(exMessage);
+        }
+        else if (isSecurityException(e))
         {
             jmsException = new JMSSecurityException(exMessage);
         }
