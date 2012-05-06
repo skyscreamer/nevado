@@ -88,12 +88,14 @@ public abstract class AbstractJMSTest {
         _awsSecretKey = prop.getProperty("aws.secretKey");
         if (_awsAccessKey == null || _awsAccessKey.trim().length() == 0
             || _awsSecretKey == null || _awsSecretKey.trim().length() == 0) {
-                System.out.println("ATTENTION: You have not set up your AWS credentials.  Follow the following steps:\n" +
-                        "    1. Copy src/test/resources/aws.properties.TEMPLATE to src/test/resources/aws.properties\n" +
-                        "    2. Edit aws.properties with your access keys from https://aws-portal.amazon.com/gp/aws/securityCredentials\n" +
-                        "    3. Have git ignore the new file.  Add the following line to .git/info/exclude:\n" +
-                        "        src/test/resources/aws.properties\n\n" +
-                        "Be careful to keep your keys in a safe place and don't commit them to source control.");
+                System.out.println("ATTENTION: You have not set up your AWS credentials.  Follow thes steps:\n" +
+                        "    1. Copy nevado-jms/src/test/resources/aws.properties.TEMPLATE to\n" +
+                        "       nevado-jms/src/test/resources/aws.properties\n" +
+                        "    2. Edit aws.properties with your access keys from\n" +
+                        "       https://aws-portal.amazon.com/gp/aws/securityCredentials\n" +
+                        "    3. Have git ignore the new file.  Add the following line to .git/info/exclude:\n\n" +
+                        "        aws.properties\n\n" +
+                        "*** Keep your keys in a safe place and don't commit them to source control. ***\n\n");
             throw new MissingResourceException("Resource /aws.properties does not exist",
                     null, null);
         }
