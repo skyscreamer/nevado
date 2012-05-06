@@ -11,7 +11,7 @@ import org.skyscreamer.nevado.jms.util.RandomData;
 import javax.jms.*;
 
 /**
- * TODO - Description
+ * Tests for durable topics
  *
  * @author Carter Page <carter@skyscreamer.org>
  */

@@ -14,7 +14,7 @@ import javax.jms.IllegalStateException;
 import java.util.List;
 
 /**
- * TODO - Description
+ * Tests Nevado implementation of MessageListener
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
@@ -141,7 +141,7 @@ public class MessageListenerTest extends AbstractJMSTest {
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(msg1);
         session.commit();
-        Thread.sleep(200);
+        Thread.sleep(250);
         producer.send(msg2);
         session.commit();
         Message msgOut = messageListener.getMessage(1000);

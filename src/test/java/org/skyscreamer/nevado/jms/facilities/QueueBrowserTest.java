@@ -21,6 +21,9 @@ public class QueueBrowserTest extends AbstractJMSTest {
 
     private static final int NUM_MESSAGES = 5;
 
+    @Test
+    public void nop() { /* Remove after enabling tests */ }
+
     // @Test - TODO - QueueBrowser deferred
     public void testQueueBrowser() throws JMSException, InterruptedException {
         NevadoSession session = createSession();

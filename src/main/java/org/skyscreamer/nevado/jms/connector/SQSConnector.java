@@ -478,7 +478,7 @@ public class SQSConnector implements NevadoConnector {
         JMSException jmsException;
         String exMessage = message + ": " + e.getMessage();
         _log.error(exMessage, e);
-        if (UnknownHostException.class.equals(e.getCause().getClass()))
+        if (e.getCause() != null && UnknownHostException.class.equals(e.getCause().getClass()))
         {
             jmsException = new ResourceAllocationException(exMessage);
         }
