@@ -242,15 +242,13 @@ public class NevadoSession implements Session {
     @Override
     public QueueBrowser createBrowser(Queue queue) throws JMSException
     {
-        checkClosed();
-        return createBrowser(queue, null);
+        throw new UnsupportedOperationException("QueueBrowsers are currently not supported");
     }
 
     @Override
     public QueueBrowser createBrowser(Queue queue, String s) throws JMSException
     {
-        checkClosed();
-        return new NevadoQueueBrowser(this, (NevadoQueue)NevadoDestination.getInstance(queue));
+        throw new UnsupportedOperationException("QueueBrowsers are currently not supported");
     }
 
     @Override

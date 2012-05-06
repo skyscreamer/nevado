@@ -4,6 +4,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
 import org.skyscreamer.nevado.jms.NevadoMessageConsumer;
+import org.skyscreamer.nevado.jms.NevadoQueueBrowser;
 import org.skyscreamer.nevado.jms.NevadoSession;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
 import org.skyscreamer.nevado.jms.util.RandomData;
@@ -18,20 +19,23 @@ import java.util.Enumeration;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class QueueBrowserTest extends AbstractJMSTest {
+
+    private static final int NUM_MESSAGES = 5;
+
     @Test
     public void testQueueBrowser() throws JMSException, InterruptedException {
         NevadoSession session = createSession();
-        TextMessage[] msgs = new TextMessage[5];
-        for(int i = 0 ; i < 5 ; ++i) {
+        TextMessage[] msgs = new TextMessage[NUM_MESSAGES];
+        for(int i = 0 ; i < NUM_MESSAGES ; ++i) {
             msgs[i] = session.createTextMessage(RandomData.readString());
         }
         Queue testQueue = session.createTemporaryQueue();
         MessageProducer producer = session.createProducer(testQueue);
-        for(int i = 0 ; i < 5 ; ++i) {
+        for(int i = 0 ; i < NUM_MESSAGES ; ++i) {
             producer.send(msgs[i]);
             Thread.sleep(200);
         }
-        QueueBrowser browser = session.createBrowser(testQueue);
+        NevadoQueueBrowser browser = session.createBrowser(testQueue);
         Enumeration e = browser.getEnumeration();
         for(int i = 0 ; e.hasMoreElements() ; ++i )
         {
@@ -40,7 +44,7 @@ public class QueueBrowserTest extends AbstractJMSTest {
             ++i;
         }
         NevadoMessageConsumer consumer = session.createConsumer(testQueue);
-        for(int i = 0 ; i < 5 ; ++i) {
+        for(int i = 0 ; i < NUM_MESSAGES ; ++i) {
             NevadoMessage msg = consumer.receiveNoWait();
             Assert.assertEquals(msgs[i], msg);
         }

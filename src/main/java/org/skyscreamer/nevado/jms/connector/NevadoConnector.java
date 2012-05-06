@@ -21,7 +21,6 @@ public interface NevadoConnector {
 
     NevadoMessage receiveMessage(NevadoConnection connection, NevadoDestination destination, long timeoutMs)
         throws JMSException;
-    List<NevadoMessage> browseMessages(NevadoQueue queue, int numToBrowse) throws JMSException;
     void deleteMessage(NevadoMessage message) throws JMSException;
     void resetMessage(NevadoMessage message) throws JMSException;
 

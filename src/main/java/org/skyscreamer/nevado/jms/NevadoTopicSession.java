@@ -74,12 +74,12 @@ public class NevadoTopicSession extends NevadoSession implements TopicSession {
 
     // Override topic methods to throw IllegalStateException
     @Override
-    public QueueBrowser createBrowser(Queue queue) throws JMSException {
+    public NevadoQueueBrowser createBrowser(Queue queue) throws JMSException {
         throw new IllegalStateException("TopicSession will not perform queue operations");
     }
 
     @Override
-    public QueueBrowser createBrowser(Queue queue, String s) throws JMSException {
+    public NevadoQueueBrowser createBrowser(Queue queue, String s) throws JMSException {
         throw new IllegalStateException("TopicSession will not perform queue operations");
     }
 

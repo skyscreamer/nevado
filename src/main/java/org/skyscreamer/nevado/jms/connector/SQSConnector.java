@@ -124,22 +124,6 @@ public class SQSConnector implements NevadoConnector {
         return sqsMessage != null ? convertSqsMessage(destination, sqsMessage, false) : null;
     }
 
-    @Override
-    public List<NevadoMessage> browseMessages(NevadoQueue queue, int numToBrowse) throws JMSException {
-        MessageQueue sqsQueue = getSQSQueue(queue);
-        Message[] messages;
-        try {
-            messages = sqsQueue.receiveMessages(numToBrowse, 0);
-        } catch (SQSException e) {
-            throw handleAWSException("Unable to retrieve messages for browsing", e);
-        }
-        List<NevadoMessage> nevadoMessages = new ArrayList<NevadoMessage>(messages.length);
-        for(Message message : messages) {
-            nevadoMessages.add(convertSqsMessage(queue, message, true));
-        }
-        return nevadoMessages;
-    }
-
     public void deleteMessage(NevadoMessage message) throws JMSException {
         MessageQueue sqsQueue = getSQSQueue(message.getNevadoDestination());
         String sqsReceiptHandle = getSQSReceiptHandle(message);
