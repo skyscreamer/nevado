@@ -42,8 +42,8 @@ import java.util.*;
 public class SQSConnector implements NevadoConnector {
     private final Log _log = LogFactory.getLog(getClass());
 
-    private final QueueService _queueService;
-    private final NotificationService _notficationService;
+    protected final QueueService _queueService;
+    protected final NotificationService _notficationService;
     private final long _receiveCheckIntervalMs;
     private static final String AWS_ERROR_CODE_AUTHENTICATION = "InvalidClientTokenId";
 
