@@ -129,7 +129,7 @@ public abstract class AbstractJMSTest {
 
     protected void deleteQueue(NevadoQueue queue) throws JMSException
     {
-        _connection.getSQSConnector().deleteQueue(queue);
+        _connection.deleteQueue(queue);
     }
 
     protected void compareTextMessages(TextMessage[] expectedTextMessages, TextMessage[] actualTextMessages) throws JMSException {

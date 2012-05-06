@@ -4,7 +4,6 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
 import org.skyscreamer.nevado.jms.NevadoMessageConsumer;
-import org.skyscreamer.nevado.jms.NevadoQueueBrowser;
 import org.skyscreamer.nevado.jms.NevadoSession;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
 import org.skyscreamer.nevado.jms.util.RandomData;
@@ -22,7 +21,7 @@ public class QueueBrowserTest extends AbstractJMSTest {
 
     private static final int NUM_MESSAGES = 5;
 
-    @Test
+    // @Test - TODO - QueueBrowser deferred
     public void testQueueBrowser() throws JMSException, InterruptedException {
         NevadoSession session = createSession();
         TextMessage[] msgs = new TextMessage[NUM_MESSAGES];
@@ -35,7 +34,7 @@ public class QueueBrowserTest extends AbstractJMSTest {
             producer.send(msgs[i]);
             Thread.sleep(200);
         }
-        NevadoQueueBrowser browser = session.createBrowser(testQueue);
+        QueueBrowser browser = session.createBrowser(testQueue);
         Enumeration e = browser.getEnumeration();
         for(int i = 0 ; e.hasMoreElements() ; ++i )
         {
@@ -50,7 +49,7 @@ public class QueueBrowserTest extends AbstractJMSTest {
         }
     }
 
-    @Test
+    // @Test - TODO - QueueBrowser deferred
     public void testBrowseEmptyQueue() throws JMSException {
         NevadoSession session = createSession();
         Queue testQueue = session.createTemporaryQueue();
@@ -58,7 +57,7 @@ public class QueueBrowserTest extends AbstractJMSTest {
         Assert.assertFalse(browser.getEnumeration().hasMoreElements());
     }
 
-    @Test(expected = IllegalStateException.class)
+    // @Test(expected = IllegalStateException.class) - TODO - QueueBrowser deferred
     public void testAcknowledgeBrowsedMessage() throws JMSException {
         NevadoSession session = createSession();
         Queue testQueue = session.createTemporaryQueue();

@@ -21,6 +21,7 @@ public abstract class NevadoDestination implements Destination, Serializable, Re
     public static final String JNDI_DESTINATION_NAME = "name";
 
     private final String _name;
+    private transient boolean _deleted;
 
     protected NevadoDestination(String name) {
         _name = name;
@@ -48,6 +49,14 @@ public abstract class NevadoDestination implements Destination, Serializable, Re
 
     public String getName() {
         return _name;
+    }
+
+    public boolean isDeleted() {
+        return _deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        _deleted = deleted;
     }
 
     public static NevadoDestination getInstance(Destination destination) throws JMSException {

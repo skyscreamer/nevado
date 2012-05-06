@@ -21,6 +21,7 @@ import org.skyscreamer.nevado.jms.message.NevadoProperty;
 import org.skyscreamer.nevado.jms.util.MessageIdUtil;
 import org.skyscreamer.nevado.jms.util.SerializeUtil;
 
+import javax.jms.InvalidDestinationException;
 import javax.jms.JMSException;
 import javax.jms.JMSSecurityException;
 import java.io.IOException;
@@ -432,8 +433,14 @@ public class SQSConnector implements NevadoConnector {
 
     protected MessageQueue getSQSQueue(NevadoDestination destination) throws JMSException
     {
-        if (destination == null) {
+        if (destination == null)
+        {
             throw new JMSException("Destination is null");
+        }
+
+        if (destination.isDeleted())
+        {
+            throw new InvalidDestinationException("Destination " + destination + " has been deleted");
         }
 
         NevadoQueue queue = (destination instanceof NevadoQueue) ? (NevadoQueue)destination

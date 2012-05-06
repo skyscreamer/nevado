@@ -60,7 +60,7 @@ public class DurableTopicTest extends AbstractJMSTest {
                     + msgAfterUnsubscribe);
         }
 
-        conn.getSQSConnector().deleteTopic(topic);
+        conn.deleteTopic(topic);
         conn.close();
     }
 
@@ -101,7 +101,7 @@ public class DurableTopicTest extends AbstractJMSTest {
         subscriber.close();
         session.unsubscribe(durableTopicName);
 
-        conn.getSQSConnector().deleteTopic(topic);
+        conn.deleteTopic(topic);
         conn.close();
     }
 

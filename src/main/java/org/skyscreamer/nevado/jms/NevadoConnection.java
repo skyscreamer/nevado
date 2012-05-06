@@ -169,8 +169,13 @@ public class NevadoConnection implements Connection {
     public void deleteTemporaryTopic(NevadoTemporaryTopic temporaryTopic) throws JMSException
     {
         checkClosed();
-        getSQSConnector().deleteTopic(temporaryTopic);
+        deleteTopic(temporaryTopic);
         _temporaryDestinations.remove(temporaryTopic);
+    }
+
+    public void deleteTopic(NevadoTopic topic) throws JMSException {
+        getSQSConnector().deleteTopic(topic);
+        topic.setDeleted(true);
     }
 
     protected NevadoTemporaryQueue createTemporaryQueue() throws JMSException
@@ -186,8 +191,13 @@ public class NevadoConnection implements Connection {
     public void deleteTemporaryQueue(NevadoTemporaryQueue temporaryQueue) throws JMSException
     {
         checkClosed();
-        getSQSConnector().deleteQueue(temporaryQueue);
+        deleteQueue(temporaryQueue);
         _temporaryDestinations.remove(temporaryQueue);
+    }
+
+    protected void deleteQueue(NevadoQueue queue) throws JMSException {
+        _nevadoConnector.deleteQueue(queue);
+        queue.setDeleted(true);
     }
 
     protected boolean ownsTemporaryDestination(Destination temporaryDestination)
