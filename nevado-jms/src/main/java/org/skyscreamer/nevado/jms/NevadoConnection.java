@@ -38,7 +38,7 @@ public class NevadoConnection implements Connection {
     private final Set<NevadoDestination> _temporaryDestinations = new CopyOnWriteArraySet<NevadoDestination>();
 
     public NevadoConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
-        _nevadoConnector = new SQSConnector(awsAccessKey, awsSecretKey);
+        _nevadoConnector = new SQSConnector(awsAccessKey, awsSecretKey, true);
         _nevadoConnector.test();
     }
 

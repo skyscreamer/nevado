@@ -10,6 +10,7 @@
     <context:component-scan base-package="org.skyscreamer.nevado"/>
 
     <bean id="connectionFactory" class="org.skyscreamer.nevado.jms.NevadoConnectionFactory" />
+    <bean id="performanceService" class="org.skyscreamer.nevado.jms.performance.PerformanceService" />
 
     <!--
     <bean id="destination" class="org.skyscreamer.nevado.jms.SQSQueue">

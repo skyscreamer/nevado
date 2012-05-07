@@ -53,11 +53,17 @@ public class SQSConnector implements NevadoConnector {
         _receiveCheckIntervalMs = 200;
     }
 
-    public SQSConnector(String awsAccessKey, String awsSecretKey, long receiveCheckIntervalMs) {
+    public SQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure) {
+        _queueService = new QueueService(awsAccessKey, awsSecretKey, isSecure);
+        _notficationService = new NotificationService(awsAccessKey, awsSecretKey, isSecure);
+        _receiveCheckIntervalMs = 200;
+    }
+
+    public SQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs) {
         _log.warn("Reducing the receiveCheckInterval will increase your AWS costs.  " +
                 "Amazon charges each time a check is made: http://aws.amazon.com/sqs/pricing/");
-        _queueService = new QueueService(awsAccessKey, awsAccessKey);
-        _notficationService = new NotificationService(awsAccessKey, awsSecretKey);
+        _queueService = new QueueService(awsAccessKey, awsAccessKey, isSecure);
+        _notficationService = new NotificationService(awsAccessKey, awsSecretKey, isSecure);
         _receiveCheckIntervalMs = receiveCheckIntervalMs;
     }
 
@@ -449,7 +455,15 @@ public class SQSConnector implements NevadoConnector {
                 : ((NevadoTopic)destination).getTopicEndpoint();
         MessageQueue sqsQueue;
         try {
-            sqsQueue = _queueService.getOrCreateMessageQueue(queue.getName());
+            if (queue.getQueueUrl() == null)
+            {
+                sqsQueue = _queueService.getOrCreateMessageQueue(queue.getName());
+                queue.setQueueUrl(sqsQueue.getUrl().toString());
+            }
+            else
+            {
+                sqsQueue = _queueService.getOrCreateMessageQueue(queue.getQueueUrl());
+            }
         } catch (SQSException e) {
             throw handleAWSException("Unable to get message queue '" + destination, e);
         }

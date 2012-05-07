@@ -1,12 +1,7 @@
 package org.skyscreamer.nevado.jms.destination;
 
-import org.skyscreamer.nevado.jms.destination.NevadoDestination;
-
 import javax.jms.JMSException;
 import javax.jms.Queue;
-import javax.naming.NamingException;
-import javax.naming.Reference;
-import java.io.Serializable;
 import java.net.URL;
 
 /**
@@ -16,6 +11,8 @@ import java.net.URL;
  * Time: 3:35 AM
  */
 public class NevadoQueue extends NevadoDestination implements Queue {
+    private String _queueUrl;
+
     public NevadoQueue(String name) {
         super(name);
     }
@@ -30,5 +27,13 @@ public class NevadoQueue extends NevadoDestination implements Queue {
 
     public String getQueueName() {
         return super.getName();
+    }
+
+    public String getQueueUrl() {
+        return _queueUrl;
+    }
+
+    public void setQueueUrl(String queueUrl) {
+        _queueUrl = queueUrl;
     }
 }
