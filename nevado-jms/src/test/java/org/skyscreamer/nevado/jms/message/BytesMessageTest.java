@@ -36,6 +36,18 @@ public class BytesMessageTest extends AbstractJMSTest {
     }
 
     @Test
+    public void testLotsOfBytes() throws JMSException
+    {
+        int howManyBytes = 48000;
+        BytesMessage msg = createSession().createBytesMessage();
+        byte[] data = RandomData.readBytes(howManyBytes);
+        msg.writeBytes(data);
+        BytesMessage msgOut = (BytesMessage)sendAndReceive(msg);
+        byte[] dataOut = new byte[howManyBytes];
+        msgOut.readBytes(dataOut);
+        Assert.assertTrue(Arrays.equals(data, dataOut));
+    }
+    @Test
     public void testBytesMessage() throws JMSException {
         BytesMessage msg = createSession().createBytesMessage();
         testBytesMessage(msg);

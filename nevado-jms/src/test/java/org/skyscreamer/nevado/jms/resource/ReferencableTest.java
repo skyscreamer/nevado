@@ -9,7 +9,6 @@ import org.skyscreamer.nevado.jms.NevadoConnectionFactory;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 import org.skyscreamer.nevado.jms.util.RandomData;
-import org.springframework.mock.jndi.SimpleNamingContext;
 
 import javax.jms.*;
 import javax.naming.Context;

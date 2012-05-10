@@ -11,7 +11,6 @@ import org.skyscreamer.nevado.jms.util.TestMessageListenerRuntimeException;
 
 import javax.jms.*;
 import javax.jms.IllegalStateException;
-import java.util.List;
 
 /**
  * Tests Nevado implementation of MessageListener

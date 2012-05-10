@@ -9,7 +9,6 @@ import org.skyscreamer.nevado.jms.message.NevadoMessage;
 import org.skyscreamer.nevado.jms.util.RandomData;
 
 import javax.jms.*;
-import javax.jms.IllegalStateException;
 import java.util.Enumeration;
 
 /**

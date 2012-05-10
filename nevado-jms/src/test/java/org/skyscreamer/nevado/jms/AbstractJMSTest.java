@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoTemporaryQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoTemporaryTopic;
-import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 import org.skyscreamer.nevado.jms.util.TestExceptionListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -19,10 +18,12 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
 import javax.jms.*;
-import javax.jms.Queue;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,7 +36,7 @@ import java.util.*;
         TransactionalTestExecutionListener.class})
 @ContextConfiguration(locations = { "classpath:/testContext.xml" })
 public abstract class AbstractJMSTest {
-    protected final Log _log = LogFactory.getLog(AbstractJMSTest.class);
+    protected final Log _log = LogFactory.getLog(getClass());
 
     private String _awsAccessKey;
     private String _awsSecretKey;

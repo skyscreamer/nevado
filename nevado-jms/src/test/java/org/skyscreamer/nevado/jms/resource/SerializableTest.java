@@ -9,7 +9,6 @@ import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 import org.skyscreamer.nevado.jms.util.RandomData;
 import org.skyscreamer.nevado.jms.util.SerializeUtil;
 
-import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import java.io.IOException;
 import java.util.Random;

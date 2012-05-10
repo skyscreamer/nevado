@@ -1,17 +1,8 @@
 package org.skyscreamer.nevado.jms.destination;
 
-import com.xerox.amazonws.sqs2.*;
-import com.xerox.amazonws.sqs2.Message;
 import junit.framework.Assert;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.*;
-import org.skyscreamer.nevado.jms.connector.NevadoConnector;
-import org.skyscreamer.nevado.jms.connector.SQSConnector;
-import org.skyscreamer.nevado.jms.destination.NevadoQueue;
-import org.skyscreamer.nevado.jms.destination.NevadoTemporaryQueue;
-import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 import org.skyscreamer.nevado.jms.util.RandomData;
 
 import javax.jms.*;
