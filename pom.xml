@@ -62,7 +62,6 @@
 
     <modules>
         <module>nevado-jms</module>
-        <module>nevado-demo</module>
     </modules>
 
     <profiles>
