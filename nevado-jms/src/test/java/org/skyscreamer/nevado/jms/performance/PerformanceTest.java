@@ -15,7 +15,7 @@ import javax.jms.JMSException;
 public class PerformanceTest extends AbstractJMSTest {
     private static final int NUM_MESSAGES = 100;
     private static final int MESSAGE_SIZE = 1;
-    private static final int NUM_THREADS = 10;
+    private static final int NUM_THREADS = 1;
     private static final int MESSAGE_SEND_DELAY_MS = 0;
 
     @Autowired private PerformanceService _performanceService;

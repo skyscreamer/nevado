@@ -28,7 +28,7 @@ public class DurableTopicTest extends AbstractJMSTest {
         TextMessage msg3 = session.createTextMessage(RandomData.readString());
         MessageProducer producer = session.createProducer(topic);
         producer.send(msg1);
-        Assert.assertEquals(msg1, subscriber.receive(1000));
+        Assert.assertEquals(msg1, subscriber.receive(2000));
         producer.send(msg2);
         producer.send(msg3);
         getConnection().close();
@@ -37,7 +37,7 @@ public class DurableTopicTest extends AbstractJMSTest {
         conn.start();
         session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
         subscriber = session.createDurableSubscriber(topic, durableTopicName);
-        Message msgOut = subscriber.receive(1000);
+        Message msgOut = subscriber.receive(2000);
         Assert.assertNotNull(msgOut);
         if (!msg2.equals(msgOut) && !msg3.equals(msgOut))
         {
@@ -86,7 +86,7 @@ public class DurableTopicTest extends AbstractJMSTest {
         conn.start();
         session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
         subscriber = session.createDurableSubscriber(topic, durableTopicName);
-        Message msgOut = subscriber.receive(1000);
+        Message msgOut = subscriber.receive(2000);
         Assert.assertNull(msgOut);
         subscriber.close();
         session.unsubscribe(durableTopicName);
@@ -96,7 +96,7 @@ public class DurableTopicTest extends AbstractJMSTest {
         conn.start();
         session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
         subscriber = session.createDurableSubscriber(topic, durableTopicName);
-        msgOut = subscriber.receive(1000);
+        msgOut = subscriber.receive(2000);
         Assert.assertEquals(msg1, msgOut);
         subscriber.close();
         session.unsubscribe(durableTopicName);
@@ -138,7 +138,7 @@ public class DurableTopicTest extends AbstractJMSTest {
         NevadoTopic topic = createTempTopic(session);
         TopicSubscriber subscriber = session.createDurableSubscriber(topic, durableTopicName);
         session.createProducer(topic).send(session.createMessage());
-        Message message = subscriber.receive(1000); // Don't acknowledge
+        Message message = subscriber.receive(2000); // Don't acknowledge
         boolean throwsException = false;
         try {
             session.unsubscribe(durableTopicName);
