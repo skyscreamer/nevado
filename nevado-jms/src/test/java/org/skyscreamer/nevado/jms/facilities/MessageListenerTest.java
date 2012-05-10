@@ -79,11 +79,14 @@ public class MessageListenerTest extends AbstractJMSTest {
         TextMessage msg2 = session.createTextMessage(RandomData.readString());
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(msg1);
-        Thread.sleep(200);
         producer.send(msg2);
         Message msgOut = messageListener.getMessage(1000);
-        Assert.assertEquals("Messages arrived out of order", msg1, messageListener.getFirstMessage());
-        Assert.assertEquals(msg1, msgOut);
+        if (msg1.equals(messageListener.getFirstMessage()))
+            Assert.assertEquals(msg1, msgOut);
+        else if (msg2.equals(messageListener.getFirstMessage()))
+            Assert.assertEquals(msg2, msgOut);
+        else
+            Assert.fail("Message did not match either sent: " + msgOut);
     }
 
     @Test
@@ -99,11 +102,14 @@ public class MessageListenerTest extends AbstractJMSTest {
         TextMessage msg2 = session.createTextMessage(RandomData.readString());
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(msg1);
-        Thread.sleep(200);
         producer.send(msg2);
         Message msgOut = messageListener.getMessage(1000);
-        Assert.assertEquals("Messages arrived out of order", msg1, messageListener.getFirstMessage());
-        Assert.assertEquals(msg1, msgOut);
+        if (msg1.equals(messageListener.getFirstMessage()))
+            Assert.assertEquals(msg1, msgOut);
+        else if (msg2.equals(messageListener.getFirstMessage()))
+            Assert.assertEquals(msg2, msgOut);
+        else
+            Assert.fail("Message did not match either sent: " + msgOut);
     }
 
     @Test
@@ -119,11 +125,14 @@ public class MessageListenerTest extends AbstractJMSTest {
         TextMessage msg2 = session.createTextMessage(RandomData.readString());
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(msg1);
-        Thread.sleep(200);
         producer.send(msg2);
         Message msgOut = messageListener.getMessage(1000);
-        Assert.assertEquals("Messages arrived out of order", msg1, messageListener.getFirstMessage());
-        Assert.assertEquals(msg2, msgOut);
+        if (msg1.equals(messageListener.getFirstMessage()))
+            Assert.assertEquals(msg2, msgOut);
+        else if (msg2.equals(messageListener.getFirstMessage()))
+            Assert.assertEquals(msg1, msgOut);
+        else
+            Assert.fail("Message did not match either sent: " + msgOut);
     }
 
     @Test
@@ -140,11 +149,14 @@ public class MessageListenerTest extends AbstractJMSTest {
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(msg1);
         session.commit();
-        Thread.sleep(250);
         producer.send(msg2);
         session.commit();
         Message msgOut = messageListener.getMessage(1000);
-        Assert.assertEquals("Messages arrived out of order", msg1, messageListener.getFirstMessage());
-        Assert.assertEquals(msg2, msgOut);
+        if (msg1.equals(messageListener.getFirstMessage()))
+            Assert.assertEquals(msg2, msgOut);
+        else if (msg2.equals(messageListener.getFirstMessage()))
+            Assert.assertEquals(msg1, msgOut);
+        else
+            Assert.fail("Message did not match either sent: " + msgOut);
     }
 }

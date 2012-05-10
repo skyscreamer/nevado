@@ -25,6 +25,7 @@ import javax.jms.InvalidDestinationException;
 import javax.jms.JMSException;
 import javax.jms.JMSSecurityException;
 import javax.jms.ResourceAllocationException;
+import javax.net.ssl.SSLException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
@@ -492,7 +493,9 @@ public class SQSConnector implements NevadoConnector {
         JMSException jmsException;
         String exMessage = message + ": " + e.getMessage();
         _log.error(exMessage, e);
-        if (e.getCause() != null && UnknownHostException.class.equals(e.getCause().getClass()))
+        if (e.getCause() != null &&
+                (UnknownHostException.class.equals(e.getCause().getClass())
+                        || SSLException.class.equals((e.getCause().getClass()))))
         {
             jmsException = new ResourceAllocationException(exMessage);
         }
