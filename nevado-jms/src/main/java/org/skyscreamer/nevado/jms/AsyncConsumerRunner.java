@@ -7,9 +7,7 @@ import org.skyscreamer.nevado.jms.util.BackoffSleeper;
 import javax.jms.Connection;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
@@ -22,7 +20,7 @@ public class  AsyncConsumerRunner implements Runnable {
     private final Connection _connection;
     private final Set<NevadoMessageConsumer> _asyncConsumers = new CopyOnWriteArraySet<NevadoMessageConsumer>();
     private volatile boolean _running = false;
-    private final BackoffSleeper _sleeper = new BackoffSleeper(50, 15000, 2.0);
+    private final BackoffSleeper _sleeper = new BackoffSleeper(50, 5000, 1.5);
     private Thread runner;
 
     protected AsyncConsumerRunner(Connection connection) {

@@ -2,12 +2,15 @@ package org.skyscreamer.nevado.jms;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.skyscreamer.nevado.jms.destination.*;
+import org.skyscreamer.nevado.jms.destination.NevadoDestination;
+import org.skyscreamer.nevado.jms.destination.NevadoQueue;
+import org.skyscreamer.nevado.jms.destination.NevadoTemporaryQueue;
+import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
-import org.skyscreamer.nevado.jms.message.NevadoProperty;
 
 import javax.jms.*;
 import javax.jms.IllegalStateException;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, TopicSubscriber {
     private final Log _log = LogFactory.getLog(getClass());
@@ -18,6 +21,7 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
     private final String _selector;
     private final boolean _noLocal;
     private volatile MessageListener _messageListener;
+    private final AtomicReference<NevadoMessage> _messageParking = new AtomicReference<NevadoMessage>();
 
     public NevadoMessageConsumer(NevadoSession session, NevadoDestination destination, String selector, boolean noLocal)
             throws JMSException
@@ -89,6 +93,11 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
             {
                 _session.getConnection().unsubscribe((NevadoTopic)_destination);
             }
+            NevadoMessage parkedMessage;
+            if ((parkedMessage = _messageParking.getAndSet(null)) != null)
+            {
+                _session.resetMessage(parkedMessage);
+            }
             _messageListener = null;
             _closed = true;
         }
@@ -98,7 +107,13 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
     {
         checkClosed();
         boolean messageProcessed = false;
-        NevadoMessage message = _session.receiveMessage(_destination, 0, _noLocal);
+
+        // First check for a parked message
+        NevadoMessage message;
+        if ((message = _messageParking.getAndSet(null)) == null)
+        {
+            message = _session.receiveMessage(_destination, 0, _noLocal);
+        }
         if (message != null) {
             try {
                 getMessageListener().onMessage(message);
@@ -109,11 +124,10 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
                 if (_session.getAcknowledgeMode() == Session.AUTO_ACKNOWLEDGE
                         || _session.getAcknowledgeMode() == Session.DUPS_OK_ACKNOWLEDGE)
                 {
-                    _session.resetMessage(message);
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException e) {
-                        _log.warn(e);
+                    NevadoMessage parkedMessage;
+                    if ((parkedMessage = _messageParking.getAndSet(message)) != null) {
+                        _log.error("Stepped on an unexpected parked message.  Resetting it: " + parkedMessage);
+                        _session.resetMessage(parkedMessage);
                     }
                 }
             }

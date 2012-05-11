@@ -80,7 +80,7 @@ public class MessageListenerTest extends AbstractJMSTest {
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(msg1);
         producer.send(msg2);
-        Message msgOut = messageListener.getMessage(1000);
+        Message msgOut = messageListener.getMessage(5000);
         if (msg1.equals(messageListener.getFirstMessage()))
             Assert.assertEquals(msg1, msgOut);
         else if (msg2.equals(messageListener.getFirstMessage()))
@@ -103,7 +103,7 @@ public class MessageListenerTest extends AbstractJMSTest {
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(msg1);
         producer.send(msg2);
-        Message msgOut = messageListener.getMessage(1000);
+        Message msgOut = messageListener.getMessage(5000);
         if (msg1.equals(messageListener.getFirstMessage()))
             Assert.assertEquals(msg1, msgOut);
         else if (msg2.equals(messageListener.getFirstMessage()))
@@ -126,7 +126,7 @@ public class MessageListenerTest extends AbstractJMSTest {
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(msg1);
         producer.send(msg2);
-        Message msgOut = messageListener.getMessage(1000);
+        Message msgOut = messageListener.getMessage(5000);
         if (msg1.equals(messageListener.getFirstMessage()))
             Assert.assertEquals(msg2, msgOut);
         else if (msg2.equals(messageListener.getFirstMessage()))
@@ -151,7 +151,7 @@ public class MessageListenerTest extends AbstractJMSTest {
         session.commit();
         producer.send(msg2);
         session.commit();
-        Message msgOut = messageListener.getMessage(1000);
+        Message msgOut = messageListener.getMessage(5000);
         if (msg1.equals(messageListener.getFirstMessage()))
             Assert.assertEquals(msg2, msgOut);
         else if (msg2.equals(messageListener.getFirstMessage()))
