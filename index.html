@@ -1,84 +1,73 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+<head>
+    <title>Nevado - Spring meets Amazon's cloud services - Introduction</title>
+    <meta name="description" content="Starting with JMS, provides simple integration of Spring applications with AWS." />
+    <meta name="keywords" content="nevado,nevado cloud,jms aws,jms sqs,jms sqs,spring sqs,spring ec2,spring aws" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="css/style.css" rel="stylesheet"/>
+    <script type="text/javascript">
 
-  <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Nevado : Spring Framework connectors for Amazon's cloud services" />
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', '']);
+        _gaq.push(['_setDomainName', 'skyscreamer.org']);
+        _gaq.push(['_trackPageview']);
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
 
-    <title>Nevado</title>
-  </head>
+    </script>
+</head>
+<body>
+<header>
+    <h1>Nevado</h1>
+</header>
+<nav>
+    <ul>
+        <li><a class="intro" href="./">Introduction</a></li>
+        <li><a class="performance" href="performance.html">Performance</a></li>
+        <li><a class="quickstart" href="quickstart.html">Quickstart</a></li>
+        <li><a class="download" href="https://github.com/skyscreamer/nevado/downloads">Download</a></li>
+        <li><a class="contrib" href="https://github.com/skyscreamer/nevado">Contribute</a></li>
+        <li><a class="wiki" href="https://github.com/skyscreamer/nevado/wiki">Wiki</a></li>
+    </ul>
+</nav>
+<section>
+    <a name="intro"></a>
+    <h2>Introduction</h2>
 
-  <body>
+    <p>Spring Framework connectors for Amazon's cloud services.</p>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/skyscreamer/nevado">View on GitHub</a>
+    <ul>
+        <li>Leverage cloud services in Amazon using standard Spring/J2EE metaphors</li>
+        <li>Avoid tight coupling to cloud-specific API's inside your code</li>
+        <li>Rapidly prototype enterprise clients in the cloud.  Then deploy them anywhere.</li>
+    </ul>
 
-          <h1 id="project_title">Nevado</h1>
-          <h2 id="project_tagline">Spring Framework connectors for Amazon's cloud services</h2>
+    <p><br/>The current version of Nevado is 0.9.0.</p>
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/skyscreamer/nevado/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/skyscreamer/nevado/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
+    <h2>Nevado JMS</h2>
+    <p>Our first connector supports 83% of the
+        <a href="http://docs.oracle.com/javaee/6/api/javax/jms/package-summary.html">JMS 1.1 specification</a> using
+        Amazon's <a href="http://aws.amazon.com/sqs/">SQS</a> and <a href="http://aws.amazon.com/sns/">SNS</a> services:</p>
+    <ul>
+        <li>Integrates cleanly with Spring's <a href="http://blog.springsource.org/2006/08/11/message-driven-pojos/">message-driven pojos</a></li>
+        <li>Written with a test-driven approach (over 300+ integration and unit tests) to ensure close adherence to JMS 1.1 specification</li>
+        <li>Easily monitor your queues and topics through the Amazon console</li>
+    </ul>
+</section>
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h3>Welcome to GitHub Pages.</h3>
-
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
-
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
-
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
-
-<h3>Designer Templates</h3>
-
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
-
-<h3>Rather Drive Stick?</h3>
-
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
-
-<h3>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-      </section>
-    </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Nevado maintained by <a href="https://github.com/skyscreamer">skyscreamer</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
-              <script type="text/javascript">
-            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-          </script>
-          <script type="text/javascript">
-            try {
-              var pageTracker = _gat._getTracker("UA-31652918-1");
-            pageTracker._trackPageview();
-            } catch(err) {}
-          </script>
-
-
-  </body>
+<section>
+    <a name="contact"></a>
+    <h2>Contact</h2>
+    <p>
+        This is open source so if you want to help out whether by submitting code, design, suggestions, feedback,
+        or feature requests, we appreciate whatever you can contribute.  Contact us at
+        <a href="mailto:nevado-dev@skyscreamer.org">nevado-dev@skyscreamer.org</a> with questions or ideas.
+    </p>
+</section>
+</body>
 </html>
