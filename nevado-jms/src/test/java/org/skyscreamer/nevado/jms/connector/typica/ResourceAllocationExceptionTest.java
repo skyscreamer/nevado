@@ -1,7 +1,8 @@
-package org.skyscreamer.nevado.jms.connector;
+package org.skyscreamer.nevado.jms.connector.typica;
 
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
+import org.skyscreamer.nevado.jms.connector.typica.TypicaSQSConnector;
 
 import javax.jms.JMSException;
 import javax.jms.ResourceAllocationException;
@@ -14,7 +15,7 @@ import javax.jms.ResourceAllocationException;
 public class ResourceAllocationExceptionTest extends AbstractJMSTest {
     @Test(expected = ResourceAllocationException.class)
     public void testResourceAllocationException() throws JMSException {
-        ((SQSConnector)getConnection().getSQSConnector())._queueService.setServer("an.invalid.server");
+        ((TypicaSQSConnector)getConnection().getSQSConnector())._queueService.setServer("an.invalid.server");
         getConnection().getSQSConnector().test();
     }
 }

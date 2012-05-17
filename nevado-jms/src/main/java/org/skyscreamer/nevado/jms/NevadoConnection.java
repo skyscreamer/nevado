@@ -3,13 +3,12 @@ package org.skyscreamer.nevado.jms;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.skyscreamer.nevado.jms.connector.NevadoConnector;
 import org.skyscreamer.nevado.jms.connector.SQSConnector;
+import org.skyscreamer.nevado.jms.connector.typica.TypicaSQSConnector;
 import org.skyscreamer.nevado.jms.destination.*;
 
 import javax.jms.*;
 import javax.jms.IllegalStateException;
-import javax.jms.Queue;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -27,7 +26,7 @@ public class NevadoConnection implements Connection {
     private final AtomicBoolean _running = new AtomicBoolean(false);
 
     protected volatile boolean _inUse = false;
-    private final NevadoConnector _nevadoConnector;
+    private final SQSConnector _sqsConnector;
     private volatile String _clientID;
     private volatile String _connectionID = UUID.randomUUID().toString();
     private volatile Integer _jmsDeliveryMode;
@@ -38,8 +37,8 @@ public class NevadoConnection implements Connection {
     private final Set<NevadoDestination> _temporaryDestinations = new CopyOnWriteArraySet<NevadoDestination>();
 
     public NevadoConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
-        _nevadoConnector = new SQSConnector(awsAccessKey, awsSecretKey, true);
-        _nevadoConnector.test();
+        _sqsConnector = new TypicaSQSConnector(awsAccessKey, awsSecretKey, true);
+        _sqsConnector.test();
     }
 
     @Override
@@ -196,7 +195,7 @@ public class NevadoConnection implements Connection {
     }
 
     protected void deleteQueue(NevadoQueue queue) throws JMSException {
-        _nevadoConnector.deleteQueue(queue);
+        _sqsConnector.deleteQueue(queue);
         queue.setDeleted(true);
     }
 
@@ -234,8 +233,8 @@ public class NevadoConnection implements Connection {
     }
 
     // Getters & Setters
-    public NevadoConnector getSQSConnector() {
-        return _nevadoConnector;
+    public SQSConnector getSQSConnector() {
+        return _sqsConnector;
     }
 
     @Override
