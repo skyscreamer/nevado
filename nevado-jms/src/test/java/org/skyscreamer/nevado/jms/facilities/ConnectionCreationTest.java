@@ -1,7 +1,9 @@
 package org.skyscreamer.nevado.jms.facilities;
 
+import junit.framework.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
+import org.skyscreamer.nevado.jms.connector.typica.TypicaSQSConnector;
 
 import javax.jms.JMSException;
 import javax.jms.JMSSecurityException;
@@ -12,8 +14,17 @@ import javax.jms.JMSSecurityException;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class ConnectionCreationTest extends AbstractJMSTest {
-    @Test(expected = JMSSecurityException.class)
+    @Test
     public void testBadConnection() throws JMSException {
-        getConnectionFactory().createConnection("BADACCESSKEY", "BADSECRETKEY");
+        if (getConnection().getSQSConnector() instanceof TypicaSQSConnector)
+        {
+            boolean exceptionThrown = false;
+            try {
+                getConnectionFactory().createConnection("BADACCESSKEY", "BADSECRETKEY");
+            } catch (JMSSecurityException e) {
+                exceptionThrown = true;
+            }
+            Assert.assertTrue("Expected exception to be thrown", exceptionThrown);
+        }
     }
 }

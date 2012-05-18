@@ -41,26 +41,9 @@ public class TypicaSQSConnector extends AbstractSQSConnector {
     protected final NotificationService _notficationService;
     private static final String AWS_ERROR_CODE_AUTHENTICATION = "InvalidClientTokenId";
 
-    public TypicaSQSConnector(String awsAccessKey, String awsSecretKey) {
-        super(200);
-        _queueService = new QueueService(awsAccessKey, awsSecretKey);
-        _notficationService = new NotificationService(awsAccessKey, awsSecretKey);
-    }
-
-    public TypicaSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure) {
-        super(200);
-        _queueService = new QueueService(awsAccessKey, awsSecretKey, isSecure);
-        _notficationService = new NotificationService(awsAccessKey, awsSecretKey, isSecure);
-    }
-
     public TypicaSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs) {
         super(receiveCheckIntervalMs);
-        if (receiveCheckIntervalMs < 200)
-        {
-            _log.warn("Reducing the receiveCheckInterval will increase your AWS costs.  " +
-                    "Amazon charges each time a check is made: http://aws.amazon.com/sqs/pricing/");
-        }
-        _queueService = new QueueService(awsAccessKey, awsAccessKey, isSecure);
+        _queueService = new QueueService(awsAccessKey, awsSecretKey, isSecure);
         _notficationService = new NotificationService(awsAccessKey, awsSecretKey, isSecure);
     }
 

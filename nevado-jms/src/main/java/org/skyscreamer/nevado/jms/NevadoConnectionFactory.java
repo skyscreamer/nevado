@@ -2,11 +2,14 @@ package org.skyscreamer.nevado.jms;
 
 import org.apache.commons.lang.StringUtils;
 import org.skyscreamer.nevado.jms.connector.SQSConnector;
+import org.skyscreamer.nevado.jms.connector.SQSConnectorFactory;
 import org.skyscreamer.nevado.jms.connector.mock.MockSQSConnector;
 import org.skyscreamer.nevado.jms.connector.typica.TypicaSQSConnector;
 import org.skyscreamer.nevado.jms.resource.NevadoReferencableFactory;
+import org.springframework.beans.factory.annotation.Required;
 
 import javax.jms.*;
+import javax.jms.IllegalStateException;
 import javax.naming.NamingException;
 import javax.naming.Reference;
 import javax.naming.Referenceable;
@@ -29,6 +32,7 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     public static final String JNDI_JMS_TTL = "jmsTTL";
     public static final String JNDI_JMS_PRIORITY = "jmsPriority";
 
+    private SQSConnectorFactory _sqsConnectorFactory;
     private volatile String _awsAccessKey;
     private volatile String _awsSecretKey;
     private volatile String _clientID;
@@ -36,44 +40,51 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     private volatile Long _jmsTTL;
     private volatile Integer _jmsPriority;
 
+    public NevadoConnectionFactory() {}
+
+    public NevadoConnectionFactory(SQSConnectorFactory sqsConnectorFactory) {
+        _sqsConnectorFactory = sqsConnectorFactory;
+    }
+
     public NevadoQueueConnection createQueueConnection() throws JMSException {
-        NevadoQueueConnection connection = new NevadoQueueConnection(getSQSConnector(_awsAccessKey, _awsSecretKey));
+        checkSQSConnectorFactory();
+        NevadoQueueConnection connection = new NevadoQueueConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey));
         initializeConnection(connection);
         return connection;
     }
 
-    static MockSQSConnector mockSQSConnector = new MockSQSConnector();
-    private SQSConnector getSQSConnector(String awsAccessKey, String awsSecretKey) {
-//        return mockSQSConnector;
-        return new TypicaSQSConnector(awsAccessKey, awsSecretKey, true);
-    }
-
     public NevadoQueueConnection createQueueConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
-        NevadoQueueConnection connection = new NevadoQueueConnection(getSQSConnector(awsAccessKey, awsSecretKey));
+        checkSQSConnectorFactory();
+        NevadoQueueConnection connection
+                = new NevadoQueueConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey));
         initializeConnection(connection);
         return connection;
     }
 
     public NevadoConnection createConnection() throws JMSException {
-        NevadoConnection connection = new NevadoConnection(getSQSConnector(_awsAccessKey, _awsSecretKey));
+        checkSQSConnectorFactory();
+        NevadoConnection connection = new NevadoConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey));
         initializeConnection(connection);
         return connection;
     }
 
     public NevadoConnection createConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
-        NevadoConnection connection = new NevadoConnection(getSQSConnector(awsAccessKey, awsSecretKey));
+        checkSQSConnectorFactory();
+        NevadoConnection connection = new NevadoConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey));
         initializeConnection(connection);
         return connection;
     }
 
     public NevadoTopicConnection createTopicConnection() throws JMSException {
-        NevadoTopicConnection connection = new NevadoTopicConnection(getSQSConnector(_awsAccessKey, _awsSecretKey));
+        checkSQSConnectorFactory();
+        NevadoTopicConnection connection = new NevadoTopicConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey));
         initializeConnection(connection);
         return connection;
     }
 
     public TopicConnection createTopicConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
-        NevadoTopicConnection connection = new NevadoTopicConnection(getSQSConnector(awsAccessKey, awsSecretKey));
+        checkSQSConnectorFactory();
+        NevadoTopicConnection connection = new NevadoTopicConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey));
         initializeConnection(connection);
         return connection;
     }
@@ -89,6 +100,11 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     }
 
     // Getters & Setters
+    @Required
+    public void setSqsConnectorFactory(SQSConnectorFactory sqsConnectorFactory) {
+        _sqsConnectorFactory = sqsConnectorFactory;
+    }
+
     public void setAwsAccessKey(String awsAccessKey) {
         _awsAccessKey = awsAccessKey;
     }
@@ -97,8 +113,8 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
         _awsSecretKey = awsSecretKey;
     }
 
-    public void setClientID(String _clientID) {
-        this._clientID = _clientID;
+    public void setClientID(String clientID) {
+        _clientID = clientID;
     }
 
     public void setOverrideJMSDeliveryMode(Integer jmsDeliveryMode) {
@@ -159,6 +175,13 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
             reference.add(new StringRefAddr(JNDI_JMS_PRIORITY, _jmsPriority.toString()));
         }
         return reference;
+    }
+
+    private void checkSQSConnectorFactory() throws IllegalStateException {
+        if (_sqsConnectorFactory == null)
+        {
+            throw new IllegalStateException("SQSConnectorFactory is null, it must be set.");
+        }
     }
 }
 

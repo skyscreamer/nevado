@@ -1,4 +1,12 @@
-# Set your access key and secret key here for testing, BUT DON'T COMMIT OR PUSH TO GIT!
-# Go here to learn how to ignore files in git: http://help.github.com/ignore-files/
+# You can use this as a template for your AWS access keys.  Copy this file to "aws.properties" and set your access
+# and secret key below.  BE CAREFUL NOT TO PUT THIS FILE IN A SHARED LOCATION (like source control).
+#
+# Here are the recommended steps:
+#     1. Copy nevado-jms/src/test/resources/aws.properties.TEMPLATE to nevado-jms/src/test/resources/aws.properties
+#     2. Update the two properties with your access keys from https://aws-portal.amazon.com/gp/aws/securityCredentials
+#     3. If using git, tell it to ignore this file!  Add "aws.properties" to .git/info/exclude.
+#
+# *** Keep your keys in a safe place and don't commit them to source control. ***
+# Go here to learn more about how to ignore files in git: http://help.github.com/ignore-files/
 aws.accessKey=
 aws.secretKey=

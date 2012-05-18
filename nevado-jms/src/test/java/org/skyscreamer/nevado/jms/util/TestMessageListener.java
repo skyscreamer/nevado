@@ -19,6 +19,10 @@ public class TestMessageListener implements MessageListener {
     private final BlockingQueue<Message> _messages = new LinkedBlockingQueue<Message>();
     private final boolean _acknowledge;
 
+    public TestMessageListener() {
+        this(false);
+    }
+
     /**
      * Constructor for listener.
      *

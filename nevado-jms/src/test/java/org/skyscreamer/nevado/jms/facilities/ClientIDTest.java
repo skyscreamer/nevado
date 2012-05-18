@@ -33,7 +33,7 @@ public class ClientIDTest extends AbstractJMSTest {
 
     @Test
     public void testClientID3() throws JMSException {
-        NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory();
+        NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
         connectionFactory.setClientID(TEST_CLIENT_ID);
         Connection conn = createConnection(connectionFactory);
         Assert.assertEquals(TEST_CLIENT_ID, conn.getClientID());

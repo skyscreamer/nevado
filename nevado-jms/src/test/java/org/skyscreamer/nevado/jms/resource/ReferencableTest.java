@@ -36,7 +36,7 @@ public class ReferencableTest extends AbstractJMSTest {
 
     @Test
     public void testConnectionFactory() throws NamingException, MalformedURLException {
-        NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory();
+        NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
         connectionFactory.setAwsAccessKey(TEST_ACCESS_KEY);
         connectionFactory.setAwsSecretKey(TEST_SECRET_KEY);
         connectionFactory.setClientID(TEST_CLIENT_ID);

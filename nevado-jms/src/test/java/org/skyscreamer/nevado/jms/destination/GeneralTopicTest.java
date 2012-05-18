@@ -36,7 +36,7 @@ public class GeneralTopicTest extends AbstractJMSTest {
     @Test
     public void testTopicFacilities() throws JMSException
     {
-        TopicConnectionFactory connectionFactory = new NevadoConnectionFactory();
+        TopicConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
         TopicConnection connection = createTopicConnection(connectionFactory);
         connection.start();
         TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
