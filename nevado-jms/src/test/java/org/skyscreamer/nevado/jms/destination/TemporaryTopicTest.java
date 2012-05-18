@@ -23,7 +23,7 @@ public class TemporaryTopicTest extends AbstractJMSTest {
         MessageProducer producer = session.createProducer(temporaryTopic);
         MessageConsumer consumer = session.createConsumer(temporaryTopic);
         producer.send(testMessage);
-        Message msgOut = consumer.receive();
+        Message msgOut = consumer.receive(5000);
         Assert.assertTrue(msgOut instanceof TextMessage);
         Assert.assertEquals("Message body not equal", testMessage.getText(), ((TextMessage) msgOut).getText());
     }

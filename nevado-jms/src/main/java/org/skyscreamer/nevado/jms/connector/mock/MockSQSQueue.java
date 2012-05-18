@@ -24,7 +24,7 @@ public class MockSQSQueue implements SQSQueue {
     private final String _queueARN = RandomData.readString();
     private final NevadoQueue _queue;
     private final MockSQSConnector _connector;
-    private boolean _isDeleted = true;
+    private boolean _isDeleted = false;
 
     public MockSQSQueue(MockSQSConnector connector, NevadoQueue queue) {
         _queue = queue;

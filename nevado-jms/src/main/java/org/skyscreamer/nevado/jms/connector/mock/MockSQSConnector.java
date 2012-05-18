@@ -22,6 +22,10 @@ public class MockSQSConnector extends AbstractSQSConnector {
     private final Map<NevadoQueue, MockSQSQueue> _mockQueueMap = new HashMap<NevadoQueue, MockSQSQueue>();
     private final Map<NevadoTopic, Collection<MockSQSQueue>> _mockTopicMap = new HashMap<NevadoTopic, Collection<MockSQSQueue>>();
 
+    public MockSQSConnector() {
+        this(200);
+    }
+
     public MockSQSConnector(long receiveCheckIntervalMs) {
         super(receiveCheckIntervalMs);
     }

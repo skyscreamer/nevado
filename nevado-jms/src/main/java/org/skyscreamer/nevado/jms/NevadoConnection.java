@@ -4,6 +4,7 @@ package org.skyscreamer.nevado.jms;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.skyscreamer.nevado.jms.connector.SQSConnector;
+import org.skyscreamer.nevado.jms.connector.mock.MockSQSConnector;
 import org.skyscreamer.nevado.jms.connector.typica.TypicaSQSConnector;
 import org.skyscreamer.nevado.jms.destination.*;
 
@@ -37,7 +38,8 @@ public class NevadoConnection implements Connection {
     private final Set<NevadoDestination> _temporaryDestinations = new CopyOnWriteArraySet<NevadoDestination>();
 
     public NevadoConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
-        _sqsConnector = new TypicaSQSConnector(awsAccessKey, awsSecretKey, true);
+//        _sqsConnector = new TypicaSQSConnector(awsAccessKey, awsSecretKey, true);
+        _sqsConnector = new MockSQSConnector();
         _sqsConnector.test();
     }
 
