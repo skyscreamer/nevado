@@ -125,7 +125,7 @@ public class TypicaSQSConnector extends AbstractSQSConnector {
     public String subscribe(NevadoTopic topic, NevadoQueue topicEndpoint) throws JMSException {
         String subscriptionArn;
         try {
-            SQSQueue queue = getSQSQueue(topicEndpoint);
+            SQSQueue queue = getSQSQueue((NevadoDestination) topicEndpoint);
             String sqsArn = queue.getQueueARN();
             String snsArn = getTopicARN(topic);
             queue.setPolicy(getPolicy(snsArn, sqsArn));
@@ -152,57 +152,6 @@ public class TypicaSQSConnector extends AbstractSQSConnector {
         }
     }
 
-    @Override
-    public void unsubscribeDurableQueueFromTopic(NevadoQueue queue) {
-        // TODO
-    }
-
-    protected NevadoMessage convertSqsMessage(NevadoDestination destination, SQSMessage sqsMessage, boolean readOnly)
-            throws JMSException
-    {
-        // Get the message
-        NevadoMessage message;
-        String messageBody;
-        if (destination instanceof NevadoQueue)
-        {
-            messageBody = sqsMessage.getMessageBody();
-        }
-        else
-        {
-            try {
-                messageBody = new JSONObject(sqsMessage.getMessageBody()).getString("Message");
-            } catch (JSONException e) {
-                throw new JMSException("Unable to parse JSON from message body: " + sqsMessage.getMessageBody());
-            }
-        }
-        try {
-            message = deserializeMessage(messageBody);
-        } catch (JMSException e) {
-            message = new InvalidMessage(e);
-        }
-
-        // Set the JMS Message ID
-        if (message.nevadoPropertyExists(NevadoProperty.DisableMessageID)
-            && (Boolean)message.getNevadoProperty(NevadoProperty.DisableMessageID))
-        {
-            message.setJMSMessageID(null);
-        }
-        else if (message.getJMSMessageID() == null)
-        {
-            message.setJMSMessageID("ID:" + sqsMessage.getMessageId());
-
-        }
-
-        // Set the receipt handle and the destination
-        message.setNevadoProperty(NevadoProperty.SQSReceiptHandle, sqsMessage.getReceiptHandle());
-        message.setJMSDestination(destination);
-
-        // Set if this is readonly (browsing)
-        message.setReadOnly(readOnly);
-
-        return message;
-    }
-
     protected void sendSNSMessage(NevadoTopic topic, String serializedMessage) throws JMSException {
         String arn = getTopicARN(topic);
         try {
@@ -212,20 +161,7 @@ public class TypicaSQSConnector extends AbstractSQSConnector {
         }
     }
 
-    protected TypicaSQSQueue getSQSQueue(NevadoDestination destination) throws JMSException
-    {
-        if (destination == null)
-        {
-            throw new JMSException("Destination is null");
-        }
-
-        if (destination.isDeleted())
-        {
-            throw new InvalidDestinationException("Destination " + destination + " has been deleted");
-        }
-
-        NevadoQueue queue = (destination instanceof NevadoQueue) ? (NevadoQueue)destination
-                : ((NevadoTopic)destination).getTopicEndpoint();
+    protected TypicaSQSQueue getSQSQueueImpl(NevadoQueue queue) throws JMSException {
         MessageQueue sqsQueue;
         try {
             if (queue.getQueueUrl() == null)
@@ -238,7 +174,7 @@ public class TypicaSQSConnector extends AbstractSQSConnector {
                 sqsQueue = _queueService.getOrCreateMessageQueue(queue.getQueueUrl());
             }
         } catch (SQSException e) {
-            throw handleAWSException("Unable to get message queue '" + destination, e);
+            throw handleAWSException("Unable to get message queue '" + queue, e);
         }
 
         // We always base64-encode the message already

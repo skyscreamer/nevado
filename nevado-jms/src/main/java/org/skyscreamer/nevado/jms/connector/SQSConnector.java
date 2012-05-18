@@ -27,8 +27,8 @@ public interface SQSConnector {
     void test() throws JMSException;
 
     NevadoQueue createQueue(String queueName) throws JMSException;
-    void deleteQueue(NevadoQueue queue) throws JMSException;
     Collection<NevadoQueue> listQueues(String temporaryQueuePrefix) throws JMSException;
+    void deleteQueue(NevadoQueue queue) throws JMSException;
 
     NevadoTopic createTopic(String tempTopicName) throws JMSException;
     void deleteTopic(NevadoTopic topic) throws JMSException;
@@ -36,5 +36,4 @@ public interface SQSConnector {
 
     String subscribe(NevadoTopic topic, NevadoQueue topicEndpoint) throws JMSException;
     void unsubscribe(NevadoTopic topic) throws JMSException;
-    void unsubscribeDurableQueueFromTopic(NevadoQueue queue);
 }

@@ -24,6 +24,15 @@ class TypicaSQSQueue implements SQSQueue {
     }
 
     @Override
+    public void deleteQueue() throws JMSException {
+        try {
+            _sqsQueue.deleteQueue();
+        } catch (SQSException e) {
+            throw _typicaSQSConnector.handleAWSException("Unable to delete message queue '" + _sqsQueue.getUrl(), e);
+        }
+    }
+
+    @Override
     public String sendMessage(String serializedMessage) throws JMSException {
         try {
             return _sqsQueue.sendMessage(serializedMessage);
@@ -59,15 +68,6 @@ class TypicaSQSQueue implements SQSQueue {
             _sqsQueue.setQueueAttribute("Policy", policy);
         } catch (SQSException e) {
             throw _typicaSQSConnector.handleAWSException("Unable to set policy", e);
-        }
-    }
-
-    @Override
-    public void deleteQueue() throws JMSException {
-        try {
-            _sqsQueue.deleteQueue();
-        } catch (SQSException e) {
-            throw _typicaSQSConnector.handleAWSException("Unable to delete message queue '" + _sqsQueue.getUrl(), e);
         }
     }
 

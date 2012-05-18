@@ -16,9 +16,9 @@ public interface SQSQueue {
 
     void setPolicy(String policy) throws JMSException;
 
-    void deleteQueue() throws JMSException;
-
     void deleteMessage(String sqsReceiptHandle) throws JMSException;
 
     SQSMessage receiveMessage() throws JMSException;
+
+    void deleteQueue() throws JMSException;
 }

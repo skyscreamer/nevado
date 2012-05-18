@@ -339,7 +339,6 @@ public class NevadoSession implements Session {
         }
 
         NevadoQueue durableQueue = new NevadoQueue(queueName);
-        _connection.getSQSConnector().unsubscribeDurableQueueFromTopic(durableQueue);
         _connection.deleteQueue(durableQueue);
     }
 
