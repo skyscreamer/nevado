@@ -609,7 +609,7 @@ public class NevadoSession implements Session {
     private void testBreak() throws JMSException {
         if (_TESTING_ONLY_break)
         {
-            throw new JMSException("SESSION DELIBERATELY THROWING EXCEPTION - FOR TESTING MODE ONLY");
+            throw new JMSException("SESSION DELIBERATELY THROWING EXCEPTION - EXPECTED BEHAVIOR - FOR TESTING MODE ONLY");
         }
     }
 }
