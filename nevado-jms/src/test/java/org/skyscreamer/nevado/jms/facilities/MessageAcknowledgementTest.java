@@ -157,6 +157,7 @@ public class MessageAcknowledgementTest extends AbstractJMSTest {
         NevadoTextMessage msgAfterAck = (NevadoTextMessage)consumer.receive(500);
         // TODO - This isn't supported yet.  In this edge case, the message is reset on the queue, but there is no way
         //        to indicate a redelivery because you can't edit the message in the queue
+        //        CORRECTION: You should be able to use the delivery count from SQS!
         // Assert.assertTrue(msgAfterAck.getJMSRedelivered());
         // Assert.assertEquals(2, msgAfterAck.getIntProperty(JMSXProperty.JMSXDeliveryCount + ""));
         Assert.assertFalse(msgAfterAck.isAcknowledged());

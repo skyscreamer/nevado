@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.skyscreamer.nevado.jms.NevadoConnectionFactory;
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 
+import javax.naming.Referenceable;
 import java.io.Serializable;
 
 /**
@@ -16,8 +17,8 @@ public class AdministeredObjectsTest {
     @Test
     public void testsImplements() {
         Assert.assertTrue(Serializable.class.isAssignableFrom(NevadoDestination.class));
-//        Assert.assertTrue(Referenceable.class.isAssignableFrom(NevadoDestination.class)); TODO
+        Assert.assertTrue(Referenceable.class.isAssignableFrom(NevadoDestination.class));
         Assert.assertTrue(Serializable.class.isAssignableFrom(NevadoConnectionFactory.class));
-//        Assert.assertTrue(Referenceable.class.isAssignableFrom(NevadoConnectionFactory.class)); TODO
+        Assert.assertTrue(Referenceable.class.isAssignableFrom(NevadoConnectionFactory.class));
     }
 }

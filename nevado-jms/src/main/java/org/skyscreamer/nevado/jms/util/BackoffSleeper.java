@@ -4,7 +4,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * TODO - Description
+ * This "sleeper" sleeps and backs off over time until it is reset.  It is used when looking for messages, so active
+ * destinations can be checked more frequently for better response.  Less active destinations will be checked less
+ * frequently as the sleeper backs off, to save AWS costs and unnecessary network calls.
  *
  * @author Carter Page <carter@skyscreamer.org>
  */

@@ -192,6 +192,6 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
     }
 
     public boolean getNoLocal() throws JMSException {
-        return false;  // TODO
+        return _noLocal;
     }
 }

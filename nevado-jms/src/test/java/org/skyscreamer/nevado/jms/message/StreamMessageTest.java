@@ -337,7 +337,7 @@ public class StreamMessageTest extends AbstractJMSTest {
     @Test(expected = MessageFormatException.class)
     public void izFail() throws JMSException { initStream(RandomData.readInt()).readBytes(new byte[10]); }
 
-    // @Test(expected = MessageFormatException.class) - TODO - Weird fail!
+    @Test(expected = MessageFormatException.class)
     public void lzFail() throws JMSException { initStream(RandomData.readLong()).readBytes(new byte[10]); }
 
     @Test(expected = MessageFormatException.class)

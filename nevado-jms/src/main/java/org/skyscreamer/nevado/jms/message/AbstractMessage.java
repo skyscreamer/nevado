@@ -224,7 +224,7 @@ public abstract class AbstractMessage<T> implements Message, Serializable {
         checkReadOnlyProperties();
         checkValidPropertyName(name);
         internalSetObjectProperty(name, value);
-        // TODO - ActiveMQMessage uses the idea of property setter to enforce the data type for defined properties.  May be overkill.
+        // TODO - Food for thought: ActiveMQMessage uses the idea of property setter to enforce the data type for defined properties.  May be overkill.
     }
 
     protected void internalSetObjectProperty(String name, Object value) throws JMSException {

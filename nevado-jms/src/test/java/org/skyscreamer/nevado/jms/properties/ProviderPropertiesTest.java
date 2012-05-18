@@ -8,7 +8,7 @@ import javax.jms.Message;
 import javax.jms.Session;
 
 /**
- * TODO - Add description
+ * Tests that client interactions with provider properties.
  *
  * @author Carter Page <carter@skyscreamer.org>
  */

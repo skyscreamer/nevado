@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * TODO - Add description
+ * A mock ExceptionListener for testing purposes.
  *
  * @author Carter Page <carter@skyscreamer.org>
  */

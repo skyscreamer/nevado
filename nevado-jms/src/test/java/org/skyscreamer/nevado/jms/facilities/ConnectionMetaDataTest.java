@@ -8,7 +8,7 @@ import javax.jms.ConnectionMetaData;
 import javax.jms.JMSException;
 
 /**
- * TODO - Description
+ * Tests Nevado's implementation of ConnectionMetaData.
  *
  * @author Carter Page <carter@skyscreamer.org>
  */

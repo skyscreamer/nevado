@@ -10,7 +10,7 @@ import javax.jms.*;
 import java.util.Collection;
 
 /**
- * TODO - Description
+ * Tests Nevado's implementation of TemporaryQueue.
  *
  * @author Carter Page <carter@skyscreamer.org>
  */

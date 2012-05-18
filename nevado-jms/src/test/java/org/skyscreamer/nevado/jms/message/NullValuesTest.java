@@ -7,7 +7,7 @@ import org.junit.Assert;
 import javax.jms.*;
 
 /**
- * TODO - Add description
+ * Tests expected handling of null values in message headers and bodies.
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
