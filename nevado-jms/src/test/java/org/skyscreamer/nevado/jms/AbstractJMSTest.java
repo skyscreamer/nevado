@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.skyscreamer.nevado.jms.connector.SQSConnectorFactory;
 import org.skyscreamer.nevado.jms.connector.mock.MockSQSConnector;
+import org.skyscreamer.nevado.jms.connector.mock.MockSQSConnectorFactory;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoTemporaryQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoTemporaryTopic;
@@ -50,7 +51,7 @@ public abstract class AbstractJMSTest {
 
     @Before
     public void setUp() throws JMSException, IOException {
-        if (!(_sqsConnectorFactory instanceof MockSQSConnector)) {
+        if (!(_sqsConnectorFactory instanceof MockSQSConnectorFactory)) {
             initializeAWSCredentials();
         }
         _connection = createConnection(_connectionFactory);
