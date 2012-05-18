@@ -1,17 +1,11 @@
 package org.skyscreamer.nevado.jms.connector.mock;
 
-import org.skyscreamer.nevado.jms.NevadoConnection;
 import org.skyscreamer.nevado.jms.connector.AbstractSQSConnector;
-import org.skyscreamer.nevado.jms.connector.SQSMessage;
-import org.skyscreamer.nevado.jms.connector.SQSQueue;
-import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoTopic;
-import org.skyscreamer.nevado.jms.message.NevadoMessage;
 
 import javax.jms.JMSException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Mock SQSConnector to test functionality without having to connect to AWS.
@@ -33,6 +27,7 @@ public class MockSQSConnector extends AbstractSQSConnector {
     @Override
     protected void sendSNSMessage(NevadoTopic topic, String body) throws JMSException {
         checkTopicExists(topic);
+        body = "{Message:\"" + body + "\"}";
         MockSQSMessage message = new MockSQSMessage(body);
         for(MockSQSQueue queue : _mockTopicMap.get(topic))
         {
@@ -41,7 +36,7 @@ public class MockSQSConnector extends AbstractSQSConnector {
     }
 
     @Override
-    protected SQSQueue getSQSQueueImpl(NevadoQueue queue) throws JMSException {
+    protected MockSQSQueue getSQSQueueImpl(NevadoQueue queue) throws JMSException {
         MockSQSQueue mockQueue;
         synchronized (_mockQueueMap) {
             mockQueue = _mockQueueMap.get(queue);
@@ -92,22 +87,26 @@ public class MockSQSConnector extends AbstractSQSConnector {
 
     @Override
     public String subscribe(NevadoTopic topic, NevadoQueue topicEndpoint) throws JMSException {
-        checkTopicExists(topic);
-        MockSQSQueue endpointQueue = new MockSQSQueue(this, topicEndpoint);
+        if (!_mockTopicMap.containsKey(topic))
+        {
+            createTopic(topic.getTopicName());
+        }
+        MockSQSQueue endpointQueue = getSQSQueueImpl(topicEndpoint);
         _mockTopicMap.get(topic).add(endpointQueue);
         return endpointQueue.getQueueARN();
     }
 
     @Override
     public void unsubscribe(NevadoTopic topic) throws JMSException {
-        checkTopicExists(topic);
         Collection<MockSQSQueue> topicEndpoints = _mockTopicMap.get(topic);
-        for(MockSQSQueue endpointQueue : topicEndpoints)
-        {
-            if (endpointQueue.getQueue().equals(topic.getTopicEndpoint()))
+        if (topicEndpoints != null) {
+            for(MockSQSQueue endpointQueue : topicEndpoints)
             {
-                topicEndpoints.remove(endpointQueue);
-                break;
+                if (endpointQueue.getQueue().equals(topic.getTopicEndpoint()))
+                {
+                    topicEndpoints.remove(endpointQueue);
+                    break;
+                }
             }
         }
     }

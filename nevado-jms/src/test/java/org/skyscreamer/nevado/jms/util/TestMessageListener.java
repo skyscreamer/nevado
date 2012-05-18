@@ -17,14 +17,26 @@ import java.util.concurrent.*;
 public class TestMessageListener implements MessageListener {
     private final Log _log = LogFactory.getLog(getClass());
     private final BlockingQueue<Message> _messages = new LinkedBlockingQueue<Message>();
+    private final boolean _acknowledge;
+
+    /**
+     * Constructor for listener.
+     *
+     * @param acknowledge If true, this listener should acknowledge messages when received.  (Set to false for AUTO_ACKNOWLEDGE.)
+     */
+    public TestMessageListener(boolean acknowledge) {
+        _acknowledge = acknowledge;
+    }
 
     public void onMessage(Message message) {
         _messages.add(message);
-        try {
-            message.acknowledge();
-        } catch (JMSException e) {
-            _log.error("Unable to acknowledge message", e);
-            throw new RuntimeException(e);
+        if (_acknowledge) {
+            try {
+                message.acknowledge();
+            } catch (JMSException e) {
+                _log.error("Unable to acknowledge message", e);
+                throw new RuntimeException(e);
+            }
         }
     }
 

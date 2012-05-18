@@ -1,5 +1,7 @@
 package org.skyscreamer.nevado.jms;
 
+import org.skyscreamer.nevado.jms.connector.SQSConnector;
+
 import javax.jms.*;
 
 /**
@@ -8,8 +10,8 @@ import javax.jms.*;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class NevadoTopicConnection extends NevadoConnection implements TopicConnection {
-    public NevadoTopicConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
-        super(awsAccessKey, awsSecretKey);
+    public NevadoTopicConnection(SQSConnector sqsConnector) throws JMSException {
+        super(sqsConnector);
     }
 
     @Override

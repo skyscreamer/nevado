@@ -43,7 +43,7 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
         // Set up session for async messages
         NevadoConnection conn = createConnection(getConnectionFactory());
         NevadoSession asyncSession = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        TestMessageListener messageListener = new TestMessageListener();
+        TestMessageListener messageListener = new TestMessageListener(false);
         Queue tempQueue = createTempQueue(asyncSession);
         asyncSession.createConsumer(tempQueue).setMessageListener(messageListener);
         MessageProducer asyncProducer = asyncSession.createProducer(tempQueue);
@@ -117,7 +117,7 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
         producer.send(testMsg2);
 
         // Add listener
-        TestMessageListener messageListener = new TestMessageListener();
+        TestMessageListener messageListener = new TestMessageListener(false);
         session.createConsumer(tempQueue).setMessageListener(messageListener);
         TextMessage msgOut1 = (TextMessage)messageListener.getMessage(1000);
         TextMessage msgOut2 = (TextMessage)messageListener.getMessage(1000);

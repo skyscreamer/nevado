@@ -1,6 +1,9 @@
 package org.skyscreamer.nevado.jms;
 
 import org.apache.commons.lang.StringUtils;
+import org.skyscreamer.nevado.jms.connector.SQSConnector;
+import org.skyscreamer.nevado.jms.connector.mock.MockSQSConnector;
+import org.skyscreamer.nevado.jms.connector.typica.TypicaSQSConnector;
 import org.skyscreamer.nevado.jms.resource.NevadoReferencableFactory;
 
 import javax.jms.*;
@@ -34,37 +37,43 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     private volatile Integer _jmsPriority;
 
     public NevadoQueueConnection createQueueConnection() throws JMSException {
-        NevadoQueueConnection connection = new NevadoQueueConnection(_awsAccessKey, _awsSecretKey);
+        NevadoQueueConnection connection = new NevadoQueueConnection(getSQSConnector(_awsAccessKey, _awsSecretKey));
         initializeConnection(connection);
         return connection;
     }
 
+    static MockSQSConnector mockSQSConnector = new MockSQSConnector();
+    private SQSConnector getSQSConnector(String awsAccessKey, String awsSecretKey) {
+//        return mockSQSConnector;
+        return new TypicaSQSConnector(awsAccessKey, awsSecretKey, true);
+    }
+
     public NevadoQueueConnection createQueueConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
-        NevadoQueueConnection connection = new NevadoQueueConnection(awsAccessKey, awsSecretKey);
+        NevadoQueueConnection connection = new NevadoQueueConnection(getSQSConnector(awsAccessKey, awsSecretKey));
         initializeConnection(connection);
         return connection;
     }
 
     public NevadoConnection createConnection() throws JMSException {
-        NevadoConnection connection = new NevadoConnection(_awsAccessKey, _awsSecretKey);
+        NevadoConnection connection = new NevadoConnection(getSQSConnector(_awsAccessKey, _awsSecretKey));
         initializeConnection(connection);
         return connection;
     }
 
     public NevadoConnection createConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
-        NevadoConnection connection = new NevadoConnection(awsAccessKey, awsSecretKey);
+        NevadoConnection connection = new NevadoConnection(getSQSConnector(awsAccessKey, awsSecretKey));
         initializeConnection(connection);
         return connection;
     }
 
     public NevadoTopicConnection createTopicConnection() throws JMSException {
-        NevadoTopicConnection connection = new NevadoTopicConnection(_awsAccessKey, _awsSecretKey);
+        NevadoTopicConnection connection = new NevadoTopicConnection(getSQSConnector(_awsAccessKey, _awsSecretKey));
         initializeConnection(connection);
         return connection;
     }
 
     public TopicConnection createTopicConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
-        NevadoTopicConnection connection = new NevadoTopicConnection(awsAccessKey, awsSecretKey);
+        NevadoTopicConnection connection = new NevadoTopicConnection(getSQSConnector(awsAccessKey, awsSecretKey));
         initializeConnection(connection);
         return connection;
     }

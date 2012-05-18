@@ -19,7 +19,7 @@ public class ExceptionListenerTest extends AbstractJMSTest {
     public void testExceptionListener() throws JMSException, InterruptedException {
         TestExceptionListener exceptionListener = new TestExceptionListener();
         getConnection().setExceptionListener(exceptionListener);
-        TestMessageListener messageListener = new TestMessageListener();
+        TestMessageListener messageListener = new TestMessageListener(false);
         NevadoSession session = createSession();
         Queue tempQueue = createTempQueue(session);
         MessageConsumer consumer = session.createConsumer(tempQueue);

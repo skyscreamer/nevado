@@ -26,7 +26,7 @@ public class ConnectionCloseTest extends AbstractJMSTest {
         Queue testQueue = createTempQueue(session);
         session.createProducer(testQueue).send(msg);
         MessageConsumer consumer = session.createConsumer(testQueue);
-        TestMessageListener listener = new TestMessageListener();
+        TestMessageListener listener = new TestMessageListener(false);
         consumer.setMessageListener(listener);
         connection.start();
         connection.close();
@@ -61,7 +61,7 @@ public class ConnectionCloseTest extends AbstractJMSTest {
         TextMessage msg1 = controlSession.createTextMessage(RandomData.readString());
         controlSession.createProducer(testQueue).send(msg1);
         Session session = testConnection.createSession(true, Session.SESSION_TRANSACTED);
-        TextMessage msgOut = (TextMessage)session.createConsumer(testQueue).receive();
+        TextMessage msgOut = (TextMessage)session.createConsumer(testQueue).receive(1000);
         Assert.assertEquals(msg1.getText(), msgOut.getText());
         TextMessage msg2 = session.createTextMessage(RandomData.readString());
         session.createProducer(testQueue).send(msg2);

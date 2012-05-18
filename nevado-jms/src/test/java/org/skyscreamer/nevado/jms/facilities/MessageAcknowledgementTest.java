@@ -37,10 +37,11 @@ public class MessageAcknowledgementTest extends AbstractJMSTest {
         Message msg = session.createMessage();
         Queue tempQueue = createTempQueue(session);
         session.createProducer(tempQueue).send(msg);
-        TestMessageListener messageListener = new TestMessageListener();
+        TestMessageListener messageListener = new TestMessageListener(false);
         session.createConsumer(tempQueue).setMessageListener(messageListener);
+        Thread.sleep(500);
         NevadoMessage message = messageListener.getMessage(1000);
-        Assert.assertFalse("Message should be acknowledged until after it returns from the listener",
+        Assert.assertTrue("Message should be acknowledged after it returns from the listener",
                 message.isAcknowledged());
         Assert.assertTrue(messageListener.isEmpty());
         session.close();

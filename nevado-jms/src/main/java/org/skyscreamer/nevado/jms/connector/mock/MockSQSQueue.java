@@ -3,15 +3,10 @@ package org.skyscreamer.nevado.jms.connector.mock;
 import org.skyscreamer.nevado.jms.connector.SQSMessage;
 import org.skyscreamer.nevado.jms.connector.SQSQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
-import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 import org.skyscreamer.nevado.jms.util.RandomData;
-import sun.font.AttributeValues;
 
 import javax.jms.JMSException;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Mock implementation of an SQSQueue.  Intended for testing and development.
@@ -79,14 +74,19 @@ public class MockSQSQueue implements SQSQueue {
     @Override
     public synchronized void deleteMessage(String sqsReceiptHandle) throws JMSException {
         checkIsDeleted();
+        MockSQSMessage messageToDelete = null;
         for(MockSQSMessage message : _messageList)
         {
             if (sqsReceiptHandle.equals(message.getReceiptHandle()))
             {
-                _messageList.remove(message);
+                messageToDelete = message;
+                break;
             }
         }
-        throw new JMSException("No message with receipt handle: " + sqsReceiptHandle);
+        if (messageToDelete == null) {
+            throw new JMSException("No message with receipt handle: " + sqsReceiptHandle);
+        }
+        _messageList.remove(messageToDelete);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class MockSQSQueue implements SQSQueue {
         {
             if (message.isVisible())
             {
-                message.setVisibleAfter(DEFAULT_MESSAGE_VISIBILITY);
+                message.setVisibleAfter(System.currentTimeMillis() + DEFAULT_MESSAGE_VISIBILITY);
                 nextMessage = message;
                 break;
             }

@@ -20,7 +20,7 @@ import javax.jms.IllegalStateException;
 public class MessageListenerTest extends AbstractJMSTest {
     @Test
     public void testMessageListener() throws JMSException, InterruptedException {
-        TestMessageListener messageListener = new TestMessageListener();
+        TestMessageListener messageListener = new TestMessageListener(false);
         NevadoSession session = createSession();
         Queue tempQueue = createTempQueue(session);
         session.createConsumer(tempQueue).setMessageListener(messageListener);
@@ -41,7 +41,7 @@ public class MessageListenerTest extends AbstractJMSTest {
 
     @Test(expected = IllegalStateException.class)
     public void testAsyncBlocksSync() throws JMSException {
-        TestMessageListener messageListener = new TestMessageListener();
+        TestMessageListener messageListener = new TestMessageListener(false);
         NevadoSession session = createSession();
         Queue tempQueue = createTempQueue(session);
         MessageConsumer consumer = session.createConsumer(tempQueue);
@@ -51,7 +51,7 @@ public class MessageListenerTest extends AbstractJMSTest {
 
     @Test
     public void testAsyncThenSyncNoBlock() throws JMSException {
-        TestMessageListener messageListener = new TestMessageListener();
+        TestMessageListener messageListener = new TestMessageListener(false);
         NevadoSession session = createSession();
         Queue tempQueue = createTempQueue(session);
         MessageConsumer consumer = session.createConsumer(tempQueue);
@@ -68,7 +68,7 @@ public class MessageListenerTest extends AbstractJMSTest {
 
     @Test
     public void testThrowRuntimeAutoAck() throws JMSException, InterruptedException {
-        TestMessageListenerRuntimeException messageListener = new TestMessageListenerRuntimeException();
+        TestMessageListenerRuntimeException messageListener = new TestMessageListenerRuntimeException(false);
         NevadoConnection connection = createConnection(getConnectionFactory());
         connection.start();
         NevadoSession session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -91,7 +91,7 @@ public class MessageListenerTest extends AbstractJMSTest {
 
     @Test
     public void testThrowRuntimeDupsOk() throws JMSException, InterruptedException {
-        TestMessageListenerRuntimeException messageListener = new TestMessageListenerRuntimeException();
+        TestMessageListenerRuntimeException messageListener = new TestMessageListenerRuntimeException(true);
         NevadoConnection connection = createConnection(getConnectionFactory());
         connection.start();
         NevadoSession session = connection.createSession(false, Session.DUPS_OK_ACKNOWLEDGE);
@@ -114,7 +114,7 @@ public class MessageListenerTest extends AbstractJMSTest {
 
     @Test
     public void testThrowRuntimeClientAck() throws JMSException, InterruptedException {
-        TestMessageListenerRuntimeException messageListener = new TestMessageListenerRuntimeException();
+        TestMessageListenerRuntimeException messageListener = new TestMessageListenerRuntimeException(true);
         NevadoConnection connection = createConnection(getConnectionFactory());
         connection.start();
         NevadoSession session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
@@ -137,7 +137,7 @@ public class MessageListenerTest extends AbstractJMSTest {
 
     @Test
     public void testThrowRuntimeTransacted() throws JMSException, InterruptedException {
-        TestMessageListenerRuntimeException messageListener = new TestMessageListenerRuntimeException();
+        TestMessageListenerRuntimeException messageListener = new TestMessageListenerRuntimeException(true);
         NevadoConnection connection = createConnection(getConnectionFactory());
         connection.start();
         NevadoSession session = connection.createSession(true, Session.SESSION_TRANSACTED);

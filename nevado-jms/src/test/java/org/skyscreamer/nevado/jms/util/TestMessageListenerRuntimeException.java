@@ -10,6 +10,10 @@ import javax.jms.Message;
 public class TestMessageListenerRuntimeException extends TestMessageListener {
     private Message _firstMessage = null;
 
+    public TestMessageListenerRuntimeException(boolean acknowledge) {
+        super(acknowledge);
+    }
+
     @Override
     public void onMessage(Message message) {
         if (_firstMessage == null)
