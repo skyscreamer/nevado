@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
 import org.skyscreamer.nevado.jms.NevadoConnection;
 
-import javax.jms.Connection;
 import java.util.Random;
 
 /**
@@ -18,7 +17,7 @@ public class ConnectionMultiThreadTest extends AbstractJMSTest {
     private static final int NUM_THREADS = 100;
     private static final int NUM_ITERATIONS = 100;
 
-    @Test(timeout = 60000)
+    @Test(timeout = 120000)
     public void testStopStartALot() throws Exception {
         // Make a lot of sessions
         for(int i = 0 ; i < NUM_SESSIONS; ++i) {
