@@ -1,7 +1,7 @@
-nevado
-======
+Nevado JMS
+==========
 
-Spring Framework connectors for Amazon's cloud services.
+Spring connectors for Amazon's cloud services.  First connector is a JMS implementation for SQS.
 
 First major feature is to write a JMS 1.1 implementation that uses SQS for the backend.
 
