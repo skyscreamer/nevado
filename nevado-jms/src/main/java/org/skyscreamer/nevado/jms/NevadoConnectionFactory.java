@@ -1,12 +1,8 @@
 package org.skyscreamer.nevado.jms;
 
 import org.apache.commons.lang.StringUtils;
-import org.skyscreamer.nevado.jms.connector.SQSConnector;
 import org.skyscreamer.nevado.jms.connector.SQSConnectorFactory;
-import org.skyscreamer.nevado.jms.connector.mock.MockSQSConnector;
-import org.skyscreamer.nevado.jms.connector.typica.TypicaSQSConnector;
 import org.skyscreamer.nevado.jms.resource.NevadoReferencableFactory;
-import org.springframework.beans.factory.annotation.Required;
 
 import javax.jms.*;
 import javax.jms.IllegalStateException;
@@ -100,7 +96,6 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     }
 
     // Getters & Setters
-    @Required
     public void setSqsConnectorFactory(SQSConnectorFactory sqsConnectorFactory) {
         _sqsConnectorFactory = sqsConnectorFactory;
     }

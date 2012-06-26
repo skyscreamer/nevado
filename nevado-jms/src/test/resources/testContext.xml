@@ -15,26 +15,4 @@
         <property name="sqsConnectorFactory" ref="sqsConnectorFactory" />
     </bean>
     <bean id="performanceService" class="org.skyscreamer.nevado.jms.performance.PerformanceService" />
-
-    <!--
-    <bean id="queue" class="org.skyscreamer.nevado.jms.destination.NevadoQueue">
-        <constructor-arg>
-            <value>testQueue</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="topic" class="org.skyscreamer.nevado.jms.destination.NevadoTopic">
-        <constructor-arg>
-            <value>testTopic</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="testMessageListener" class="org.skyscreamer.nevado.jms.util.TestMessageListener" />
-
-    <bean id="jmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
-        <property name="connectionFactory" ref="connectionFactory"/>
-        <property name="destination" ref="queue"/>
-        <property name="messageListener" ref="testMessageListener" />
-    </bean>
-    -->
 </beans>
