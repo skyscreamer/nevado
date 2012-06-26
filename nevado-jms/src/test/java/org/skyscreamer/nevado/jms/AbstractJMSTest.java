@@ -7,7 +7,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.skyscreamer.nevado.jms.connector.SQSConnectorFactory;
-import org.skyscreamer.nevado.jms.connector.mock.MockSQSConnector;
 import org.skyscreamer.nevado.jms.connector.mock.MockSQSConnectorFactory;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoTemporaryQueue;
@@ -87,7 +86,7 @@ public abstract class AbstractJMSTest {
 
     private void initializeAWSCredentials() throws IOException {
         Properties prop = new Properties();
-        InputStream in = getClass().getResourceAsStream("/aws.properties.bak");
+        InputStream in = getClass().getResourceAsStream("/aws.properties");
         prop.load(in);
         in.close();
 
@@ -96,12 +95,12 @@ public abstract class AbstractJMSTest {
         if (_awsAccessKey == null || _awsAccessKey.trim().length() == 0
             || _awsSecretKey == null || _awsSecretKey.trim().length() == 0) {
                 System.out.println("ATTENTION: You have not set up your AWS credentials.  Follow thes steps:\n" +
-                        "    1. Copy nevado-jms/src/test/resources/aws.properties.bak.TEMPLATE to\n" +
-                        "       nevado-jms/src/test/resources/aws.properties.bak\n" +
-                        "    2. Edit aws.properties.bak with your access keys from\n" +
+                        "    1. Copy nevado-jms/src/test/resources/aws.properties.TEMPLATE to\n" +
+                        "       nevado-jms/src/test/resources/aws.properties\n" +
+                        "    2. Edit aws.properties with your access keys from\n" +
                         "       https://aws-portal.amazon.com/gp/aws/securityCredentials\n" +
                         "    3. Have git ignore the new file.  Add the following line to .git/info/exclude:\n\n" +
-                        "        aws.properties.bak\n\n" +
+                        "        aws.properties\n\n" +
                         "*** Keep your keys in a safe place and don't commit them to source control. ***\n\n");
             throw new MissingResourceException("Resource /aws.properties.bak does not exist",
                     null, null);
