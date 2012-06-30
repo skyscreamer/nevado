@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+    <title>Nevado - Spring meets Amazon's cloud services - Introduction</title>
+    <meta name="description" content="Starting with JMS, provides simple integration of Spring applications with AWS." />
+    <meta name="keywords" content="nevado,nevado cloud,jms aws,jms sqs,jms sqs,spring sqs,spring ec2,spring aws" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="css/style.css" rel="stylesheet"/>
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-31652918-1']);
+        _gaq.push(['_setDomainName', 'skyscreamer.org']);
+        _gaq.push(['_trackPageview']);
+
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+
+    </script>
+</head>
+<body>
+<header>
+    <h1>Nevado</h1>
+</header>
+<nav>
+    <ul>
+        <li><a class="intro" href="./">Introduction</a></li>
+        <li><a class="performance" href="performance.html">Performance</a></li>
+        <li><a class="quickstart" href="quickstart.html">Quickstart</a></li>
+        <li><a class="download" href="https://github.com/skyscreamer/nevado/downloads">Download</a></li>
+        <li><a class="contrib" href="https://github.com/skyscreamer/nevado">Contribute</a></li>
+        <li><a class="wiki" href="https://github.com/skyscreamer/nevado/wiki">Wiki</a></li>
+    </ul>
+</nav>
+<section>
+    <a name="intro"></a>
+    <h2>Introduction</h2>
+
+    <p>Spring Framework connectors for Amazon's cloud services.</p>
+
+    <ul>
+        <li>Leverage cloud services in Amazon using standard Spring/J2EE metaphors</li>
+        <li>Avoid tight coupling to cloud-specific API's inside your code</li>
+        <li>Rapidly prototype enterprise clients in the cloud.  Then deploy them anywhere.</li>
+    </ul>
+
+    <p><br/>The current version of Nevado is 0.9.0.</p>
+
+    <h2>Nevado JMS</h2>
+    <p>Our first connector supports 83% of the
+        <a href="http://docs.oracle.com/javaee/6/api/javax/jms/package-summary.html">JMS 1.1 specification</a> using
+        Amazon's <a href="http://aws.amazon.com/sqs/">SQS</a> and <a href="http://aws.amazon.com/sns/">SNS</a> services:</p>
+    <ul>
+        <li>Integrates cleanly with Spring's <a href="http://blog.springsource.org/2006/08/11/message-driven-pojos/">message-driven pojos</a></li>
+        <li>Written with a test-driven approach (over 300+ integration and unit tests) to ensure close adherence to JMS 1.1 specification</li>
+        <li>Easily monitor your queues and topics through the Amazon console</li>
+    </ul>
+</section>
+
+<section>
+    <a name="contact"></a>
+    <h2>Contact</h2>
+    <p>
+        This is open source so if you want to help out whether by submitting code, design, suggestions, feedback,
+        or feature requests, we appreciate whatever you can contribute.  Contact us at
+        <a href="mailto:nevado-dev@skyscreamer.org">nevado-dev@skyscreamer.org</a> with questions or ideas.
+    </p>
+</section>
+</body>
+</html>
