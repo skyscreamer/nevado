@@ -92,17 +92,19 @@ body {
             nav .intro {
                 background: #3a3a3a;
             }
-            nav .performance {
+            nav .compliance {
                 background: #115511;
             }
-            nav .quickstart {
+            nav .performance {
                 background: #757575;
             }
-            nav .download {
+            nav .quickstart {
                 background: #929090;
             }
-            nav .contrib {
+            nav .quickstart {
                 background: #a6a6a6;
+            }
+            nav .contrib {
                 background-image:url('http://skyscreamer.org/i/blacktocat.png');
                 background-repeat:no-repeat;
                 background-position:center;
