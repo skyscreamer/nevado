@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+    <title>Nevado - Spring meets Amazon's cloud services - Compliance</title>
+    <meta name="description" content="Enable field selectors and call aggregation on Java-based REST servers." />
+    <meta name="keywords" content="yoga,yoga rest,field selector,java rest,java restful,yoga api,rest aggregate,rest open source" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="css/style.css" rel="stylesheet"/>
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-31652918-1']);
+        _gaq.push(['_setDomainName', 'skyscreamer.org']);
+        _gaq.push(['_trackPageview']);
+
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+
+    </script>
+</head>
+<body>
+<header>
+    <h1>Nevado JMS</h1>
+    <h2>a <a href="http://skyscreamer.org">Skyscreamer</a> project</h2>
+</header>
+<br clear="all" />
+<nav>
+    <ul>
+        <li><a class="intro" href="./">Introduction</a></li>
+        <li><a class="compliance" href="">Compliance</a></li>
+        <li><a class="performance" href="performance.html">Performance</a></li>
+        <li><a class="quickstart" href="quickstart.html">Quickstart</a></li>
+        <li><a class="download" href="https://github.com/skyscreamer/nevado/downloads">Download</a></li>
+        <li><a class="contrib" href="https://github.com/skyscreamer/nevado"> &nbsp; </a></li>
+    </ul>
+</nav>
+<section>
+    <a name="compliance"></a>
+    <h2>JMS Compliance</h2>
+    <p>Nevado JMS is not 100% compliant,
+        <b><a href="https://github.com/skyscreamer/nevado/wiki/Master-Feature-Grid">but it's close</a></b>.
+        Nevado creates a lot of JMS functionality itself, and hides the limitations of SQS where possible.
+        It was developed against version 1.1 of the specification, and we hope to update it to 2.0 when that becomes
+        final in 2013.</p>
+</section>
+<section>
+    <a name="supported"></a>
+    <h2>Supported</h2>
+    <ul>
+        <li>Multi-threading</li>
+        <li>Messages containing Java objects, XML, JSON, etc..</li>
+        <li>Supports standard JMS headers and properties</li>
+        <li>Full support for all JMS message types: TextMessage, ObjectMessage, MapMessage, StreamMessage, BytesMessage</li>
+        <li>Supports messages from other JMS providers</li>
+        <li>Both synchronous or asynchronous delivery</li>
+        <li>Message TTL</li>
+        <li>PTP Queues and Pub/Sub Topics</li>
+        <li>Durable Topics</li>
+        <li>Temporary queues and topics</li>
+        <li>Transaction support</li>
+        <li>Client- or auto-acknowledgement of messages</li>
+    </ul>
+</section>
+<section>
+    <a name="unsupported"></a>
+    <h2>Not Supported (yet)</h2>
+    <ul>
+        <li>True FIFO (SQS does not guarantee strict message order)</li>
+        <li>XA-compliance</li>
+        <li>Expediting of high priority messages</li>
+        <li>Message selectors</li>
+        <li>Queue browsing (can still be accomplished through AWS console)</li>
+        <li>Topic groups / heirarchies</li>
+        <li>Extended Application Server Facilities (ConnectionConsumer)</li>
+    </ul>
+</section>
+<section>
+    <a name="sorta_supported"></a>
+    <h2>Grey Area</h2>
+    <p>SQS guarantees at-least-once delivery, whereas JMS requires once-and-only-once delivery.
+        <a href="http://www.cloudstacking.com/?p=243">In practice, duplicate
+        messages are very rare.</a>
+        You can send millions of messages and never see a duplicate, but they are still a possibility and your
+        code needs to be able to handle them.
+        If this is a big issue for you, let us know.  This could be prevented with
+        some additional magic in Nevado, but it's an edge case and hard to reliably recreate for testing,
+        so it's not covered it yet.
+    </p>
+</section>
+</body>
+</html>
