@@ -39,7 +39,6 @@ import java.util.*;
 public class TypicaSQSConnector extends AbstractSQSConnector {
     protected final QueueService _queueService;
     protected final NotificationService _notficationService;
-    private static final String AWS_ERROR_CODE_AUTHENTICATION = "InvalidClientTokenId";
 
     public TypicaSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs) {
         super(receiveCheckIntervalMs);

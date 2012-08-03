@@ -10,11 +10,12 @@
     <context:component-scan base-package="org.skyscreamer.nevado"/>
 
     <bean id="sqsConnectorFactory" class="org.skyscreamer.nevado.jms.connector.mock.MockSQSConnectorFactory" />
-     <!--<bean id="sqsConnectorFactory" class="org.skyscreamer.nevado.jms.connector.typica.TypicaSQSConnectorFactory" />-->
+    <!--<bean id="sqsConnectorFactory" class="org.skyscreamer.nevado.jms.connector.typica.TypicaSQSConnectorFactory" />-->
+    <!--<bean id="sqsConnectorFactory" class="org.skyscreamer.nevado.jms.connector.amazonaws.AmazonAwsSQSConnectorFactory" />-->
     <bean id="connectionFactory" class="org.skyscreamer.nevado.jms.NevadoConnectionFactory">
         <property name="sqsConnectorFactory" ref="sqsConnectorFactory" />
-        <!--<property name="awsAccessKey" value="${aws.accessKey}" />-->
-        <!--<property name="awsSecretKey" value="${aws.secretKey}" />-->
+        <property name="awsAccessKey" value="${aws.accessKey}" />
+        <property name="awsSecretKey" value="${aws.secretKey}" />
     </bean>
     <bean id="performanceService" class="org.skyscreamer.nevado.jms.performance.PerformanceService" />
 </beans>

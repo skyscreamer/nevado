@@ -30,7 +30,7 @@ public interface SQSConnector {
     Collection<NevadoQueue> listQueues(String temporaryQueuePrefix) throws JMSException;
     void deleteQueue(NevadoQueue queue) throws JMSException;
 
-    NevadoTopic createTopic(String tempTopicName) throws JMSException;
+    NevadoTopic createTopic(String topicName) throws JMSException;
     void deleteTopic(NevadoTopic topic) throws JMSException;
     Collection<NevadoTopic> listTopics() throws JMSException;
 

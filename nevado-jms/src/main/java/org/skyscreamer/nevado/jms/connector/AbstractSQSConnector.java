@@ -28,6 +28,8 @@ import java.util.List;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public abstract class AbstractSQSConnector implements SQSConnector {
+    protected static final String AWS_ERROR_CODE_AUTHENTICATION = "InvalidClientTokenId";
+
     protected final Log _log = LogFactory.getLog(getClass());
 
     private final long _receiveCheckIntervalMs;

@@ -1,7 +1,7 @@
 package org.skyscreamer.nevado.jms.connector;
 
 /**
- * Factory class for SQSConnector objects.
+ * Factory for SQSConnector objects.
  *
  * @author Carter Page <carter@skyscreamer.org>
  */

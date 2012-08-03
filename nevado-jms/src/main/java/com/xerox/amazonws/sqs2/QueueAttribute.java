@@ -27,7 +27,7 @@ public enum QueueAttribute {
 	REQUEST_PAYER ("RequestPayer"),
 	MAXIUMUM_MESSAGE_SIZE ("MaximumMessageSize"),
 	MESSAGE_RETENTION_PERIOD ("MessageRetentionPeriod"),
-	POLICY ("POLICY"),
+	POLICY ("Policy"),
     QUEUE_ARN ("QueueArn");
 
 	private final String queryAttribute;

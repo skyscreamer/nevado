@@ -65,7 +65,7 @@ class TypicaSQSQueue implements SQSQueue {
     @Override
     public void setPolicy(String policy) throws JMSException {
         try {
-            _sqsQueue.setQueueAttribute("Policy", policy);
+            _sqsQueue.setQueueAttribute(QueueAttribute.POLICY.queryAttribute(), policy);
         } catch (SQSException e) {
             throw _typicaSQSConnector.handleAWSException("Unable to set policy", e);
         }
