@@ -8,12 +8,12 @@ Getting started is easy.  Download the jar or add the following to your pom.xml:
     <dependency>
         <groupId>org.skyscreamer</groupId>
         <artifactId>nevado-jms</artifactId>
-        <version>1.0.0-Beta2</version>
+        <version>1.0.0-RC1</version>
     </dependency>
 
-Initializing in Spring is a piece of cake.
+Initializing Spring is a piece of cake.
 
-    <!-- Define the SDK to talk to AWS -->
+    <!-- Pick your AWS SDK.  Typica is pretty fast. -->
     <bean id="sqsConnectorFactory" class="org.skyscreamer.nevado.jms.connector.typica.TypicaSQSConnectorFactory" />
 
     <!-- And this is an implementation of javax.jms.ConnectionFactory -->
@@ -23,7 +23,7 @@ Initializing in Spring is a piece of cake.
         <property name="awsSecretKey" value="${aws.secretKey}" /> <!-- And this -->
     </bean>
 
-And now you've got a working JMS 1.1 implementation in your application.
+And now you've got a working JMS client.
 
 Most of the JMS 1.1 spec is covered.  A complete [coverage map with unit tests](https://github.com/skyscreamer/nevado/wiki/Master-Feature-Grid) provides more details to satisfy geeky curiosity.
 
