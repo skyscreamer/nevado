@@ -8,7 +8,7 @@ Getting started is easy.  Download the jar or add the following to your pom.xml:
     <dependency>
         <groupId>org.skyscreamer</groupId>
         <artifactId>nevado-jms</artifactId>
-        <version>1.0.0-RC1</version>
+        <version>1.0.0</version>
     </dependency>
 
 Initializing Spring is a piece of cake.
