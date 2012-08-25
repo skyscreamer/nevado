@@ -6,27 +6,24 @@ import com.xerox.amazonws.common.ListResult;
 import com.xerox.amazonws.common.Result;
 import com.xerox.amazonws.sns.NotificationService;
 import com.xerox.amazonws.sns.SNSException;
-import com.xerox.amazonws.sqs2.*;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.xerox.amazonws.sqs2.MessageQueue;
+import com.xerox.amazonws.sqs2.QueueService;
+import com.xerox.amazonws.sqs2.SQSException;
 import org.skyscreamer.nevado.jms.connector.AbstractSQSConnector;
-import org.skyscreamer.nevado.jms.connector.SQSMessage;
 import org.skyscreamer.nevado.jms.connector.SQSQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoTopic;
-import org.skyscreamer.nevado.jms.message.NevadoMessage;
-import org.skyscreamer.nevado.jms.message.InvalidMessage;
-import org.skyscreamer.nevado.jms.message.NevadoProperty;
 
-import javax.jms.InvalidDestinationException;
 import javax.jms.JMSException;
 import javax.jms.JMSSecurityException;
 import javax.jms.ResourceAllocationException;
 import javax.net.ssl.SSLException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Connector for SQS-only implementation of the Nevado JMS driver.
@@ -132,6 +129,14 @@ public class TypicaSQSConnector extends AbstractSQSConnector {
             throw handleAWSException("Unable to subscribe topic " + topic + " with sub ARN "
                     + topic.getSubscriptionArn(), e);
         }
+    }
+
+    public QueueService getQueueService() {
+        return _queueService;
+    }
+
+    public NotificationService getNotficationService() {
+        return _notficationService;
     }
 
     protected void sendSNSMessage(NevadoTopic topic, String serializedMessage) throws JMSException {
