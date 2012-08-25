@@ -102,7 +102,7 @@ public abstract class AbstractJMSTest {
                         "    3. Have git ignore the new file.  Add the following line to .git/info/exclude:\n\n" +
                         "        aws.properties\n\n" +
                         "*** Keep your keys in a safe place and don't commit them to source control. ***\n\n");
-            throw new MissingResourceException("Resource /aws.properties.bak does not exist",
+            throw new MissingResourceException("Resource /aws.properties does not exist",
                     null, null);
         }
     }

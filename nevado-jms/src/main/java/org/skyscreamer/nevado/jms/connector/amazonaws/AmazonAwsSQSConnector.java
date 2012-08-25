@@ -34,8 +34,8 @@ import java.util.HashSet;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class AmazonAwsSQSConnector extends AbstractSQSConnector {
-    final AmazonSQS _amazonSQS;
-    final AmazonSNS _amazonSNS;
+    protected final AmazonSQS _amazonSQS;
+    protected final AmazonSNS _amazonSNS;
 
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs) {
         super(receiveCheckIntervalMs);
@@ -160,6 +160,14 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
             throw handleAWSException("Unable to subscribe topic " + topic + " with sub ARN "
                     + topic.getSubscriptionArn(), e);
         }
+    }
+
+    public AmazonSQS getAmazonSQS() {
+        return _amazonSQS;
+    }
+
+    public AmazonSNS getAmazonSNS() {
+        return _amazonSNS;
     }
 
     protected String getTopicARN(NevadoTopic topic) throws JMSException {
