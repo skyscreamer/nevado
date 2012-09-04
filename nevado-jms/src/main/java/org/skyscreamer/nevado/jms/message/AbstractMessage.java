@@ -1,12 +1,12 @@
 package org.skyscreamer.nevado.jms.message;
 
-import org.apache.commons.codec.binary.StringUtils;
 import org.skyscreamer.nevado.jms.util.PropertyConvertUtil;
 import org.skyscreamer.nevado.jms.util.SerializeUtil;
 
 import javax.jms.*;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 /**
@@ -55,11 +55,19 @@ public abstract class AbstractMessage<T> implements Message, Serializable {
     }
 
     public byte[] getJMSCorrelationIDAsBytes() throws JMSException {
-        return StringUtils.getBytesUtf8(_correlationID);
+        try {
+            return _correlationID != null ? _correlationID.getBytes("UTF-8") : null;
+        } catch (UnsupportedEncodingException e) {
+            throw new JMSException(e.getMessage());
+        }
     }
 
     public void setJMSCorrelationIDAsBytes(byte[] correlationID) throws JMSException {
-        _correlationID = StringUtils.newStringUtf8(correlationID);
+        try {
+            _correlationID = correlationID != null ? new String(correlationID, "UTF-8") : null;
+        } catch (UnsupportedEncodingException e) {
+            throw new JMSException(e.getMessage());
+        }
     }
 
     public void setJMSCorrelationID(String correlationID) throws JMSException {

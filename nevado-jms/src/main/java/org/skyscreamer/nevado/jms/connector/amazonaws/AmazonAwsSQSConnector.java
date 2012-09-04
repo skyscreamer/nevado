@@ -1,5 +1,6 @@
 package org.skyscreamer.nevado.jms.connector.amazonaws;
 
+import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.Protocol;
@@ -52,7 +53,7 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
         try {
             _amazonSNS.publish(new PublishRequest(arn, serializedMessage));
         }
-        catch (AmazonServiceException e) {
+        catch (AmazonClientException e) {
             throw handleAWSException("Unable to send message to topic: " + arn, e);
         }
     }
@@ -65,7 +66,7 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
                 CreateQueueResult result = _amazonSQS.createQueue(new CreateQueueRequest(queue.getQueueName()));
                 queue.setQueueUrl(result.getQueueUrl());
             }
-        } catch (AmazonServiceException e) {
+        } catch (AmazonClientException e) {
             throw handleAWSException("Unable to get message queue '" + queue, e);
         }
 
@@ -77,7 +78,7 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
         try {
             _amazonSQS.listQueues();
             _amazonSNS.listSubscriptions();
-        } catch (AmazonServiceException e) {
+        } catch (AmazonClientException e) {
             throw handleAWSException("Connection test failed", e);
         }
     }
@@ -88,7 +89,7 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
         ListQueuesResult result;
         try {
             result = _amazonSQS.listQueues(new ListQueuesRequest().withQueueNamePrefix(temporaryQueuePrefix));
-        } catch (AmazonServiceException e) {
+        } catch (AmazonClientException e) {
             throw handleAWSException("Unable to list queues with prefix '" + temporaryQueuePrefix + "'", e);
         }
         queues = new HashSet<NevadoQueue>(result.getQueueUrls().size());
@@ -109,7 +110,7 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
     public void deleteTopic(NevadoTopic topic) throws JMSException {
         try {
             _amazonSNS.deleteTopic(new DeleteTopicRequest().withTopicArn(getTopicARN(topic)));
-        } catch (AmazonServiceException e) {
+        } catch (AmazonClientException e) {
             throw handleAWSException("Unable to delete message topic '" + topic, e);
         }
     }
@@ -120,7 +121,7 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
         ListTopicsResult result;
         try {
             result = _amazonSNS.listTopics();
-        } catch (AmazonServiceException e) {
+        } catch (AmazonClientException e) {
             throw handleAWSException("Unable to list topics", e);
         }
         topics = new HashSet<NevadoTopic>(result.getTopics().size());
@@ -140,7 +141,7 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
             queue.setPolicy(getPolicy(snsArn, sqsArn));
             subscriptionArn = _amazonSNS.subscribe(new SubscribeRequest().withTopicArn(getTopicARN(topic))
                     .withProtocol("sqs").withEndpoint(sqsArn)).getSubscriptionArn();
-        } catch (AmazonServiceException e) {
+        } catch (AmazonClientException e) {
             throw handleAWSException("Unable to subscripe to topic " + topic, e);
         }
         return subscriptionArn;
@@ -156,7 +157,7 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
         }
         try {
             _amazonSNS.unsubscribe(new UnsubscribeRequest().withSubscriptionArn(topic.getSubscriptionArn()));
-        } catch (AmazonServiceException e) {
+        } catch (AmazonClientException e) {
             throw handleAWSException("Unable to subscribe topic " + topic + " with sub ARN "
                     + topic.getSubscriptionArn(), e);
         }
@@ -177,7 +178,7 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
             try {
                 result = _amazonSNS.createTopic(new CreateTopicRequest(topic.getTopicName()));
             }
-            catch (AmazonServiceException e) {
+            catch (AmazonClientException e) {
                 throw handleAWSException("Unable to create/lookup topic: " + topic, e);
             }
             topic.setArn(result.getTopicArn());
@@ -185,7 +186,7 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
         return topic.getArn();
     }
 
-    protected JMSException handleAWSException(String message, AmazonServiceException e) {
+    protected JMSException handleAWSException(String message, AmazonClientException e) {
         JMSException jmsException;
         String exMessage = message + ": " + e.getMessage();
         _log.error(exMessage, e);
@@ -206,7 +207,12 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
         return jmsException;
     }
 
-    private boolean isSecurityException(AmazonServiceException e) {
-        return AWS_ERROR_CODE_AUTHENTICATION.equals(e.getErrorCode());
+    private boolean isSecurityException(AmazonClientException e) {
+        if (e instanceof AmazonServiceException) {
+            return AWS_ERROR_CODE_AUTHENTICATION.equals(((AmazonServiceException)e).getErrorCode());
+        }
+        else {
+            return false;
+        }
     }
 }

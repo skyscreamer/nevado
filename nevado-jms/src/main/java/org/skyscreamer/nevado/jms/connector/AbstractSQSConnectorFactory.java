@@ -2,8 +2,8 @@ package org.skyscreamer.nevado.jms.connector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.skyscreamer.nevado.jms.connector.SQSConnector;
-import org.skyscreamer.nevado.jms.connector.SQSConnectorFactory;
+
+import javax.jms.JMSException;
 
 /**
  * Abstract implementation of factory for SQSConnector objects.
@@ -11,14 +11,20 @@ import org.skyscreamer.nevado.jms.connector.SQSConnectorFactory;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public abstract class AbstractSQSConnectorFactory implements SQSConnectorFactory {
-    private final Log _log = LogFactory.getLog(getClass());
+    protected final Log _log = LogFactory.getLog(getClass());
 
     public static final int DEFAULT_RECEIVE_CHECK_INTERVAL_MS = 200;
     protected boolean _isSecure = true;
     protected long _receiveCheckIntervalMs = DEFAULT_RECEIVE_CHECK_INTERVAL_MS;
 
     @Override
-    public abstract SQSConnector getInstance(String awsAccessKey, String awsSecretKey);
+    public abstract SQSConnector getInstance(String awsAccessKey, String awsSecretKey, String awsSQSEndpoint,
+                                             String awsSNSEndpoint) throws JMSException;
+
+    @Override
+    public SQSConnector getInstance(String awsAccessKey, String awsSecretKey) throws JMSException {
+        return getInstance(awsAccessKey, awsSecretKey, null, null);
+    }
 
     public void setSecure(boolean secure) {
         _isSecure = secure;
