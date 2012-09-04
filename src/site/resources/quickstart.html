@@ -1,0 +1,253 @@
+<!doctype html>
+<html>
+<head>
+    <title>Nevado - Spring meets Amazon's cloud services - Quickstart</title>
+    <meta name="description" content="Enable field selectors and call aggregation on Java-based REST servers." />
+    <meta name="keywords" content="yoga,yoga rest,field selector,java rest,java restful,yoga api,rest aggregate,rest open source" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="css/style.css" rel="stylesheet"/>
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-31652918-1']);
+        _gaq.push(['_setDomainName', 'skyscreamer.org']);
+        _gaq.push(['_trackPageview']);
+
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+
+    </script>
+</head>
+<body>
+<header>
+    <h1>Nevado JMS</h1>
+    <h2>a <a href="http://skyscreamer.org">Skyscreamer</a> project</h2>
+</header>
+<br clear="all" />
+<nav>
+    <ul>
+        <li><a class="intro" href="">Introduction</a></li>
+        <li><a class="compliance" href="compliance.html">Compliance</a></li>
+        <li><a class="performance" href="performance.html">Performance</a></li>
+        <li><a class="quickstart" href="">Quickstart</a></li>
+        <li><a class="download" href="https://github.com/skyscreamer/nevado/downloads">Download</a></li>
+        <li><a class="contrib" href="https://github.com/skyscreamer/nevado"> &nbsp; </a></li>
+    </ul>
+</nav>
+<section>
+    <a name="quickstart"></a>
+    <h2>Quickstart</h2>
+    <p>0. If you haven't already, <a href="http://aws.amazon.com/">Sign up</a> for Amazon Web Services.  Enable
+        <a href="https://console.aws.amazon.com/sqs/home">SQS</a>
+        and <a href="https://console.aws.amazon.com/sns/home">SNS</a>.  <a href="http://aws.amazon.com/sqs/pricing/">View pricing</a></p>
+    <blockquote>Remember Amazon charges for every
+            call made to the server.  Nevado polls the server regularly when a listener is configured, even when no
+            messages are coming through.  (Although by
+            default it will "back off" pretty quickly when it's not receiving messages.)
+            The pricing is fairly cheap, but it can add up in extreme cases.</blockquote>
+
+    <p>1. Get the library.  You can <a href="https://github.com/skyscreamer/nevado/downloads">download</a> it, ...</p>
+
+    <div class="example">
+        <p>build it:</p>
+        <blockquote>
+            <a>% git clone git@github.com:skyscreamer/nevado.git</a><br/>
+            <a>% cd nevado ; mvn clean install</a>
+        </blockquote>
+    </div>
+
+    <div class="example">
+        <p>or put it as a dependency in your application's pom.xml:</p>
+        <blockquote>
+            <a>&lt;dependency&gt;</a><br/>
+            <a> &nbsp; &lt;groupId&gt;org.skyscreamer&lt;/groupId&gt;</a><br/>
+            <a> &nbsp; &lt;artifactId&gt;nevado-jms&lt;/artifactId&gt;</a><br/>
+            <a> &nbsp; &lt;version&gt;1.0.0-Beta2&lt;/version&gt;</a><br/>
+            <a>&lt;/dependency&gt;</a><br/>
+        </blockquote>
+    </div>
+
+    <p>2. Configure your AWS credentials for Spring.</p>
+
+    <div class="example">
+        <p>Create <b>aws.properties</b> in the root of your classpath.  Store your access key and secret in there.  You can
+        <a href="https://aws-portal.amazon.com/gp/aws/securityCredentials">look them up on AWS</a>.</p>
+        <blockquote>
+            <a>aws.accessKey=[YOUR ACCESS KEY]</a><br/>
+            <a>aws.secretKey=[YOUR SECRET KEY]</a><br/>
+        </blockquote>
+    </div>
+
+    <div class="example">
+        <p>If you don't have a <i>PropertyPlaceholderConfigurer</i> already in your project, create one.  Otherwise, just
+        add aws.properties to your existing  bean configuration:</p>
+        <blockquote>
+            <a>&lt;bean
+                  class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"&gt;</a><br/>
+            <a> &nbsp; &lt;property name="locations"&gt;</a><br/>
+            <a> &nbsp; &nbsp; &lt;list&gt;</a><br/>
+            <a> &nbsp; &nbsp; &nbsp; &lt;value&gt;classpath:aws.properties&lt;/value&gt;</a><br/>
+            <a> &nbsp; &nbsp; &lt;/list&gt;</a><br/>
+            <a> &nbsp; &lt;/property&gt;</a><br/>
+            <a>&lt;/bean&gt;</a><br/>
+        </blockquote>
+    </div>
+
+    <div class="example">
+        <p>Make sure you have spring-jms in your project.  If you are using maven, simply add the following
+	  to your pom.xml:</p>
+        <blockquote>
+            <a>&lt;dependency&gt;</a><br/>
+            <a> &nbsp; &lt;groupId&gt;org.springframework&lt;/groupId&gt;</a><br/>
+            <a> &nbsp; &lt;artifactId&gt;spring-jms&lt;/artifactId&gt;</a><br/>
+            <a> &nbsp; &lt;version&gt;3.0.5.RELEASE&lt;/version&gt;</a><br/>
+            <a>&lt;/dependency&gt;</a><br/>
+        </blockquote>
+    </div>
+
+    <p>3. Set up Nevado JMS in your Spring configuration:</p>
+
+    <div class="example">
+        <p>Define your connector.  Currently Typica is supported.  (We also provide a mock connector --
+            org.skyscreamer.nevado.jms.connector.typica.mock.MockSQSConnectorFactory
+            -- that allows you to develop offline.):</p>
+        <blockquote>
+            <a>&lt;bean id="sqsConnectorFactory" class="org.skyscreamer.nevado.jms.connector.typica.TypicaSQSConnectorFactory" /&gt;</a><br/>
+        </blockquote>
+    </div>
+
+    <div class="example">
+        <p>The connection factory:</p>
+        <blockquote>
+            <a>&lt;bean id="connectionFactory" class="org.skyscreamer.nevado.jms.NevadoConnectionFactory"&gt;</a><br/>
+            <a> &nbsp; &lt;property name="sqsConnectorFactory" ref="sqsConnectorFactory" /&gt;</a><br/>
+            <a> &nbsp; &lt;property name="awsAccessKey" value="${aws.accessKey}" /&gt;</a><br/>
+            <a> &nbsp; &lt;property name="awsSecretKey" value="${aws.secretKey}" /&gt;</a><br/>
+            <a>&lt;/bean&gt;</a><br/>
+        </blockquote>
+    </div>
+
+    <div class="example">
+        <p>A queue.  (A topic is similar.  Just use NevadoTopic instead.):</p>
+        <blockquote>
+            <a>&lt;bean id="helloWorldQueue" class="org.skyscreamer.nevado.jms.destination.NevadoQueue"&gt;</a><br/>
+            <a> &nbsp; &lt;constructor-arg value="helloWorldQueue" /&gt;</a><br/>
+            <a>&lt;/bean&gt;</a><br/>
+        </blockquote>
+    </div>
+
+    <div class="example">
+        <p>A client connector:</p>
+        <blockquote>
+            <a>&lt;bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate"&gt;</a><br/>
+                <a> &nbsp; &lt;property name="defaultDestinationName" value="helloWorldQueue"/&gt;</a><br/>
+                <a> &nbsp; &lt;property name="connectionFactory" ref="connectionFactory"/&gt;</a><br/>
+            <a>&lt;/bean&gt;</a><br/>
+        </blockquote>
+    </div>
+
+    <div class="example">
+        <p>A listener and a MDP container:</p>
+        <blockquote>
+            <a>&lt;bean id="helloService" class="demo.HelloService"/&gt;</a><br/>
+            <br/>
+            <a>&lt;bean id="listener" class="org.springframework.jms.listener.adapter.MessageListenerAdapter"&gt;</a><br/>
+                <a> &nbsp; &lt;property name="delegate" ref="helloService"/&gt;</a><br/>
+                <a> &nbsp; &lt;property name="defaultListenerMethod" value="hello"/&gt;</a><br/>
+                <a> &nbsp; &lt;property name="defaultResponseDestination" ref="helloWorldQueue"/&gt;</a><br/>
+            <a>&lt;/bean&gt;</a><br/>
+            <br/>
+            <a>&lt;bean id="container" class="org.springframework.jms.listener.SimpleMessageListenerContainer"&gt;</a><br/>
+            <a> &nbsp; &lt;property name="connectionFactory" ref="connectionFactory"/&gt;</a><br/>
+            <a> &nbsp; &lt;property name="messageListener" ref="listener"/&gt;</a><br/>
+            <a> &nbsp; &lt;property name="destination" ref="helloWorldQueue"/&gt;</a><br/>
+            <a>&lt;/bean&gt;</a><br/>
+        </blockquote>
+    </div>
+
+    <p>4. Write your Java code.  Following is a simple example using Spring MDP's, but any JMS client code should work:</p>
+
+    <div class="example">
+        <p>A listener delegate to receive the messages:</p>
+        <blockquote>
+            <a>package demo;</a><br/>
+            <br/>
+            <a>public class HelloService {</a><br/>
+            <a> &nbsp; public void hello(String name) {</a><br/>
+            <a> &nbsp; &nbsp; System.out.println("Hello " + name + "!");</a><br/>
+            <a> &nbsp; }</a><br/>
+            <a>}<br/></a>
+        </blockquote>
+    </div>
+
+    <div class="example">
+        <p>A simple daemon to do the listening:</p>
+        <blockquote>
+            <a>package demo;</a><br/>
+            <br/>
+            <a>import org.springframework.context.support.ClassPathXmlApplicationContext;</a><br/>
+            <br/>
+            <a>public class HelloRunner {</a><br/>
+            <a> &nbsp; public static void main(String[] args) throws Exception {</a><br/>
+            <a> &nbsp;  &nbsp; new ClassPathXmlApplicationContext("/applicationContext.xml");</a><br/>
+            <a> &nbsp;  &nbsp; System.in.read();</a><br/>
+            <a> &nbsp; }</a><br/>
+            <a>}<br/></a>
+        </blockquote>
+    </div>
+
+    <div class="example">
+        <p>A client to publish the messages:</p>
+        <blockquote>
+            <a>package demo;</a><br/>
+            <br/>
+            <a>import org.springframework.context.ApplicationContext;</a><br/>
+            <a>import org.springframework.context.support.ClassPathXmlApplicationContext;</a><br/>
+            <a>import org.springframework.jms.core.JmsTemplate;</a><br/>
+            <br/>
+            <a>import java.io.BufferedReader;</a><br/>
+            <a>import java.io.InputStreamReader;</a><br/>
+            <br/>
+            <a>public class HelloWorld {</a><br/>
+            <a> &nbsp; public static void main(String[] args) throws Exception {</a><br/>
+            <a> &nbsp;  &nbsp; ApplicationContext context = new ClassPathXmlApplicationContext("/applicationContext.xml");</a><br/>
+            <a> &nbsp;  &nbsp; JmsTemplate jmsTemplate = (JmsTemplate) context.getBean("jmsTemplate");</a><br/>
+            <br/>
+            <a> &nbsp;  &nbsp; BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));</a><br/>
+            <br/>
+            <a> &nbsp;  &nbsp; while(true) {</a></br>
+            <a> &nbsp;  &nbsp;  &nbsp; System.out.print("Enter Name: ");</a><br/>
+            <a> &nbsp;  &nbsp;  &nbsp; String name = reader.readLine();</a><br/>
+            <a> &nbsp;  &nbsp;  &nbsp; jmsTemplate.convertAndSend(name);</a><br/>
+            <a> &nbsp;  &nbsp;  &nbsp; Thread.sleep(5000);</a><br/>
+            <a> &nbsp;  &nbsp; }</a><br/>
+            <a> &nbsp; }</a><br/>
+            <a>}</a><br/>
+        </blockquote>
+    </div>
+
+    <p>5. And run it...</p>
+    <div class="example">
+        <p>Start the program and enter some names:</p>
+        <blockquote>
+            <a>Enter Name: Juergen Hoeller</a><br/>
+            <a>Hello Juergen Hoeller!</a><br/>
+            <a>Enter Name: Mark Hapner</a><br/>
+            <a>Hello Mark Hapner!</a><br/>
+            <a>Enter Name:</a><br/>
+        </blockquote>
+    </div>
+
+    <p>
+        This just barely taps into what you can do with JMS, but it should be a start.
+        If you need to learn more about how to write JMS client code, check out
+        <a href="http://docs.oracle.com/javaee/1.3/jms/tutorial/">Oracle's JMS Tutorial</a>.
+        Good luck!
+    </p>
+
+</section>
+</body>
+</html>
