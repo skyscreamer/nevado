@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+    <title>Nevado - Spring meets Amazon's cloud services - Performance</title>
+    <meta name="description" content="Enable field selectors and call aggregation on Java-based REST servers." />
+    <meta name="keywords" content="yoga,yoga rest,field selector,java rest,java restful,yoga api,rest aggregate,rest open source" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="css/style.css" rel="stylesheet"/>
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-31652918-1']);
+        _gaq.push(['_setDomainName', 'skyscreamer.org']);
+        _gaq.push(['_trackPageview']);
+
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+
+    </script>
+</head>
+<body>
+<header>
+    <h1>Nevado JMS</h1>
+    <h2>a <a href="http://skyscreamer.org">Skyscreamer</a> project</h2>
+</header>
+<br clear="all" />
+<nav>
+    <ul>
+        <li><a class="intro" href="">Introduction</a></li>
+        <li><a class="compliance" href="compliance.html">Compliance</a></li>
+        <li><a class="performance" href="">Performance</a></li>
+        <li><a class="quickstart" href="quickstart.html">Quickstart</a></li>
+        <li><a class="download" href="https://github.com/skyscreamer/nevado/downloads">Download</a></li>
+        <li><a class="contrib" href="https://github.com/skyscreamer/nevado"> &nbsp; </a></li>
+    </ul>
+</nav>
+<section>
+    <a name="performance"></a>
+    <h2>Performance</h2>
+    <p>Nevado JMS uses REST calls to Amazon web services under the covers, so depends closely on network latency.
+    Here are a set of informal tests that we're run to provide an idea of what's possible:</p>
+    <table class="perf_table">
+        <tr><th>Message Size (bytes)</th><th># of Threads</th><th>Send Rate (msg/sec)</th><th>Receive Rate (msg/sec)</th></tr>
+        <tr><td>1</td><td>1</td><td>34</td><td>23</td></tr>
+        <tr class="alt_row"><td>1</td><td>2</td><td>71</td><td>45</td></tr>
+        <tr><td>10k</td><td>1</td><td>23</td><td>20</td></tr>
+        <tr class="alt_row"><td>10k</td><td>2</td><td>48</td><td>42</td></tr>
+    </table>
+    <p>Nevado+SQS is comparable speed-wise to <a href="http://bhavin.directi.com/rabbitmq-vs-apache-activemq-vs-apache-qpid/">ActiveMQ
+        in persistent mode</a>, which is to say it's not breath-taking.  That said, the big advantage
+        with SQS is <u>this solution scales
+        linearly</u>.  Add threads and boxes and you can scale your messaging horizontally and indefinitely.</p>
+</section>
+<section>
+    <a name="message_size"></a>
+    <h2>Message Size</h2>
+    <p>SQS imposes a message body maximum of 64k.  Due to message serialization, this means an object upper-limit of
+        48k in Nevado.  If you need larger payloads than this,
+    we recommend that you store the payload in an external store like DynamoDB and use Nevado JMS to pass identifiers
+    to the data.  Smaller messages also improve performance.</p>
+</section>
+</body>
+</html>
