@@ -1,10 +1,8 @@
 package org.skyscreamer.nevado.jms.connector.typica;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.skyscreamer.nevado.jms.connector.AbstractSQSConnectorFactory;
-import org.skyscreamer.nevado.jms.connector.SQSConnector;
-import org.skyscreamer.nevado.jms.connector.SQSConnectorFactory;
+
+import javax.jms.JMSException;
 
 /**
  * Connectory factory for Typica connector.
@@ -13,9 +11,9 @@ import org.skyscreamer.nevado.jms.connector.SQSConnectorFactory;
  */
 public class TypicaSQSConnectorFactory extends AbstractSQSConnectorFactory {
     @Override
-    public TypicaSQSConnector getInstance(String awsAccessKey, String awsSecretKey) {
-        TypicaSQSConnector typicaSQSConnector = new TypicaSQSConnector(awsAccessKey, awsSecretKey, _isSecure,
-                _receiveCheckIntervalMs);
+    public TypicaSQSConnector getInstance(String awsAccessKey, String awsSecretKey, String awsSQSEndpoint, String awsSNSEndpoint) throws JMSException {
+        TypicaSQSConnector typicaSQSConnector = new TypicaSQSConnector(awsAccessKey, awsSecretKey, awsSQSEndpoint,
+                awsSNSEndpoint, _isSecure, _receiveCheckIntervalMs);
         return typicaSQSConnector;
     }
 }

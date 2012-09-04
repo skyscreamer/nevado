@@ -9,6 +9,7 @@ import com.xerox.amazonws.sns.SNSException;
 import com.xerox.amazonws.sqs2.MessageQueue;
 import com.xerox.amazonws.sqs2.QueueService;
 import com.xerox.amazonws.sqs2.SQSException;
+import org.apache.commons.lang.StringUtils;
 import org.skyscreamer.nevado.jms.connector.AbstractSQSConnector;
 import org.skyscreamer.nevado.jms.connector.SQSQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
@@ -19,6 +20,7 @@ import javax.jms.JMSException;
 import javax.jms.JMSSecurityException;
 import javax.jms.ResourceAllocationException;
 import javax.net.ssl.SSLException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Collection;
@@ -37,10 +39,41 @@ public class TypicaSQSConnector extends AbstractSQSConnector {
     protected final QueueService _queueService;
     protected final NotificationService _notficationService;
 
-    public TypicaSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs) {
+    public TypicaSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs)
+            throws JMSException
+    {
+        this(awsAccessKey, awsAccessKey, null, null, isSecure, receiveCheckIntervalMs);
+    }
+
+    public TypicaSQSConnector(String awsAccessKey, String awsSecretKey, String awsSQSEndpoint, String awsSNSEndpoint,
+                              boolean isSecure, long receiveCheckIntervalMs) throws JMSException {
         super(receiveCheckIntervalMs);
-        _queueService = new QueueService(awsAccessKey, awsSecretKey, isSecure);
-        _notficationService = new NotificationService(awsAccessKey, awsSecretKey, isSecure);
+        if (StringUtils.isEmpty(awsSQSEndpoint)) {
+            _queueService = new QueueService(awsAccessKey, awsSecretKey, isSecure);
+        }
+        else {
+            URL sqsURL = parseURL(awsSQSEndpoint);
+            _queueService = new QueueService(awsAccessKey, awsSecretKey, isSecure, sqsURL.getHost());
+        }
+        if (StringUtils.isEmpty(awsSNSEndpoint)) {
+            _notficationService = new NotificationService(awsAccessKey, awsSecretKey, isSecure);
+        }
+        else {
+            URL snsURL = parseURL(awsSNSEndpoint);
+            _notficationService = new NotificationService(awsAccessKey, awsSecretKey, isSecure, snsURL.getHost());
+        }
+    }
+
+    private URL parseURL(String awsSQSEndpoint) throws JMSException {
+        URL sqsURL;
+        try {
+            sqsURL = new URL(awsSQSEndpoint);
+        } catch (MalformedURLException e) {
+            String exMessage = "Invalid URL: " + awsSQSEndpoint;
+            _log.error(exMessage, e);
+            throw new JMSException(exMessage);
+        }
+        return sqsURL;
     }
 
     /**
