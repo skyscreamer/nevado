@@ -1,9 +1,7 @@
 package org.skyscreamer.nevado.jms.connector.amazonaws;
 
+import org.apache.commons.lang.StringUtils;
 import org.skyscreamer.nevado.jms.connector.AbstractSQSConnectorFactory;
-import org.skyscreamer.nevado.jms.connector.SQSConnector;
-import org.skyscreamer.nevado.jms.connector.SQSConnectorFactory;
-import org.skyscreamer.nevado.jms.connector.typica.TypicaSQSConnector;
 
 /**
  * Connectory factory for Amazon AWS connector.
@@ -12,9 +10,15 @@ import org.skyscreamer.nevado.jms.connector.typica.TypicaSQSConnector;
  */
 public class AmazonAwsSQSConnectorFactory extends AbstractSQSConnectorFactory {
     @Override
-    public AmazonAwsSQSConnector getInstance(String awsAccessKey, String awsSecretKey) {
+    public AmazonAwsSQSConnector getInstance(String awsAccessKey, String awsSecretKey, String awsSQSEndpoint, String awsSNSEndpoint) {
         AmazonAwsSQSConnector amazonAwsSQSConnector = new AmazonAwsSQSConnector(awsAccessKey, awsSecretKey, _isSecure,
                 _receiveCheckIntervalMs);
+        if (StringUtils.isNotEmpty(awsSQSEndpoint)) {
+            amazonAwsSQSConnector._amazonSQS.setEndpoint(awsSQSEndpoint);
+        }
+        if (StringUtils.isNotEmpty(awsSNSEndpoint)) {
+            amazonAwsSQSConnector._amazonSNS.setEndpoint(awsSNSEndpoint);
+        }
         return amazonAwsSQSConnector;
     }
 }

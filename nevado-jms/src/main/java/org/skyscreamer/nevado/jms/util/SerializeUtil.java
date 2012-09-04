@@ -42,7 +42,7 @@ public class SerializeUtil
     public static Serializable deserializeFromString(String s) throws IOException
     {
         // Initialize buffer and converter
-        byte [] dataBytes = Base64.decodeBase64(s);
+        byte [] dataBytes = Base64.decodeBase64(s.getBytes("UTF-8"));
         return deserialize(dataBytes);
     }
 
