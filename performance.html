@@ -60,7 +60,8 @@
     <p>SQS imposes a message body maximum of 64k.  Due to message serialization, this means an object upper-limit of
         48k in Nevado.  If you need larger payloads than this,
     we recommend that you store the payload in an external store like DynamoDB and use Nevado JMS to pass identifiers
-    to the data.  Smaller messages also improve performance.</p>
+    to the data.  This is referred to as the <a href="http://eaipatterns.com/StoreInLibrary.html" target="_blank">Claim Check Pattern</a>.
+    Smaller messages improve performance.</p>
 </section>
 </body>
 </html>
