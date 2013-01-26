@@ -73,15 +73,15 @@
     <h2>Quickstart - Simplest</h2>
 
     <blockquote>
-      SQSConnectorFactory nevadoConnectorFactory = new AmazonAwsSQSConnectorFactory();<br/>
-      ConnectionFactory connectionFactory = new NevadoConnectionFactory(nevadoConnectorFactory);<br/>
-      Connection conn = connectionFactory.createConnection("[YOUR ACCESS KEY]", "[YOUR SECRET KEY]");<br/>
-      Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);<br/>
-      Queue myQueue = session.createQueue("myQueue");<br/>
-      Message msg = session.createTextMessage("My first Nevado message");<br/>
-      session.createProducer(myQueue).send(msg);<br/>
-      Message msgOut = session.createConsumer(myQueue).receive();<br/>
-      System.out.println((TextMessage)msgOut);<br/>
+      <a>SQSConnectorFactory nevadoConnectorFactory = new AmazonAwsSQSConnectorFactory();</a><br/>
+      <a>ConnectionFactory connectionFactory = new NevadoConnectionFactory(nevadoConnectorFactory);</a><br/>
+      <a>Connection conn = connectionFactory.createConnection("[YOUR ACCESS KEY]", "[YOUR SECRET KEY]");</a><br/>
+      <a>Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);</a><br/>
+      <a>Queue myQueue = session.createQueue("myQueue");</a><br/>
+      <a>Message msg = session.createTextMessage("My first Nevado message");</a><br/>
+      <a>session.createProducer(myQueue).send(msg);</a><br/>
+      <a>Message msgOut = session.createConsumer(myQueue).receive();</a><br/>
+      <a>System.out.println((TextMessage)msgOut);</a><br/>
     </blockquote>
 
     <h2>Quickstart - Spring</h2>
