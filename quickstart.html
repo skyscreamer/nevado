@@ -39,8 +39,8 @@
 </nav>
 <section>
     <a name="quickstart"></a>
-    <h2>Quickstart</h2>
-    <p>0. If you haven't already, <a href="http://aws.amazon.com/">Sign up</a> for Amazon Web Services.  Enable
+    <h2>Before you begin</h2>
+    <p>1. If you haven't already, <a href="http://aws.amazon.com/">Sign up</a> for Amazon Web Services.  Enable
         <a href="https://console.aws.amazon.com/sqs/home">SQS</a>
         and <a href="https://console.aws.amazon.com/sns/home">SNS</a>.  <a href="http://aws.amazon.com/sqs/pricing/">View pricing</a></p>
     <blockquote>Remember Amazon charges for every
@@ -49,7 +49,7 @@
             default it will "back off" pretty quickly when it's not receiving messages.)
             The pricing is fairly cheap, but it can add up in extreme cases.</blockquote>
 
-    <p>1. Get the library.  You can <a href="https://github.com/skyscreamer/nevado/downloads">download</a> it, ...</p>
+    <p>2. Get the library.  You can <a href="https://github.com/skyscreamer/nevado/downloads">download</a> it, ...</p>
 
     <div class="example">
         <p>build it:</p>
@@ -70,7 +70,22 @@
         </blockquote>
     </div>
 
-    <p>2. Configure your AWS credentials for Spring.</p>
+    <h2>Quickstart - Simplest</h2>
+
+    <blockquote>
+      SQSConnectorFactory nevadoConnectorFactory = new AmazonAwsSQSConnectorFactory();<br/>
+      ConnectionFactory connectionFactory = new NevadoConnectionFactory(nevadoConnectorFactory);<br/>
+      Connection conn = connectionFactory.createConnection("[YOUR ACCESS KEY]", "[YOUR SECRET KEY]");<br/>
+      Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);<br/>
+      Queue myQueue = session.createQueue("myQueue");<br/>
+      Message msg = session.createTextMessage("My first Nevado message");<br/>
+      session.createProducer(myQueue).send(msg);<br/>
+      Message msgOut = session.createConsumer(myQueue).receive();<br/>
+      System.out.println((TextMessage)msgOut);<br/>
+    </blockquote>
+
+    <h2>Quickstart - Spring</h2>
+    <p>1. Configure your AWS credentials for Spring.</p>
 
     <div class="example">
         <p>Create <b>aws.properties</b> in the root of your classpath.  Store your access key and secret in there.  You can
@@ -108,7 +123,7 @@
         </blockquote>
     </div>
 
-    <p>3. Set up Nevado JMS in your Spring configuration:</p>
+    <p>2. Set up Nevado JMS in your Spring configuration:</p>
 
     <div class="example">
         <p>Define your connector.  Currently Typica is supported.  (We also provide a mock connector --
@@ -168,7 +183,7 @@
         </blockquote>
     </div>
 
-    <p>4. Write your Java code.  Following is a simple example using Spring MDP's, but any JMS client code should work:</p>
+    <p>3. Write your Java code.  Following is a simple example using Spring MDP's, but any JMS client code should work:</p>
 
     <div class="example">
         <p>A listener delegate to receive the messages:</p>
@@ -229,7 +244,7 @@
         </blockquote>
     </div>
 
-    <p>5. And run it...</p>
+    <p>4. And run it...</p>
     <div class="example">
         <p>Start the program and enter some names:</p>
         <blockquote>
