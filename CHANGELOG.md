@@ -1,7 +1,11 @@
 Changelog
 =========
 
-Version 1.0.1 - 9/3/2012
+Version 1.1.1 - 1/26/2012
+-------------------------
+ - Fixed a bug in which Nevado would hang when trying to close the container running it
+
+Version 1.1.0 - 9/3/2012
 ------------------------
  - Added the ability to override SQS and SNS endpoints through NevadoConnectionFactory
  - Downgraded commons-codec dependency to 1.3 to play nicer with other libraries
