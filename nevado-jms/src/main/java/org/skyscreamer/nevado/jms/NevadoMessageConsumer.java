@@ -76,7 +76,14 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
     public NevadoMessage receive(long timeoutMs) throws JMSException {
         checkClosed();
         checkAsync();
-        NevadoMessage message = _session.receiveMessage(_destination, timeoutMs, _noLocal);
+        NevadoMessage message;
+        try {
+            message = _session.receiveMessage(_destination, timeoutMs, _noLocal);
+        }
+        catch(InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
+        }
         tryAutoAck(message);
         return message;
     }
@@ -103,8 +110,7 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
         }
     }
 
-    protected boolean processAsyncMessage() throws JMSException
-    {
+    protected boolean processAsyncMessage() throws JMSException, InterruptedException {
         checkClosed();
         boolean messageProcessed = false;
 

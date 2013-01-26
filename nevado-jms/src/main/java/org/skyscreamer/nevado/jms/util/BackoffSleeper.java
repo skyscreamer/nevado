@@ -42,13 +42,9 @@ public class BackoffSleeper {
         _wait = _minWait;
     }
 
-    public void sleep() {
-        try {
-            synchronized (_waiter) {
-                _waiter.wait(_wait);
-            }
-        } catch (InterruptedException e) {
-            _log.warn("Sleep interrupted", e);
+    public void sleep() throws InterruptedException {
+        synchronized (_waiter) {
+            _waiter.wait(_wait);
         }
         if (_wait < _maxWait) {
             _wait = Math.round(_wait * _backoffMultiplier);
@@ -58,7 +54,7 @@ public class BackoffSleeper {
         }
     }
 
-    public void interrupt() {
+    public void stopSleeping() {
         synchronized (_waiter) {
             _waiter.notifyAll();
         }
