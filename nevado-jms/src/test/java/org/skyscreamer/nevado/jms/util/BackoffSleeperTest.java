@@ -10,7 +10,7 @@ import org.junit.Test;
  */
 public class BackoffSleeperTest {
     @Test
-    public void testBackoffSleeper() {
+    public void testBackoffSleeper() throws InterruptedException {
         BackoffSleeper sleeper = new BackoffSleeper(10, 100, 2.0);
         long now = System.currentTimeMillis();
         sleeper.sleep();

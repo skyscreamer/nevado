@@ -89,7 +89,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
         }
     }
 
-    public final NevadoMessage receiveMessage(NevadoConnection connection, NevadoDestination destination, long timeoutMs) throws JMSException {
+    public final NevadoMessage receiveMessage(NevadoConnection connection, NevadoDestination destination, long timeoutMs) throws JMSException, InterruptedException {
         long startTimeMs = new Date().getTime();
         SQSQueue sqsQueue = getSQSQueue(destination);
         SQSMessage sqsMessage = receiveSQSMessage(connection, destination, timeoutMs, startTimeMs, sqsQueue);
@@ -157,8 +157,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
 
     protected final SQSMessage receiveSQSMessage(NevadoConnection connection, NevadoDestination destination, long timeoutMs,
                                            long startTimeMs, SQSQueue sqsQueue)
-            throws JMSException
-    {
+            throws JMSException, InterruptedException {
         SQSMessage sqsMessage;
         while(true) {
             if (connection.isRunning()) {
@@ -184,11 +183,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
                 break;
             }
 
-            try {
-                Thread.sleep(_receiveCheckIntervalMs);
-            } catch (InterruptedException e) {
-                _log.warn("Wait time between receive checks interrupted", e);
-            }
+            Thread.sleep(_receiveCheckIntervalMs);
         }
         if (_log.isDebugEnabled())
         {

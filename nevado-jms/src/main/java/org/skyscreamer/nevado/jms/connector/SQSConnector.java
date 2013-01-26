@@ -20,7 +20,7 @@ public interface SQSConnector {
     void sendMessages(NevadoDestination destination, List<NevadoMessage> outgoingMessages) throws JMSException;
 
     NevadoMessage receiveMessage(NevadoConnection connection, NevadoDestination destination, long timeoutMs)
-        throws JMSException;
+            throws JMSException, InterruptedException;
     void deleteMessage(NevadoMessage message) throws JMSException;
     void resetMessage(NevadoMessage message) throws JMSException;
 
