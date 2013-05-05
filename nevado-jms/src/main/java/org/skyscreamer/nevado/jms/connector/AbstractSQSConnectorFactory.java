@@ -15,6 +15,7 @@ public abstract class AbstractSQSConnectorFactory implements SQSConnectorFactory
 
     public static final int DEFAULT_RECEIVE_CHECK_INTERVAL_MS = 200;
     protected boolean _isSecure = true;
+    protected boolean _useAsyncSend = false;
     protected long _receiveCheckIntervalMs = DEFAULT_RECEIVE_CHECK_INTERVAL_MS;
 
     @Override
@@ -30,6 +31,10 @@ public abstract class AbstractSQSConnectorFactory implements SQSConnectorFactory
         _isSecure = secure;
     }
 
+    public void setUseAsyncSend(boolean useAsyncSend) {
+		this._useAsyncSend = useAsyncSend;
+	}
+    
     public void setReceiveCheckIntervalMs(long receiveCheckIntervalMs) {
         if (receiveCheckIntervalMs < DEFAULT_RECEIVE_CHECK_INTERVAL_MS) {
             _log.warn("Reducing the receiveCheckInterval will increase your AWS costs.  " +
