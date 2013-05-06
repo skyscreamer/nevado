@@ -28,7 +28,7 @@ public class AmazonAwsSQSConnectorFactory extends AbstractSQSConnectorFactory {
         _useAsyncSend = useAsyncSend;
     }
     
-    public boolean getUseAsyncSend() {
+    public boolean isUseAsyncSend() {
         return _useAsyncSend;
     }
 }
