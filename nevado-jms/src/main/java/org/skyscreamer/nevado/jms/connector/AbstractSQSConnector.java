@@ -1,13 +1,6 @@
 package org.skyscreamer.nevado.jms.connector;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-
-import javax.jms.InvalidDestinationException;
-import javax.jms.JMSException;
-
+import com.xerox.amazonws.sqs2.SQSException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -21,6 +14,13 @@ import org.skyscreamer.nevado.jms.message.NevadoMessage;
 import org.skyscreamer.nevado.jms.message.NevadoProperty;
 import org.skyscreamer.nevado.jms.util.MessageIdUtil;
 import org.skyscreamer.nevado.jms.util.SerializeUtil;
+
+import javax.jms.InvalidDestinationException;
+import javax.jms.JMSException;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Abstract connector that handles handling of messages and queues independent of the actual implementation.
