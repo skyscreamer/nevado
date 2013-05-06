@@ -43,6 +43,7 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs) {
         this(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, false);
     }
+    
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, boolean isAsync) {
         super(receiveCheckIntervalMs);
         AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
@@ -57,7 +58,7 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
         }
     }
 
-	@Override
+    @Override
     protected void sendSNSMessage(NevadoTopic topic, String serializedMessage) throws JMSException {
         String arn = getTopicARN(topic);
         try {
