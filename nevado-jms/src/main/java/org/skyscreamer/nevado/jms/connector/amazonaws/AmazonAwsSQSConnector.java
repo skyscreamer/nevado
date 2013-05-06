@@ -40,6 +40,9 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
     private final AmazonSQS _amazonSQS;
     private final AmazonSNS _amazonSNS;
 
+    public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs) {
+        this(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, false);
+    }
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, boolean isAsync) {
         super(receiveCheckIntervalMs);
         AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
