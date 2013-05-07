@@ -7,9 +7,11 @@ import com.amazonaws.Protocol;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.sns.AmazonSNS;
+import com.amazonaws.services.sns.AmazonSNSAsyncClient;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.*;
 import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.AmazonSQSAsyncClient;
 import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.CreateQueueRequest;
 import com.amazonaws.services.sqs.model.CreateQueueResult;
@@ -35,16 +37,25 @@ import java.util.HashSet;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class AmazonAwsSQSConnector extends AbstractSQSConnector {
-    protected final AmazonSQS _amazonSQS;
-    protected final AmazonSNS _amazonSNS;
+    private final AmazonSQS _amazonSQS;
+    private final AmazonSNS _amazonSNS;
 
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs) {
+        this(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, false);
+    }
+    
+    public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, boolean isAsync) {
         super(receiveCheckIntervalMs);
         AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         clientConfiguration.setProtocol(isSecure ? Protocol.HTTPS : Protocol.HTTP);
-        _amazonSQS = new AmazonSQSClient(awsCredentials, clientConfiguration);
-        _amazonSNS = new AmazonSNSClient(awsCredentials, clientConfiguration);
+        if (isAsync) {
+            _amazonSQS = new AmazonSQSClient(awsCredentials, clientConfiguration);
+            _amazonSNS = new AmazonSNSClient(awsCredentials, clientConfiguration);
+        } else {
+            _amazonSQS = new AmazonSQSAsyncClient(awsCredentials, clientConfiguration, null);
+            _amazonSNS = new AmazonSNSAsyncClient(awsCredentials, clientConfiguration, null);
+        }
     }
 
     @Override
