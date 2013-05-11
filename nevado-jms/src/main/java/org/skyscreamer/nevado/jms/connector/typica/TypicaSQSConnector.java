@@ -35,6 +35,7 @@ import java.util.List;
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
+@Deprecated
 public class TypicaSQSConnector extends AbstractSQSConnector {
     protected final QueueService _queueService;
     protected final NotificationService _notficationService;
