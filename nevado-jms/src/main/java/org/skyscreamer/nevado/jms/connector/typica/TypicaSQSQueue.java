@@ -14,6 +14,7 @@ import java.util.Map;
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
+@Deprecated
 class TypicaSQSQueue implements SQSQueue {
     private final TypicaSQSConnector _typicaSQSConnector;
     private final MessageQueue _sqsQueue;

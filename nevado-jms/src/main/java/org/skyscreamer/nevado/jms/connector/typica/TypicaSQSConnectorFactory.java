@@ -9,6 +9,7 @@ import javax.jms.JMSException;
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
+@Deprecated
 public class TypicaSQSConnectorFactory extends AbstractSQSConnectorFactory {
     @Override
     public TypicaSQSConnector getInstance(String awsAccessKey, String awsSecretKey, String awsSQSEndpoint, String awsSNSEndpoint) throws JMSException {
