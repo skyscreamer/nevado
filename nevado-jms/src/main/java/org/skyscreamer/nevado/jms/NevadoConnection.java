@@ -110,9 +110,16 @@ public class NevadoConnection implements Connection {
         synchronized (_closed) {
             if (!_closed.get()) {
                 stop();
+                List<JMSException> sessionExceptions = new ArrayList<JMSException>();
                 for(NevadoSession session : _sessions)
                 {
-                    session.close();
+                    try {
+                        session.close();
+                    } catch (JMSException e) {
+                        sessionExceptions.add(e);
+                        _log.warn("Caught exception closing a session.  Will continue trying to clean up, then will " +
+                                "throw it up the stack.  (First one if multiple.)", e);
+                    }
                 }
                 for(NevadoDestination temporaryDestination : new ArrayList<NevadoDestination>(_temporaryDestinations)) {
                     try {
@@ -137,6 +144,9 @@ public class NevadoConnection implements Connection {
                 }
                 _temporaryDestinations.clear();
                 _closed.set(true);
+                if (sessionExceptions.size() > 0) {
+                    throw sessionExceptions.get(0);
+                }
             }
         }
     }
