@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>Nevado - JMS for Amazon SQS/SNS - Performance</title>
+    <title>Nevado - Spring meets Amazon's cloud services - Performance</title>
     <meta name="description" content="Enable field selectors and call aggregation on Java-based REST servers." />
     <meta name="keywords" content="yoga,yoga rest,field selector,java rest,java restful,yoga api,rest aggregate,rest open source" />
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -40,19 +40,30 @@
 <section>
     <a name="performance"></a>
     <h2>Performance</h2>
-    <p>Nevado JMS uses REST calls to Amazon web services under the covers, so depends closely on network latency.
-    Here are a set of informal tests that we're run to provide an idea of what's possible:</p>
+    <p>Nevado adds less than 100 <i>micro-</i>seconds to each send/receive operation, so
+        performance is purely determined by AWS, your network, and the AWS SDK.
+        Here are some tests we ran. Your mileage may vary.</p>
+
     <table class="perf_table">
-        <tr><th>Message Size (bytes)</th><th># of Threads</th><th>Send Rate (msg/sec)</th><th>Receive Rate (msg/sec)</th></tr>
-        <tr><td>1</td><td>1</td><td>34</td><td>23</td></tr>
-        <tr class="alt_row"><td>1</td><td>2</td><td>71</td><td>45</td></tr>
-        <tr><td>10k</td><td>1</td><td>23</td><td>20</td></tr>
-        <tr class="alt_row"><td>10k</td><td>2</td><td>48</td><td>42</td></tr>
+        <tr><th>Message Size</th><th>Threads</th><th>Send (msg/sec)</th><th>Receive (msg/sec)</th></tr>
+        <tr><td>1 kb</td><td>1</td><td>51</td><td>38</td></tr>
+        <tr class="alt_row"><td>1 kb</td><td>2</td><td>93</td><td>65</td></tr>
+        <tr><td>1 kb</td><td>4</td><td>197</td><td>145</td></tr>
+        <tr class="alt_row"><td>40 kb</td><td>1</td><td>14</td><td>23</td></tr>
+        <tr><td>40 kb</td><td>2</td><td>27</td><td>41</td></tr>
+        <tr class="alt_row"><td>40 kb</td><td>4</td><td>57</td><td>93</td></tr>
     </table>
-    <p>Nevado+SQS is comparable speed-wise to <a href="http://bhavin.directi.com/rabbitmq-vs-apache-activemq-vs-apache-qpid/">ActiveMQ
-        in persistent mode</a>, which is to say it's not breath-taking.  That said, the big advantage
-        with SQS is <u>this solution scales
-        linearly</u>.  Add threads and boxes and you can scale your messaging horizontally and indefinitely.</p>
+
+    <h3>Summary</h3>
+    <p>Performance is comparable to <a href="http://bhavin.directi.com/rabbitmq-vs-apache-activemq-vs-apache-qpid/">ActiveMQ
+        in persistent mode</a>.  It's good for load distribution, but it's no Ferrari.  If you are looking to handle
+        thousands of
+        messages per second, you'll either need to scale over many servers, or run your own queueing solution.
+    </p>
+    <p>
+        Nevado is ideal for starting a new solution that needs to grow over time.  If you need to change in the future,
+        you can always switch to another JMS provider without changing your client code.
+    </p>
 </section>
 <section>
     <a name="message_size"></a>
@@ -60,8 +71,7 @@
     <p>SQS imposes a message body maximum of 64k.  Due to message serialization, this means an object upper-limit of
         48k in Nevado.  If you need larger payloads than this,
     we recommend that you store the payload in an external store like DynamoDB and use Nevado JMS to pass identifiers
-    to the data.  This is referred to as the <a href="http://eaipatterns.com/StoreInLibrary.html" target="_blank">Claim Check Pattern</a>.
-    Smaller messages improve performance.</p>
+    to the data.  Smaller messages also improve performance.</p>
 </section>
 </body>
 </html>
