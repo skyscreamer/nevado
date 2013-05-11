@@ -26,7 +26,10 @@ public class TopicSubscriberTest extends AbstractJMSTest {
         TextMessage msgOut2 = (TextMessage)consumer2.receive(1000);
         Assert.assertEquals(testMessage.getText(), msgOut1.getText());
         Assert.assertEquals(testMessage.getText(), msgOut2.getText());
-        getConnection().getSQSConnector().deleteTopic(testTopic);
+        producer.close();
+        consumer1.close();
+        consumer2.close();
+        getConnection().deleteTopic(testTopic);
     }
 
     @Test
