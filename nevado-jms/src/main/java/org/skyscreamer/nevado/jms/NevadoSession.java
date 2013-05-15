@@ -568,14 +568,14 @@ public class NevadoSession implements Session {
         _asyncConsumerRunner.start();
     }
 
-    protected synchronized void stop() throws JMSException
+    protected synchronized void stop()
     {
         try {
             _asyncConsumerRunner.stop();
         } catch (InterruptedException e) {
             String exMessage = "Session threads may not have closed yet: " + e.getMessage();
             _log.warn(exMessage, e);
-            throw new JMSException(exMessage);
+            Thread.currentThread().interrupt();
         }
     }
 

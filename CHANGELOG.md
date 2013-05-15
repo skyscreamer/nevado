@@ -1,7 +1,16 @@
 Changelog
 =========
 
-Version 1.1.1 - 1/26/2012
+Version 1.2.0 - 5/11/2013
+-------------------------
+ - Add support for asynchronous API calls in AWS connector (thanks @shlasouski!)
+ - Make best effort clean-up when exception encountered during connection.close()
+ - Modernize the maven dependencies
+ - Fixed interrupt handling in Session.stop()
+ - Make timing more coarse in BackoffSleeperTest to make it Cloudbees friendly
+ - Typica is being **deprecated** going forward due to lack of development
+
+Version 1.1.1 - 1/26/2013
 -------------------------
  - Fixed a bug in which Nevado would hang when trying to close the container running it
 

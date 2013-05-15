@@ -10,6 +10,8 @@ import org.skyscreamer.nevado.jms.message.NevadoMessage;
 
 import javax.jms.*;
 import javax.jms.IllegalStateException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, TopicSubscriber {
@@ -96,9 +98,16 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
     public synchronized void close() throws JMSException {
         if (!_closed)
         {
+            List<JMSException> exceptions = new ArrayList<JMSException>();
             if (_destination instanceof NevadoTopic && !((NevadoTopic)_destination).isDurable())
             {
-                _session.getConnection().unsubscribe((NevadoTopic)_destination);
+                try {
+                    _session.getConnection().unsubscribe((NevadoTopic)_destination);
+                } catch (JMSException e) {
+                    _log.warn("Exception thrown trying to unsubscribe.  Will continue trying to close then will throw " +
+                            "exception.  (First one if multiple.)", e);
+                    exceptions.add(e);
+                }
             }
             NevadoMessage parkedMessage;
             if ((parkedMessage = _messageParking.getAndSet(null)) != null)
@@ -107,6 +116,9 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
             }
             _messageListener = null;
             _closed = true;
+            if (exceptions.size() > 0) {
+                throw exceptions.get(0);
+            }
         }
     }
 

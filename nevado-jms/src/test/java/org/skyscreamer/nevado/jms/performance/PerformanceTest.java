@@ -24,16 +24,18 @@ public class PerformanceTest extends AbstractJMSTest {
     public void testSequence() throws JMSException, InterruptedException {
         PerformanceResult result = _performanceService.runSample(getConnection(), NUM_MESSAGES, MESSAGE_SIZE,
                 NUM_THREADS, MESSAGE_SEND_DELAY_MS);
-        _log.info("Sent " + result.getNumMessagesSent() + " messages in " + result.getTotalSendTimeMs()
-                + " ms for an average of " + (result.getTotalSendTimeMs() / result.getNumMessagesSent()) + " ms/msg "
+        _log.warn("Sent " + result.getNumMessagesSent() + " messages in " + result.getTotalSendTimeMs()
+                + " ms - " + (result.getTotalSendTimeMs() / result.getNumMessagesSent()) + " ms/msg, "
+                + ((result.getNumMessagesSent()*1000) / result.getTotalSendTimeMs()) + " msg/sec "
                 + "(including an introduced delay of " + MESSAGE_SEND_DELAY_MS + " ms)");
-        _log.info("Received  " + result.getNumMessagesReceived() + " messages in " + result.getTotalReceiveTimeMs()
-                + " ms for an average of " + (result.getTotalReceiveTimeMs() / result.getNumMessagesReceived()) + " ms/msg");
-        _log.info("Messages out of order: " + result.getNumOutOfOrder());
-        _log.info("Duplicate messages: " + result.getNumDupMessages());
-        _log.info("Missed messages: " + result.getNumMissedMessages());
-        _log.info("Message size: " + result.getMessageSize());
-        _log.info("# of threads: " + result.getNumThreads());
+        _log.warn("Received  " + result.getNumMessagesReceived() + " messages in " + result.getTotalReceiveTimeMs()
+                + " ms - " + (result.getTotalReceiveTimeMs() / result.getNumMessagesSent()) + " ms/msg, "
+                + ((result.getNumMessagesSent()*1000) / result.getTotalReceiveTimeMs()) + " msg/sec ");
+        _log.warn("Messages out of order: " + result.getNumOutOfOrder());
+        _log.warn("Duplicate messages: " + result.getNumDupMessages());
+        _log.warn("Missed messages: " + result.getNumMissedMessages());
+        _log.warn("Message size: " + result.getMessageSize());
+        _log.warn("# of threads: " + result.getNumThreads());
         Assert.assertEquals(0, result.getNumDupMessages());
         Assert.assertEquals(0, result.getNumMissedMessages());
     }

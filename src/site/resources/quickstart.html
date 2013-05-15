@@ -111,11 +111,11 @@
     <p>3. Set up Nevado JMS in your Spring configuration:</p>
 
     <div class="example">
-        <p>Define your connector.  Currently Typica is supported.  (We also provide a mock connector --
-            org.skyscreamer.nevado.jms.connector.typica.mock.MockSQSConnectorFactory
-            -- that allows you to develop offline.):</p>
+        <p>Define your connector.  We recommend Amazon's SDK.  We also provide a mock connector
+            (org.skyscreamer.nevado.jms.connector.mock.MockSQSConnectorFactory)
+            that allows you to develop offline.):</p>
         <blockquote>
-            <a>&lt;bean id="sqsConnectorFactory" class="org.skyscreamer.nevado.jms.connector.typica.TypicaSQSConnectorFactory" /&gt;</a><br/>
+            <a>&lt;bean id="sqsConnectorFactory" class="org.skyscreamer.nevado.jms.connector.amazonaws.AmazonAwsSQSConnectorFactory" /&gt;</a><br/>
         </blockquote>
     </div>
 

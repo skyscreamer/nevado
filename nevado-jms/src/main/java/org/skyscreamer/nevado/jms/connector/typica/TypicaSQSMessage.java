@@ -8,6 +8,7 @@ import org.skyscreamer.nevado.jms.connector.SQSMessage;
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
+@Deprecated
 class TypicaSQSMessage implements SQSMessage {
     private final Message _message;
 
