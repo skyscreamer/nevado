@@ -50,11 +50,11 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         clientConfiguration.setProtocol(isSecure ? Protocol.HTTPS : Protocol.HTTP);
         if (isAsync) {
-            _amazonSQS = new AmazonSQSClient(awsCredentials, clientConfiguration);
-            _amazonSNS = new AmazonSNSClient(awsCredentials, clientConfiguration);
-        } else {
             _amazonSQS = new AmazonSQSAsyncClient(awsCredentials, clientConfiguration, null);
             _amazonSNS = new AmazonSNSAsyncClient(awsCredentials, clientConfiguration, null);
+        } else {
+            _amazonSQS = new AmazonSQSClient(awsCredentials, clientConfiguration);
+            _amazonSNS = new AmazonSNSClient(awsCredentials, clientConfiguration);
         }
     }
 
