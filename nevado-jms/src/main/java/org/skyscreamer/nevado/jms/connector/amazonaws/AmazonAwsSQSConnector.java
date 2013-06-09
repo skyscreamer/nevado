@@ -17,11 +17,14 @@ import com.amazonaws.services.sqs.model.CreateQueueRequest;
 import com.amazonaws.services.sqs.model.CreateQueueResult;
 import com.amazonaws.services.sqs.model.ListQueuesRequest;
 import com.amazonaws.services.sqs.model.ListQueuesResult;
+import com.amazonaws.services.sqs.model.SendMessageRequest;
+import com.amazonaws.services.sqs.model.SendMessageResult;
 import org.skyscreamer.nevado.jms.connector.AbstractSQSConnector;
 import org.skyscreamer.nevado.jms.connector.SQSQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoTopic;
+import org.skyscreamer.nevado.jms.util.MessageIdUtil;
 
 import javax.jms.JMSException;
 import javax.jms.JMSSecurityException;
@@ -51,8 +54,20 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         clientConfiguration.setProtocol(isSecure ? Protocol.HTTPS : Protocol.HTTP);
         if (isAsync) {
-            _amazonSQS = new AmazonSQSAsyncClient(awsCredentials, clientConfiguration, Executors.newCachedThreadPool());
-            _amazonSNS = new AmazonSNSAsyncClient(awsCredentials, clientConfiguration, Executors.newCachedThreadPool());
+            _amazonSQS = new AmazonSQSAsyncClient(awsCredentials, clientConfiguration, Executors.newCachedThreadPool()) {
+                @Override
+                public SendMessageResult sendMessage(SendMessageRequest sendMessageRequest) throws AmazonServiceException, AmazonClientException {
+                    sendMessageAsync(sendMessageRequest);
+                    return new SendMessageResult().withMessageId(MessageIdUtil.createMessageId());
+                }
+            };
+            _amazonSNS = new AmazonSNSAsyncClient(awsCredentials, clientConfiguration, Executors.newCachedThreadPool()) {
+                @Override
+                public PublishResult publish(PublishRequest publishRequest) throws AmazonServiceException, AmazonClientException {
+                    publishAsync(publishRequest);
+                    return new PublishResult().withMessageId(MessageIdUtil.createMessageId());
+                }
+            };
         } else {
             _amazonSQS = new AmazonSQSClient(awsCredentials, clientConfiguration);
             _amazonSNS = new AmazonSNSClient(awsCredentials, clientConfiguration);
