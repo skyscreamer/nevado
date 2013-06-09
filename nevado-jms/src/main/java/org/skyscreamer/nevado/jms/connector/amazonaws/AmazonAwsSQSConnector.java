@@ -54,14 +54,14 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         clientConfiguration.setProtocol(isSecure ? Protocol.HTTPS : Protocol.HTTP);
         if (isAsync) {
-            _amazonSQS = new AmazonSQSAsyncClient(awsCredentials, clientConfiguration, Executors.newCachedThreadPool()) {
+            _amazonSQS = new AmazonSQSAsyncClient(awsCredentials, clientConfiguration, Executors.newSingleThreadExecutor()) {
                 @Override
                 public SendMessageResult sendMessage(SendMessageRequest sendMessageRequest) throws AmazonServiceException, AmazonClientException {
                     sendMessageAsync(sendMessageRequest);
                     return new SendMessageResult().withMessageId(MessageIdUtil.createMessageId());
                 }
             };
-            _amazonSNS = new AmazonSNSAsyncClient(awsCredentials, clientConfiguration, Executors.newCachedThreadPool()) {
+            _amazonSNS = new AmazonSNSAsyncClient(awsCredentials, clientConfiguration, Executors.newSingleThreadExecutor()) {
                 @Override
                 public PublishResult publish(PublishRequest publishRequest) throws AmazonServiceException, AmazonClientException {
                     publishAsync(publishRequest);
