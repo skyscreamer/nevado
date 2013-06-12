@@ -1,10 +1,8 @@
 package org.skyscreamer.nevado.jms.connector.amazonaws;
 
 import com.amazonaws.AmazonServiceException;
-import com.amazonaws.services.sqs.AmazonSQSAsyncClient;
 import com.amazonaws.services.sqs.model.*;
 import org.skyscreamer.nevado.jms.connector.SQSQueue;
-import org.skyscreamer.nevado.jms.util.MessageIdUtil;
 
 import javax.jms.JMSException;
 import java.util.Collections;
@@ -21,31 +19,22 @@ public class AmazonAwsSQSQueue implements SQSQueue {
     public static final String ATTRIBUTE_POLICY = "Policy";
     private final String _queueUrl;
     private final AmazonAwsSQSConnector _amazonAwsSQSConnector;
-    private final boolean _isAsycn;
 
-    public AmazonAwsSQSQueue(AmazonAwsSQSConnector amazonAwsSQSConnector, String queueUrl, boolean isAsync) {
+    public AmazonAwsSQSQueue(AmazonAwsSQSConnector amazonAwsSQSConnector, String queueUrl) {
         _amazonAwsSQSConnector = amazonAwsSQSConnector;
         _queueUrl = queueUrl;
-        _isAsycn = isAsync;
     }
 
     @Override
     public String sendMessage(String serializedMessage) throws JMSException {
-        SendMessageRequest sendMessageRequest;
-        String result;
+        SendMessageResult result;
         try {
-            sendMessageRequest = new SendMessageRequest(_queueUrl, serializedMessage);
-            if (_isAsycn) {
-                ((AmazonSQSAsyncClient)_amazonAwsSQSConnector.getAmazonSQS()).sendMessageAsync(sendMessageRequest);
-                result = MessageIdUtil.createMessageId();
-            } else {
-                result = _amazonAwsSQSConnector.getAmazonSQS().sendMessage(sendMessageRequest).getMessageId();
-            }
+            result = _amazonAwsSQSConnector.getAmazonSQS().sendMessage(new SendMessageRequest(_queueUrl, serializedMessage));
         }
         catch (AmazonServiceException e) {
             throw _amazonAwsSQSConnector.handleAWSException("Unable to send message to queue " + _queueUrl, e);
         }
-        return result;
+        return result.getMessageId();
     }
 
     @Override
