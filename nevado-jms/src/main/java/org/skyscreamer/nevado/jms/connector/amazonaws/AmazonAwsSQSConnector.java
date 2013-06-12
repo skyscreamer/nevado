@@ -44,6 +44,7 @@ import java.util.concurrent.Executors;
 public class AmazonAwsSQSConnector extends AbstractSQSConnector {
     private final AmazonSQS _amazonSQS;
     private final AmazonSNS _amazonSNS;
+    private final boolean _isAsync;
 
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs) {
         this(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, false);
@@ -54,22 +55,12 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
         AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         clientConfiguration.setProtocol(isSecure ? Protocol.HTTPS : Protocol.HTTP);
+        _isAsync = isAsync;
         if (isAsync) {
+            
             ExecutorService executorService = Executors.newSingleThreadExecutor();
-            _amazonSQS = new AmazonSQSAsyncClient(awsCredentials, clientConfiguration, executorService) {
-                @Override
-                public SendMessageResult sendMessage(SendMessageRequest sendMessageRequest) throws AmazonServiceException, AmazonClientException {
-                    sendMessageAsync(sendMessageRequest);
-                    return new SendMessageResult().withMessageId(MessageIdUtil.createMessageId());
-                }
-            };
-            _amazonSNS = new AmazonSNSAsyncClient(awsCredentials, clientConfiguration, executorService) {
-                @Override
-                public PublishResult publish(PublishRequest publishRequest) throws AmazonServiceException, AmazonClientException {
-                    publishAsync(publishRequest);
-                    return new PublishResult().withMessageId(MessageIdUtil.createMessageId());
-                }
-            };
+            _amazonSQS = new AmazonSQSAsyncClient(awsCredentials, clientConfiguration, executorService);
+            _amazonSNS = new AmazonSNSAsyncClient(awsCredentials, clientConfiguration, executorService);
         } else {
             _amazonSQS = new AmazonSQSClient(awsCredentials, clientConfiguration);
             _amazonSNS = new AmazonSNSClient(awsCredentials, clientConfiguration);
@@ -79,8 +70,14 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
     @Override
     protected void sendSNSMessage(NevadoTopic topic, String serializedMessage) throws JMSException {
         String arn = getTopicARN(topic);
+        PublishRequest publishRequest;
         try {
-            _amazonSNS.publish(new PublishRequest(arn, serializedMessage));
+            publishRequest = new PublishRequest(arn, serializedMessage);
+            if (_isAsync) {
+                ((AmazonSNSAsyncClient)_amazonSNS).publishAsync(publishRequest);
+            } else {
+                _amazonSNS.publish(publishRequest);
+            }
         }
         catch (AmazonClientException e) {
             throw handleAWSException("Unable to send message to topic: " + arn, e);
@@ -99,14 +96,14 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
             throw handleAWSException("Unable to get message queue '" + queue, e);
         }
 
-        return new AmazonAwsSQSQueue(this, queue.getQueueUrl());
+        return new AmazonAwsSQSQueue(this, queue.getQueueUrl(), _isAsync);
     }
 
     @Override
     public void test() throws JMSException {
         try {
             _amazonSQS.listQueues();
-            _amazonSNS.listSubscriptions();
+            //_amazonSNS.listSubscriptions();
         } catch (AmazonClientException e) {
             throw handleAWSException("Connection test failed", e);
         }

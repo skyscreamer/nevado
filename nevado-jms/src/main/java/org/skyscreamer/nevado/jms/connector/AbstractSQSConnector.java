@@ -1,6 +1,5 @@
 package org.skyscreamer.nevado.jms.connector;
 
-import com.xerox.amazonws.sqs2.SQSException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
