@@ -56,20 +56,8 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
         clientConfiguration.setProtocol(isSecure ? Protocol.HTTPS : Protocol.HTTP);
         if (isAsync) {
             ExecutorService executorService = Executors.newSingleThreadExecutor();
-            _amazonSQS = new AmazonSQSAsyncClient(awsCredentials, clientConfiguration, executorService) {
-                @Override
-                public SendMessageResult sendMessage(SendMessageRequest sendMessageRequest) throws AmazonServiceException, AmazonClientException {
-                    sendMessageAsync(sendMessageRequest);
-                    return new SendMessageResult().withMessageId(MessageIdUtil.createMessageId());
-                }
-            };
-            _amazonSNS = new AmazonSNSAsyncClient(awsCredentials, clientConfiguration, executorService) {
-                @Override
-                public PublishResult publish(PublishRequest publishRequest) throws AmazonServiceException, AmazonClientException {
-                    publishAsync(publishRequest);
-                    return new PublishResult().withMessageId(MessageIdUtil.createMessageId());
-                }
-            };
+            _amazonSQS = new NevadoAmazonSQSAsyncClient(new AmazonSQSAsyncClient(awsCredentials, clientConfiguration, executorService));
+            _amazonSNS = new NevadoAmazonSNSAsyncClient(new AmazonSNSAsyncClient(awsCredentials, clientConfiguration, executorService));
         } else {
             _amazonSQS = new AmazonSQSClient(awsCredentials, clientConfiguration);
             _amazonSNS = new AmazonSNSClient(awsCredentials, clientConfiguration);
