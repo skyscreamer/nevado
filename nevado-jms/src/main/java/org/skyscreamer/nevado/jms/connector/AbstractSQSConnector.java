@@ -1,6 +1,13 @@
 package org.skyscreamer.nevado.jms.connector;
 
-import com.xerox.amazonws.sqs2.SQSException;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+
+import javax.jms.InvalidDestinationException;
+import javax.jms.JMSException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -14,13 +21,6 @@ import org.skyscreamer.nevado.jms.message.NevadoMessage;
 import org.skyscreamer.nevado.jms.message.NevadoProperty;
 import org.skyscreamer.nevado.jms.util.MessageIdUtil;
 import org.skyscreamer.nevado.jms.util.SerializeUtil;
-
-import javax.jms.InvalidDestinationException;
-import javax.jms.JMSException;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Abstract connector that handles handling of messages and queues independent of the actual implementation.
@@ -211,6 +211,15 @@ public abstract class AbstractSQSConnector implements SQSConnector {
         if (destination instanceof NevadoQueue)
         {
             messageBody = sqsMessage.getMessageBody();
+            try {
+                /* Could it be a SNS notification? */
+                JSONObject notification = new JSONObject(sqsMessage.getMessageBody());
+                if (notification.has("Type") && "Notification".equals(notification.getString("Type"))) {
+                    messageBody = notification.getString("Message");
+                }
+            } catch (JSONException e) {
+                /* It's not a SNS notification */
+            }
         }
         else
         {
