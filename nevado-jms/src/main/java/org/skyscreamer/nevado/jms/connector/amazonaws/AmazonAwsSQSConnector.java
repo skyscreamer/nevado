@@ -6,25 +6,22 @@ import com.amazonaws.ClientConfiguration;
 import com.amazonaws.Protocol;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.sns.AmazonSNS;
-import com.amazonaws.services.sns.AmazonSNSAsyncClient;
-import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.*;
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.AmazonSQSAsyncClient;
-import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.CreateQueueRequest;
 import com.amazonaws.services.sqs.model.CreateQueueResult;
 import com.amazonaws.services.sqs.model.ListQueuesRequest;
 import com.amazonaws.services.sqs.model.ListQueuesResult;
-import com.amazonaws.services.sqs.model.SendMessageRequest;
-import com.amazonaws.services.sqs.model.SendMessageResult;
 import org.skyscreamer.nevado.jms.connector.AbstractSQSConnector;
 import org.skyscreamer.nevado.jms.connector.SQSQueue;
+import org.skyscreamer.nevado.jms.connector.amazonaws.client.NevadoAmazonSNS;
+import org.skyscreamer.nevado.jms.connector.amazonaws.client.NevadoAmazonSNSAsyncClient;
+import org.skyscreamer.nevado.jms.connector.amazonaws.client.NevadoAmazonSNSClient;
+import org.skyscreamer.nevado.jms.connector.amazonaws.client.NevadoAmazonSQS;
+import org.skyscreamer.nevado.jms.connector.amazonaws.client.NevadoAmazonSQSAsyncClient;
+import org.skyscreamer.nevado.jms.connector.amazonaws.client.NevadoAmazonSQSClient;
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoTopic;
-import org.skyscreamer.nevado.jms.util.MessageIdUtil;
 
 import javax.jms.JMSException;
 import javax.jms.JMSSecurityException;
@@ -42,25 +39,25 @@ import java.util.concurrent.Executors;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class AmazonAwsSQSConnector extends AbstractSQSConnector {
-    private final AmazonSQS _amazonSQS;
-    private final AmazonSNS _amazonSNS;
+    private final NevadoAmazonSQS _amazonSQS;
+    private final NevadoAmazonSNS _amazonSNS;
 
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs) {
         this(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, false);
     }
     
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, boolean isAsync) {
-        super(receiveCheckIntervalMs);
+        super(receiveCheckIntervalMs, isAsync);
         AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         clientConfiguration.setProtocol(isSecure ? Protocol.HTTPS : Protocol.HTTP);
         if (isAsync) {
             ExecutorService executorService = Executors.newSingleThreadExecutor();
-            _amazonSQS = new NevadoAmazonSQSAsyncClient(new AmazonSQSAsyncClient(awsCredentials, clientConfiguration, executorService));
-            _amazonSNS = new NevadoAmazonSNSAsyncClient(new AmazonSNSAsyncClient(awsCredentials, clientConfiguration, executorService));
+            _amazonSQS = new NevadoAmazonSQSAsyncClient(awsCredentials, clientConfiguration, executorService);
+            _amazonSNS = new NevadoAmazonSNSAsyncClient(awsCredentials, clientConfiguration, executorService);
         } else {
-            _amazonSQS = new AmazonSQSClient(awsCredentials, clientConfiguration);
-            _amazonSNS = new AmazonSNSClient(awsCredentials, clientConfiguration);
+            _amazonSQS = new NevadoAmazonSQSClient(awsCredentials, clientConfiguration);
+            _amazonSNS = new NevadoAmazonSNSClient(awsCredentials, clientConfiguration);
         }
     }
 
@@ -180,11 +177,11 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
         }
     }
 
-    public AmazonSQS getAmazonSQS() {
+    public NevadoAmazonSQS getAmazonSQS() {
         return _amazonSQS;
     }
 
-    public AmazonSNS getAmazonSNS() {
+    public NevadoAmazonSNS getAmazonSNS() {
         return _amazonSNS;
     }
 
