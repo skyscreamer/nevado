@@ -2,13 +2,10 @@ package org.skyscreamer.nevado.jms.connector.amazonaws.client;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
-import com.amazonaws.AmazonWebServiceRequest;
 import com.amazonaws.ClientConfiguration;
-import com.amazonaws.ResponseMetadata;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClient;
-import com.amazonaws.services.sqs.model.AddPermissionRequest;
 import com.amazonaws.services.sqs.model.ChangeMessageVisibilityRequest;
 import com.amazonaws.services.sqs.model.CreateQueueRequest;
 import com.amazonaws.services.sqs.model.CreateQueueResult;
@@ -20,7 +17,6 @@ import com.amazonaws.services.sqs.model.ListQueuesRequest;
 import com.amazonaws.services.sqs.model.ListQueuesResult;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
-import com.amazonaws.services.sqs.model.RemovePermissionRequest;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.amazonaws.services.sqs.model.SendMessageResult;
 import com.amazonaws.services.sqs.model.SetQueueAttributesRequest;
@@ -40,11 +36,6 @@ public class NevadoAmazonSQSAsyncClient implements NevadoAmazonSQS {
     @Override
     public void setEndpoint(String endpoint) throws IllegalArgumentException {
         _client.setEndpoint(endpoint);
-    }
-
-    @Override
-    public void shutdown() {
-        _client.shutdown();
     }
 
     @Override
@@ -72,21 +63,9 @@ public class NevadoAmazonSQSAsyncClient implements NevadoAmazonSQS {
     }
 
     @Override
-    public void removePermission(RemovePermissionRequest removePermissionRequest) throws AmazonServiceException,
-            AmazonClientException {
-        _client.removePermission(removePermissionRequest);
-    }
-
-    @Override
     public GetQueueAttributesResult getQueueAttributes(GetQueueAttributesRequest getQueueAttributesRequest)
             throws AmazonServiceException, AmazonClientException {
         return _client.getQueueAttributes(getQueueAttributesRequest);
-    }
-
-    @Override
-    public void addPermission(AddPermissionRequest addPermissionRequest) throws AmazonServiceException,
-            AmazonClientException {
-        _client.addPermission(addPermissionRequest);
     }
 
     @Override
@@ -116,11 +95,6 @@ public class NevadoAmazonSQSAsyncClient implements NevadoAmazonSQS {
     @Override
     public ListQueuesResult listQueues() throws AmazonServiceException, AmazonClientException {
         return _client.listQueues();
-    }
-
-    @Override
-    public ResponseMetadata getCachedResponseMetadata(AmazonWebServiceRequest request) {
-        return _client.getCachedResponseMetadata(request);
     }
 
 }
