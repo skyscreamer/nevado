@@ -1,6 +1,5 @@
 package org.skyscreamer.nevado.jms.connector;
 
-import com.xerox.amazonws.sqs2.SQSException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -33,10 +32,21 @@ public abstract class AbstractSQSConnector implements SQSConnector {
     protected final Log _log = LogFactory.getLog(getClass());
 
     private final long _receiveCheckIntervalMs;
+    private final boolean _isAsync;
 
     protected AbstractSQSConnector(long receiveCheckIntervalMs)
     {
+        this(receiveCheckIntervalMs, false);
+    }
+
+    protected AbstractSQSConnector(long receiveCheckIntervalMs, boolean isAsync)
+    {
         _receiveCheckIntervalMs = receiveCheckIntervalMs;
+        _isAsync = isAsync;
+    }
+
+    public boolean isAsync() {
+        return _isAsync;
     }
 
     public final void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException
@@ -58,6 +68,9 @@ public abstract class AbstractSQSConnector implements SQSConnector {
 
         if (destination instanceof NevadoQueue)
         {
+            if (isAsync() && !message.isDisableMessageID() && message.getJMSMessageID() == null) {
+                message.setJMSMessageID(MessageIdUtil.createMessageId());
+            }
             String serializedMessage = serializeMessage(message);
             String sqsMessageId = sendSQSMessage((NevadoQueue)destination, serializedMessage);
             if (!message.isDisableMessageID() && message.getJMSMessageID() == null)
