@@ -1,8 +1,10 @@
 package org.skyscreamer.nevado.jms.connector.amazonaws;
 
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.model.*;
 import org.skyscreamer.nevado.jms.connector.SQSQueue;
+import org.skyscreamer.nevado.jms.util.MessageIdUtil;
 
 import javax.jms.JMSException;
 import java.util.Collections;
@@ -19,22 +21,34 @@ public class AmazonAwsSQSQueue implements SQSQueue {
     public static final String ATTRIBUTE_POLICY = "Policy";
     private final String _queueUrl;
     private final AmazonAwsSQSConnector _amazonAwsSQSConnector;
+    private final boolean _isAsync;
 
     public AmazonAwsSQSQueue(AmazonAwsSQSConnector amazonAwsSQSConnector, String queueUrl) {
+        this(amazonAwsSQSConnector, queueUrl, false);
+    }
+
+    public AmazonAwsSQSQueue(AmazonAwsSQSConnector amazonAwsSQSConnector, String queueUrl, boolean isAsync) {
         _amazonAwsSQSConnector = amazonAwsSQSConnector;
         _queueUrl = queueUrl;
+        _isAsync = isAsync;
     }
 
     @Override
     public String sendMessage(String serializedMessage) throws JMSException {
-        SendMessageResult result;
+        String messageId;
+        SendMessageRequest request = new SendMessageRequest(_queueUrl, serializedMessage);
         try {
-            result = _amazonAwsSQSConnector.getAmazonSQS().sendMessage(new SendMessageRequest(_queueUrl, serializedMessage));
+            if (_isAsync) {
+                ((AmazonSQSAsync)_amazonAwsSQSConnector.getAmazonSQS()).sendMessageAsync(request);
+                messageId = MessageIdUtil.createMessageId();
+            } else {
+                messageId = _amazonAwsSQSConnector.getAmazonSQS().sendMessage(request).getMessageId();
+            }
         }
         catch (AmazonServiceException e) {
             throw _amazonAwsSQSConnector.handleAWSException("Unable to send message to queue " + _queueUrl, e);
         }
-        return result.getMessageId();
+        return messageId;
     }
 
     @Override
