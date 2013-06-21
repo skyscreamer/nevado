@@ -40,7 +40,7 @@ public class AmazonAwsSQSQueue implements SQSQueue {
         try {
             if (_isAsync) {
                 ((AmazonSQSAsync)_amazonAwsSQSConnector.getAmazonSQS()).sendMessageAsync(request);
-                messageId = MessageIdUtil.createMessageId();
+                messageId = null;
             } else {
                 messageId = _amazonAwsSQSConnector.getAmazonSQS().sendMessage(request).getMessageId();
             }
