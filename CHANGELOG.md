@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 1.2.1 - 6/22/2013
+-------------------------
+ - Fixed asynchronous support for AWS connector (@shlasouski)
+ - Fixed bug with non-transient log object in BytesMessage and StreamMessage
+ - Use single thread executor for async AWS calls
+
 Version 1.2.0 - 5/11/2013
 -------------------------
  - Add support for asynchronous API calls in AWS connector (thanks @shlasouski!)
