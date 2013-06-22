@@ -9,6 +9,6 @@ import java.util.UUID;
  */
 public class MessageIdUtil {
     public static String createMessageId() {
-        return "nevado-" + UUID.randomUUID().toString();
+        return "ID:nevado-" + UUID.randomUUID().toString();
     }
 }
