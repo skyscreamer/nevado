@@ -27,7 +27,7 @@ import java.io.*;
  * limitations under the License.
  */
 public class NevadoBytesMessage extends NevadoMessage implements BytesMessage {
-    transient private Log _log = LogFactory.getLog(NevadoStreamMessage.class);
+    transient private Log _log = LogFactory.getLog(NevadoBytesMessage.class);
 
     private ByteArray _body;
 
