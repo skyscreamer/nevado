@@ -175,7 +175,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
         while(true) {
             if (connection.isRunning()) {
                 sqsMessage = sqsQueue.receiveMessage();
-                if (message != null && !connection.isRunning()) {
+                if (sqsMessage != null && !connection.isRunning()) {
                     // Connection was stopped while the REST call to SQS was being made
                     try {
                         sqsQueue.setMessageVisibilityTimeout(sqsMessage.getReceiptHandle(), 0); // Make it immediately available to the next requestor
