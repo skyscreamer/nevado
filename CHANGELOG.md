@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 1.2.2 - 7/3/2013
+-------------------------
+ - Fixed a NullPointerException on some shutdowns
+
 Version 1.2.1 - 6/22/2013
 -------------------------
  - Fixed asynchronous support for AWS connector (@shlasouski)
