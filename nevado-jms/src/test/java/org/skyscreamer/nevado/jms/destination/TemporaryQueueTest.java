@@ -9,8 +9,9 @@ import org.skyscreamer.nevado.jms.NevadoSession;
 import org.skyscreamer.nevado.jms.util.RandomData;
 
 import javax.jms.*;
+import java.math.BigInteger;
 import java.util.Collection;
-import java.util.UUID;
+import java.util.Random;
 
 /**
  * Tests Nevado's implementation of TemporaryQueue.
@@ -43,7 +44,7 @@ public class TemporaryQueueTest extends AbstractJMSTest {
     public void testTemporaryQueueSuffix() throws Exception
     {
         NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
-        String temporaryQueueSuffix = UUID.randomUUID().toString();
+        String temporaryQueueSuffix = "_" + new BigInteger(32, new Random()).toString(32);
         Assert.assertTrue(temporaryQueueSuffix.length() > 0);
         connectionFactory.setTemporaryQueueSuffix(temporaryQueueSuffix);
         Connection connection = createConnection(connectionFactory);
@@ -54,7 +55,21 @@ public class TemporaryQueueTest extends AbstractJMSTest {
         connection.close();
     }
 
-    @Test
+    // Because the queues returned by SQS ListQueues is not synchronous with creation and deletion of queues, it is
+    // too flaky to test in a quick, automated fashion.  This could be done with thie very slow test
+    // but we'll leave it disabled so our overall suite can remain fast.
+    //@Test
+    public void testTemporaryQueueDeletion() throws Exception {
+        NevadoSession session = createSession();
+        TemporaryQueue temporaryQueue = session.createTemporaryQueue();
+        Collection<NevadoTemporaryQueue> allTemporaryQueues = getConnection().listAllTemporaryQueues();
+        Assert.assertTrue("Temporary queue should exist", allTemporaryQueues.contains(temporaryQueue));
+        getConnection().close();
+        allTemporaryQueues = getConnection().listAllTemporaryQueues();
+        Assert.assertFalse("Temporary queue should not exist", allTemporaryQueues.contains(temporaryQueue));
+    }
+
+    //@Test
     public void testDeleteUnusedTemporaryQueues() throws Exception {
         NevadoConnection conn1;
         String suffix1;
@@ -63,13 +78,13 @@ public class TemporaryQueueTest extends AbstractJMSTest {
 
         {
             NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
-            suffix1 = UUID.randomUUID().toString();
+            suffix1 = "_" + new BigInteger(32, new Random()).toString(32);
             connectionFactory.setTemporaryQueueSuffix(suffix1);
             conn1 = createConnection(connectionFactory);
         }
         {
             NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
-            suffix2 = UUID.randomUUID().toString();
+            suffix2 = "_" + new BigInteger(32, new Random()).toString(32);
             connectionFactory.setTemporaryQueueSuffix(suffix2);
             conn2 = createConnection(connectionFactory);
         }
@@ -77,8 +92,6 @@ public class TemporaryQueueTest extends AbstractJMSTest {
         try {
             conn1.start();
             conn2.start();
-            Assert.assertTrue(conn1.listAllTemporaryQueues().isEmpty());
-            Assert.assertTrue(conn2.listAllTemporaryQueues().isEmpty());
             NevadoTemporaryQueue queue1 = conn1.createSession(false, Session.AUTO_ACKNOWLEDGE).createTemporaryQueue();
             NevadoTemporaryQueue queue2 = conn2.createSession(false, Session.AUTO_ACKNOWLEDGE).createTemporaryQueue();
             Assert.assertTrue(conn1.listAllTemporaryQueues().contains(queue1));
@@ -104,21 +117,5 @@ public class TemporaryQueueTest extends AbstractJMSTest {
                 _log.error("Unable to close connection 1", t);
             }
         }
-    }
-
-    // Because the queues returned by SQS ListQueues is not synchronous with creation and deletion of queues, it is
-    // too flaky to test in a quick, automated fashion.  This could be done with thie very slow test
-    // but we'll leave it disabled so our overall suite can remain fast.
-    //@Test
-    public void testTemporaryQueueDeletion() throws Exception {
-        NevadoSession session = createSession();
-        TemporaryQueue temporaryQueue = session.createTemporaryQueue();
-        Thread.sleep(15000);
-        Collection<NevadoTemporaryQueue> allTemporaryQueues = getConnection().listAllTemporaryQueues();
-        Assert.assertTrue("Temporary queue should exist", allTemporaryQueues.contains(temporaryQueue));
-        getConnection().close();
-        Thread.sleep(60000);
-        allTemporaryQueues = getConnection().listAllTemporaryQueues();
-        Assert.assertFalse("Temporary queue should not exist", allTemporaryQueues.contains(temporaryQueue));
     }
 }

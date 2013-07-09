@@ -79,8 +79,6 @@ public class TemporaryTopicTest extends AbstractJMSTest {
         try {
             conn1.start();
             conn2.start();
-            Assert.assertTrue(conn1.listAllTemporaryTopics().isEmpty());
-            Assert.assertTrue(conn2.listAllTemporaryTopics().isEmpty());
             NevadoTemporaryTopic topic1 = conn1.createSession(false, Session.AUTO_ACKNOWLEDGE).createTemporaryTopic();
             NevadoTemporaryTopic topic2 = conn2.createSession(false, Session.AUTO_ACKNOWLEDGE).createTemporaryTopic();
             Assert.assertTrue(conn1.listAllTemporaryTopics().contains(topic1));
@@ -111,15 +109,13 @@ public class TemporaryTopicTest extends AbstractJMSTest {
     // Because the queues returned by SNS ListTopics is not synchronous with creation and deletion of topics, it is
     // too flaky to test in a quick, automated fashion.  This could be done with thie very slow test
     // but we'll leave it disabled so our overall suite can remain fast.
-    //@Test
+    @Test
     public void testTemporaryTopicDeletion() throws Exception {
         NevadoSession session = createSession();
         TemporaryTopic temporaryTopic = session.createTemporaryTopic();
-        Thread.sleep(15000);
         Collection<NevadoTemporaryTopic> allTemporaryTopics = getConnection().listAllTemporaryTopics();
         Assert.assertTrue("Temporary topic should exist", allTemporaryTopics.contains(temporaryTopic));
         getConnection().close();
-        Thread.sleep(60000);
         allTemporaryTopics = getConnection().listAllTemporaryTopics();
         Assert.assertFalse("Temporary topic should not exist", allTemporaryTopics.contains(temporaryTopic));
     }
