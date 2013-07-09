@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 1.2.3 - 7/9/2013
+-------------------------
+ - Enable suffixes for temporary queues and topics to make them easier to identify
+ - Added a method in Connection to simplify deletion of temporary queues and topics
+
 Version 1.2.2 - 7/3/2013
 -------------------------
  - Fixed a NullPointerException on some shutdowns
