@@ -87,6 +87,7 @@ public class MessageListenerTest extends AbstractJMSTest {
             Assert.assertEquals(msg2, msgOut);
         else
             Assert.fail("Message did not match either sent: " + msgOut);
+        connection.close();
     }
 
     @Test
@@ -110,6 +111,7 @@ public class MessageListenerTest extends AbstractJMSTest {
             Assert.assertEquals(msg2, msgOut);
         else
             Assert.fail("Message did not match either sent: " + msgOut);
+        connection.close();
     }
 
     @Test
@@ -133,6 +135,7 @@ public class MessageListenerTest extends AbstractJMSTest {
             Assert.assertEquals(msg1, msgOut);
         else
             Assert.fail("Message did not match either sent: " + msgOut);
+        connection.close();
     }
 
     @Test
@@ -158,5 +161,6 @@ public class MessageListenerTest extends AbstractJMSTest {
             Assert.assertEquals(msg1, msgOut);
         else
             Assert.fail("Message did not match either sent: " + msgOut);
+        connection.close();
     }
 }

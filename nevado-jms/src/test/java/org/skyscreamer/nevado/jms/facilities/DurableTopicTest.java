@@ -90,6 +90,7 @@ public class DurableTopicTest extends AbstractJMSTest {
         Assert.assertNull(msgOut);
         subscriber.close();
         session.unsubscribe(durableTopicName);
+        conn.close();
 
         conn = createConnection(getConnectionFactory());
         conn.setClientID("abc");

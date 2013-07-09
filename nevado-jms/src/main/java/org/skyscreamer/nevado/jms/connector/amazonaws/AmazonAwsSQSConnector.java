@@ -28,6 +28,8 @@ import javax.jms.JMSException;
 import javax.jms.JMSSecurityException;
 import javax.jms.ResourceAllocationException;
 import javax.net.ssl.SSLException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -113,8 +115,14 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
             throw handleAWSException("Unable to list queues with prefix '" + temporaryQueuePrefix + "'", e);
         }
         queues = new HashSet<NevadoQueue>(result.getQueueUrls().size());
-        for(String queueUrl : result.getQueueUrls()) {
-            queues.add(new NevadoQueue(queueUrl));
+        for(String queueUrlString : result.getQueueUrls()) {
+            URL queueURL = null;
+            try {
+                queueURL = new URL(queueUrlString);
+            } catch (MalformedURLException e) {
+                throw new JMSException("Unable to parse URL for: " + queueUrlString);
+            }
+            queues.add(new NevadoQueue(queueURL));
         }
         return queues;
     }

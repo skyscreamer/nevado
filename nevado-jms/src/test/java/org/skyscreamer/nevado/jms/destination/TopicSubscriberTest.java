@@ -61,5 +61,7 @@ public class TopicSubscriberTest extends AbstractJMSTest {
         TextMessage msgOut1 = (TextMessage)consumer3.receive(1000);
         TextMessage msgOut2 = (TextMessage)consumer3.receive(1000);
         compareTextMessages(new TextMessage[] {testMessage1, testMessage2}, new TextMessage[] {msgOut1, msgOut2});
+        conn1.close();
+        conn2.close();
     }
 }
