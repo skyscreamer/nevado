@@ -237,6 +237,34 @@ public class NevadoConnection implements Connection {
         return temporaryTopics;
     }
 
+    public Collection<NevadoTemporaryQueue> deleteUnusedTemporaryQueues(String suffix) throws JMSException {
+        if (suffix == null)
+            suffix = "";
+        Collection<NevadoTemporaryQueue> allQueues = listAllTemporaryQueues();
+        List<NevadoTemporaryQueue> deletedQueues = new ArrayList<NevadoTemporaryQueue>();
+        for (NevadoTemporaryQueue queue : allQueues) {
+            if (queue.getQueueName().endsWith(suffix) && !_temporaryDestinations.contains(queue)) {
+                deleteTemporaryQueue(queue);
+                deletedQueues.add(queue);
+            }
+        }
+        return deletedQueues;
+    }
+
+    public Collection<NevadoTemporaryTopic> deleteUnusedTemporaryTopics(String suffix) throws JMSException {
+        if (suffix == null)
+            suffix = "";
+        Collection<NevadoTemporaryTopic> allTopics = listAllTemporaryTopics();
+        List<NevadoTemporaryTopic> deletedTopics = new ArrayList<NevadoTemporaryTopic>();
+        for (NevadoTemporaryTopic topic : allTopics) {
+            if (topic.getTopicName().endsWith(suffix) && !_temporaryDestinations.contains(topic)) {
+                deleteTemporaryTopic(topic);
+                deletedTopics.add(topic);
+            }
+        }
+        return deletedTopics;
+    }
+
     public String subscribe(NevadoTopic topic, NevadoQueue topicEndpoint) throws JMSException {
         return getSQSConnector().subscribe(topic, topicEndpoint);
     }
