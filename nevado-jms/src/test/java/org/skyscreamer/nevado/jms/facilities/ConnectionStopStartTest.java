@@ -36,6 +36,7 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
         msg.acknowledge();
         Assert.assertTrue(msg instanceof TextMessage);
         Assert.assertEquals(testBody, ((TextMessage)msg).getText());
+        conn.close();
     }
 
     @Test
@@ -57,6 +58,7 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
 
         TextMessage message = (TextMessage)messageListener.getMessage(1000);
         Assert.assertEquals(asyncTestBody, message.getText());
+        conn.close();
     }
     
     @Test

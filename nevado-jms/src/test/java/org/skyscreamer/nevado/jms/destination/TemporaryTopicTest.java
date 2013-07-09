@@ -3,11 +3,13 @@ package org.skyscreamer.nevado.jms.destination;
 import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
+import org.skyscreamer.nevado.jms.NevadoConnectionFactory;
 import org.skyscreamer.nevado.jms.NevadoSession;
 import org.skyscreamer.nevado.jms.util.RandomData;
 
 import javax.jms.*;
 import java.util.Collection;
+import java.util.UUID;
 
 /**
  * Test temporary topics
@@ -36,6 +38,21 @@ public class TemporaryTopicTest extends AbstractJMSTest {
         Connection theWrongConnection = createConnection(getConnectionFactory());
         Session theWrongSession = theWrongConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         theWrongSession.createConsumer(temporaryTopic);
+    }
+
+    @Test
+    public void testTemporaryTopicSuffix() throws Exception
+    {
+        NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
+        String temporaryTopicSuffix = UUID.randomUUID().toString();
+        Assert.assertTrue(temporaryTopicSuffix.length() > 0);
+        connectionFactory.setTemporaryTopicSuffix(temporaryTopicSuffix);
+        Connection connection = createConnection(connectionFactory);
+        connection.start();
+        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        TemporaryTopic topic = session.createTemporaryTopic();
+        Assert.assertTrue(topic.getTopicName().endsWith(temporaryTopicSuffix));
+        connection.close();
     }
 
     // Because the queues returned by SNS ListTopics is not synchronous with creation and deletion of topics, it is

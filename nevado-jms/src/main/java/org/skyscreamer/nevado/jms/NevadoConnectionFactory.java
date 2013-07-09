@@ -37,6 +37,8 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     private volatile Integer _jmsDeliveryMode;
     private volatile Long _jmsTTL;
     private volatile Integer _jmsPriority;
+    private String _temporaryQueueSuffix;
+    private String _temporaryTopicSuffix;
 
     public NevadoConnectionFactory() {}
 
@@ -95,6 +97,8 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
         connection.setOverrideJMSDeliveryMode(_jmsDeliveryMode);
         connection.setOverrideJMSPriority(_jmsPriority);
         connection.setOverrideJMSTTL(_jmsTTL);
+        connection.setTemporaryQueueSuffix(_temporaryQueueSuffix);
+        connection.setTemporaryTopicSuffix(_temporaryTopicSuffix);
     }
 
     // Getters & Setters
@@ -156,6 +160,14 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
 
     public Integer getJMSPriority() {
         return _jmsPriority;
+    }
+
+    public void setTemporaryQueueSuffix(String temporaryQueueSuffix) {
+        _temporaryQueueSuffix = temporaryQueueSuffix;
+    }
+
+    public void setTemporaryTopicSuffix(String temporaryTopicSuffix) {
+        _temporaryTopicSuffix = temporaryTopicSuffix;
     }
 
     public Reference getReference() throws NamingException {

@@ -34,6 +34,8 @@ public class NevadoConnection implements Connection {
     private volatile ExceptionListener _exceptionListener;
     private final List<NevadoSession> _sessions = new CopyOnWriteArrayList<NevadoSession>();
     private final Set<NevadoDestination> _temporaryDestinations = new CopyOnWriteArraySet<NevadoDestination>();
+    private String _temporaryQueueSuffix = "";
+    private String _temporaryTopicSuffix = "";
 
     public NevadoConnection(SQSConnector sqsConnector) throws JMSException {
         _sqsConnector = sqsConnector;
@@ -167,7 +169,8 @@ public class NevadoConnection implements Connection {
 
     protected NevadoTemporaryTopic createTemporaryTopic() throws JMSException {
         checkClosed();
-        String tempTopicName = "" + NevadoProviderQueuePrefix.TEMPORARY_DESTINATION_PREFIX + UUID.randomUUID();
+        String tempTopicName = "" + NevadoProviderQueuePrefix.TEMPORARY_DESTINATION_PREFIX
+                + UUID.randomUUID() + _temporaryTopicSuffix;
         NevadoTopic topic = getSQSConnector().createTopic(tempTopicName);
         NevadoTemporaryTopic temporaryTopic = new NevadoTemporaryTopic(this, topic);
         _temporaryDestinations.add(temporaryTopic);
@@ -189,7 +192,8 @@ public class NevadoConnection implements Connection {
     protected NevadoTemporaryQueue createTemporaryQueue() throws JMSException
     {
         checkClosed();
-        String tempQueueName = "" + NevadoProviderQueuePrefix.TEMPORARY_DESTINATION_PREFIX + UUID.randomUUID();
+        String tempQueueName = "" + NevadoProviderQueuePrefix.TEMPORARY_DESTINATION_PREFIX
+                + UUID.randomUUID() + _temporaryQueueSuffix;
         NevadoQueue queue = getSQSConnector().createQueue(tempQueueName);
         NevadoTemporaryQueue temporaryQueue = new NevadoTemporaryQueue(this, queue);
         _temporaryDestinations.add(temporaryQueue);
@@ -285,6 +289,14 @@ public class NevadoConnection implements Connection {
     public void setOverrideJMSTTL(Long jmsTTL) throws IllegalStateException {
         checkClosed();
         _jmsTTL = jmsTTL;
+    }
+
+    public void setTemporaryQueueSuffix(String temporaryQueueSuffix) {
+        _temporaryQueueSuffix = temporaryQueueSuffix;
+    }
+
+    public void setTemporaryTopicSuffix(String temporaryTopicSuffix) {
+        _temporaryTopicSuffix = temporaryTopicSuffix;
     }
 
     public boolean isRunning() {

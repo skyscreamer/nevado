@@ -3,11 +3,13 @@ package org.skyscreamer.nevado.jms.destination;
 import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
+import org.skyscreamer.nevado.jms.NevadoConnectionFactory;
 import org.skyscreamer.nevado.jms.NevadoSession;
 import org.skyscreamer.nevado.jms.util.RandomData;
 
 import javax.jms.*;
 import java.util.Collection;
+import java.util.UUID;
 
 /**
  * Tests Nevado's implementation of TemporaryQueue.
@@ -34,6 +36,21 @@ public class TemporaryQueueTest extends AbstractJMSTest {
         Connection theWrongConnection = createConnection(getConnectionFactory());
         Session theWrongSession = theWrongConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         MessageConsumer consumer = theWrongSession.createConsumer(temporaryQueue);
+    }
+
+    @Test
+    public void testTemporaryQueueSuffix() throws Exception
+    {
+        NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
+        String temporaryQueueSuffix = UUID.randomUUID().toString();
+        Assert.assertTrue(temporaryQueueSuffix.length() > 0);
+        connectionFactory.setTemporaryQueueSuffix(temporaryQueueSuffix);
+        Connection connection = createConnection(connectionFactory);
+        connection.start();
+        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        TemporaryQueue queue = session.createTemporaryQueue();
+        Assert.assertTrue(queue.getQueueName().endsWith(temporaryQueueSuffix));
+        connection.close();
     }
 
     // Because the queues returned by SQS ListQueues is not synchronous with creation and deletion of queues, it is
