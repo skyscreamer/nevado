@@ -33,6 +33,7 @@ public class ConnectionFactoryEndpointTest extends AbstractJMSTest {
         Assert.assertNotNull(msgOut);
         Assert.assertTrue(msgOut instanceof TextMessage);
         Assert.assertEquals(testMessage, (TextMessage)msgOut);
+        connection.close();
     }
 
     @Test(expected = ResourceAllocationException.class)
@@ -52,6 +53,7 @@ public class ConnectionFactoryEndpointTest extends AbstractJMSTest {
         Assert.assertNotNull(msgOut);
         Assert.assertTrue(msgOut instanceof TextMessage);
         Assert.assertEquals(testMessage, (TextMessage)msgOut);
+        connection.close();
     }
 
     @Test(expected = ResourceAllocationException.class)
@@ -71,5 +73,6 @@ public class ConnectionFactoryEndpointTest extends AbstractJMSTest {
         Assert.assertNotNull(msgOut);
         Assert.assertTrue(msgOut instanceof TextMessage);
         Assert.assertEquals(testMessage, (TextMessage)msgOut);
+        connection.close();
     }
 }

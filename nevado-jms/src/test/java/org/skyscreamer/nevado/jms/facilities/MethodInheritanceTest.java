@@ -29,6 +29,7 @@ public class MethodInheritanceTest extends AbstractJMSTest {
         connection.start();
         QueueSession session = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         session.createDurableSubscriber(new NevadoTopic("unusedTopic"), null);
+        connection.close();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -38,6 +39,7 @@ public class MethodInheritanceTest extends AbstractJMSTest {
         connection.start();
         QueueSession session = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         session.createDurableSubscriber(new NevadoTopic("unusedTopic"), null, null, false);
+        connection.close();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -47,6 +49,7 @@ public class MethodInheritanceTest extends AbstractJMSTest {
         connection.start();
         QueueSession session = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         session.createTemporaryTopic();
+        connection.close();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -56,6 +59,7 @@ public class MethodInheritanceTest extends AbstractJMSTest {
         connection.start();
         QueueSession session = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         session.createTopic("unusedTopic");
+        connection.close();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -65,6 +69,7 @@ public class MethodInheritanceTest extends AbstractJMSTest {
         connection.start();
         QueueSession session = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         session.unsubscribe("unusedTopic");
+        connection.close();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -74,6 +79,7 @@ public class MethodInheritanceTest extends AbstractJMSTest {
         connection.start();
         TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
         session.createBrowser(new NevadoQueue("unusedQueue"));
+        connection.close();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -83,6 +89,7 @@ public class MethodInheritanceTest extends AbstractJMSTest {
         connection.start();
         TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
         session.createBrowser(new NevadoQueue("unusedQueue"), null);
+        connection.close();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -92,6 +99,7 @@ public class MethodInheritanceTest extends AbstractJMSTest {
         connection.start();
         TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
         session.createQueue("unusedQueue");
+        connection.close();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -101,5 +109,6 @@ public class MethodInheritanceTest extends AbstractJMSTest {
         connection.start();
         TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
         session.createTemporaryQueue();
+        connection.close();
     }
 }
