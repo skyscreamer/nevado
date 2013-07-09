@@ -217,19 +217,19 @@ public class NevadoConnection implements Connection {
         return _temporaryDestinations.contains(temporaryDestination);
     }
 
-    public Collection<TemporaryQueue> listAllTemporaryQueues() throws JMSException {
+    public Collection<NevadoTemporaryQueue> listAllTemporaryQueues() throws JMSException {
         Collection<NevadoQueue> queues = getSQSConnector()
                 .listQueues(NevadoProviderQueuePrefix.TEMPORARY_DESTINATION_PREFIX + "");
-        Collection<TemporaryQueue> temporaryQueues = new HashSet<TemporaryQueue>(queues.size());
+        Collection<NevadoTemporaryQueue> temporaryQueues = new HashSet<NevadoTemporaryQueue>(queues.size());
         for(NevadoQueue queue : queues) {
             temporaryQueues.add(new NevadoTemporaryQueue(this, queue));
         }
         return temporaryQueues;
     }
 
-    public Collection<TemporaryTopic> listAllTemporaryTopics() throws JMSException {
+    public Collection<NevadoTemporaryTopic> listAllTemporaryTopics() throws JMSException {
         Collection<NevadoTopic> topics = getSQSConnector().listTopics();
-        Collection<TemporaryTopic> temporaryTopics = new HashSet<TemporaryTopic>(topics.size());
+        Collection<NevadoTemporaryTopic> temporaryTopics = new HashSet<NevadoTemporaryTopic>(topics.size());
         for(NevadoTopic topic : topics) {
             if (topic.getTopicName().startsWith(NevadoProviderQueuePrefix.TEMPORARY_DESTINATION_PREFIX + ""))
                 temporaryTopics.add(new NevadoTemporaryTopic(this, topic));
