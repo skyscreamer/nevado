@@ -13,7 +13,7 @@
     <packaging>pom</packaging>
 
     <name>Nevado</name>
-    <description>Spring Framework connectors for Amazon's cloud services</description>
+    <description>Spring/Guice/J2EE Framework connectors for Amazon's cloud services</description>
     <url>https://github.com/skyscreamer/nevado</url>
 
     <licenses>
