@@ -2,8 +2,8 @@
 <html>
 <head>
     <title>Nevado - Spring meets Amazon's cloud services - Introduction</title>
-    <meta name="description" content="Starting with JMS, provides simple integration of Spring applications with AWS." />
-    <meta name="keywords" content="nevado,nevado cloud,jms aws,jms sqs,jms sqs,spring sqs,spring ec2,spring aws" />
+    <meta name="description" content="Starting with JMS, provides simple integration of J2EE applications with AWS." />
+    <meta name="keywords" content="nevado,jms aws,jms sqs,spring sqs,guice sqs,jboss sqs,spring aws" />
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link href="css/style.css" rel="stylesheet"/>
     <script type="text/javascript">
@@ -44,7 +44,8 @@
     <p>Nevado JMS is a JMS driver for Amazon SQS.</p>
 
     <ul>
-        <li>Leverage cloud services in Amazon using standard Spring/J2EE metaphors</li>
+        <li>Leverage cloud services in Amazon using standard J2EE metaphors</li>
+        <li>Container-independent.  Can work with Spring, Guice, JBoss, etc..</li>
         <li>Avoid tight coupling to cloud-specific API's inside your code</li>
         <li>Rapidly prototype enterprise clients in the cloud.  Then deploy them anywhere.</li>
     </ul>
@@ -52,12 +53,12 @@
     <p><br/>The current version of Nevado is 1.2.3.</p>
 
     <h2>Nevado JMS</h2>
-    <p>Our first connector supports <a href="https://github.com/skyscreamer/nevado/wiki/Master-Feature-Grid">83%</a> of the
+    <p>Supports <a href="https://github.com/skyscreamer/nevado/wiki/Master-Feature-Grid">83%</a> of the
         <a href="http://docs.oracle.com/javaee/6/api/javax/jms/package-summary.html">JMS 1.1 specification</a> using
         Amazon's <a href="http://aws.amazon.com/sqs/">SQS</a> and <a href="http://aws.amazon.com/sns/">SNS</a> services:</p>
     <ul>
         <li>Written with a test-driven approach (<a href="https://skyscreamer.ci.cloudbees.com/job/Nevado/lastStableBuild/org.skyscreamer$nevado-jms/testReport/">over 300+ integration and unit tests</a>) to ensure close adherence to JMS 1.1 specification</li>
-        <li>Integrates cleanly with Spring's <a href="http://blog.springsource.org/2006/08/11/message-driven-pojos/">message-driven pojos</a></li>
+        <li>Integrates cleanly with any J2EE container, including Spring's <a href="http://blog.springsource.org/2006/08/11/message-driven-pojos/">message-driven pojos</a></li>
         <li>Easily monitor your queues and topics through the Amazon console</li>
     </ul>
 </section>
