@@ -16,6 +16,9 @@
         <property name="sqsConnectorFactory" ref="sqsConnectorFactory" />
         <property name="awsAccessKey" value="${aws.accessKey}" />
         <property name="awsSecretKey" value="${aws.secretKey}" />
+        <property name="temporaryQueueSuffix" value="_tempQueue" />
+        <property name="temporaryTopicSuffix" value="_tempTopic" />
+        <property name="maxPollWaitMs" value="1000" />
     </bean>
     <bean id="performanceService" class="org.skyscreamer.nevado.jms.performance.PerformanceService" />
 </beans>

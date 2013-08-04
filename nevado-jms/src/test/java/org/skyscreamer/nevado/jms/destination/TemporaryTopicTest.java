@@ -22,6 +22,7 @@ public class TemporaryTopicTest extends AbstractJMSTest {
     public void testTemporaryTopic() throws Exception {
         NevadoSession session = createSession();
         TemporaryTopic temporaryTopic = session.createTemporaryTopic();
+        Assert.assertFalse(temporaryTopic.getTopicName().endsWith("null"));
         TextMessage testMessage = session.createTextMessage(RandomData.readString());
         MessageProducer producer = session.createProducer(temporaryTopic);
         MessageConsumer consumer = session.createConsumer(temporaryTopic);

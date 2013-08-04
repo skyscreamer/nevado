@@ -20,11 +20,12 @@ public class  AsyncConsumerRunner implements Runnable {
     private final Connection _connection;
     private final Set<NevadoMessageConsumer> _asyncConsumers = new CopyOnWriteArraySet<NevadoMessageConsumer>();
     private volatile boolean _running = false;
-    private final BackoffSleeper _sleeper = new BackoffSleeper(50, 5000, 1.5);
+    private final BackoffSleeper _sleeper;
     private Thread runner;
 
-    protected AsyncConsumerRunner(Connection connection) {
+    protected AsyncConsumerRunner(NevadoConnection connection) {
         _connection = connection;
+        _sleeper = new BackoffSleeper(50, connection.getMaxPollWaitMs(), 1.5);
     }
 
     public void run() {
