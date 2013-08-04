@@ -23,6 +23,7 @@ public class TemporaryQueueTest extends AbstractJMSTest {
     public void testTemporaryQueue() throws Exception {
         NevadoSession session = createSession();
         TemporaryQueue temporaryQueue = session.createTemporaryQueue();
+        Assert.assertFalse(temporaryQueue.getQueueName().endsWith("null"));
         TextMessage testMessage = session.createTextMessage(RandomData.readString());
         session.createProducer(temporaryQueue).send(testMessage);
         Message msgOut = session.createConsumer(temporaryQueue).receive();

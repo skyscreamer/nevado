@@ -37,8 +37,9 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     private volatile Integer _jmsDeliveryMode;
     private volatile Long _jmsTTL;
     private volatile Integer _jmsPriority;
-    private String _temporaryQueueSuffix;
-    private String _temporaryTopicSuffix;
+    private String _temporaryQueueSuffix = "";
+    private String _temporaryTopicSuffix = "";
+    private long _maxPollWaitMs = NevadoConnection.DEFAULT_MAX_POLL_WAIT_MS;
 
     public NevadoConnectionFactory() {}
 
@@ -99,6 +100,7 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
         connection.setOverrideJMSTTL(_jmsTTL);
         connection.setTemporaryQueueSuffix(_temporaryQueueSuffix);
         connection.setTemporaryTopicSuffix(_temporaryTopicSuffix);
+        connection.setMaxPollWaitMs(_maxPollWaitMs);
     }
 
     // Getters & Setters
@@ -168,6 +170,10 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
 
     public void setTemporaryTopicSuffix(String temporaryTopicSuffix) {
         _temporaryTopicSuffix = temporaryTopicSuffix;
+    }
+
+    public void setMaxPollWaitMs(long maxPollWaitMs) {
+        _maxPollWaitMs = maxPollWaitMs;
     }
 
     public Reference getReference() throws NamingException {
