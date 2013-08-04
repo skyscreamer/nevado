@@ -37,8 +37,8 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     private volatile Integer _jmsDeliveryMode;
     private volatile Long _jmsTTL;
     private volatile Integer _jmsPriority;
-    private String _temporaryQueueSuffix;
-    private String _temporaryTopicSuffix;
+    private String _temporaryQueueSuffix = "";
+    private String _temporaryTopicSuffix = "";
 
     public NevadoConnectionFactory() {}
 

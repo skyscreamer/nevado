@@ -8,6 +8,7 @@ import org.skyscreamer.nevado.jms.destination.*;
 
 import javax.jms.*;
 import javax.jms.IllegalStateException;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -170,8 +171,9 @@ public class NevadoConnection implements Connection {
     protected NevadoTemporaryTopic createTemporaryTopic() throws JMSException {
         checkClosed();
         String tempTopicName = "" + NevadoProviderQueuePrefix.TEMPORARY_DESTINATION_PREFIX
-                + UUID.randomUUID() + _temporaryTopicSuffix;
+                + new BigInteger(64, new Random()).toString(Character.MAX_RADIX) + _temporaryTopicSuffix;
         NevadoTopic topic = getSQSConnector().createTopic(tempTopicName);
+        _log.info("Created temporary topic " + tempTopicName);
         NevadoTemporaryTopic temporaryTopic = new NevadoTemporaryTopic(this, topic);
         _temporaryDestinations.add(temporaryTopic);
         return temporaryTopic;
@@ -193,8 +195,9 @@ public class NevadoConnection implements Connection {
     {
         checkClosed();
         String tempQueueName = "" + NevadoProviderQueuePrefix.TEMPORARY_DESTINATION_PREFIX
-                + UUID.randomUUID() + _temporaryQueueSuffix;
+                + new BigInteger(64, new Random()).toString(Character.MAX_RADIX) + _temporaryQueueSuffix;
         NevadoQueue queue = getSQSConnector().createQueue(tempQueueName);
+        _log.info("Created temporary queue " + tempQueueName);
         NevadoTemporaryQueue temporaryQueue = new NevadoTemporaryQueue(this, queue);
         _temporaryDestinations.add(temporaryQueue);
         return temporaryQueue;
