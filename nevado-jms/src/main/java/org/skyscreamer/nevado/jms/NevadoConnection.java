@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class NevadoConnection implements Connection {
+    public static final int DEFAULT_MAX_POLL_WAIT_MS = 5000;
     private final Log _log = LogFactory.getLog(getClass());
 
     private final AtomicBoolean _closed = new AtomicBoolean(false);
@@ -37,6 +38,7 @@ public class NevadoConnection implements Connection {
     private final Set<NevadoDestination> _temporaryDestinations = new CopyOnWriteArraySet<NevadoDestination>();
     private String _temporaryQueueSuffix = "";
     private String _temporaryTopicSuffix = "";
+    private long _maxPollWaitMs = DEFAULT_MAX_POLL_WAIT_MS;
 
     public NevadoConnection(SQSConnector sqsConnector) throws JMSException {
         _sqsConnector = sqsConnector;
@@ -328,6 +330,14 @@ public class NevadoConnection implements Connection {
 
     public void setTemporaryTopicSuffix(String temporaryTopicSuffix) {
         _temporaryTopicSuffix = temporaryTopicSuffix;
+    }
+
+    public void setMaxPollWaitMs(long maxPollWaitMs) {
+        _maxPollWaitMs = maxPollWaitMs;
+    }
+
+    protected long getMaxPollWaitMs() {
+        return _maxPollWaitMs;
     }
 
     public boolean isRunning() {
