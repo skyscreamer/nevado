@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 1.2.4 - 8/4/2013
+------------------------
+ - Fixed big where unfixed suffixes was causing queues ending with "null"
+ - Shorter queue names (base32 instead of base16 for random token)
+ - Allow setting maximum poll time.  (Defaults to 5000.)
+
 Version 1.2.3 - 7/9/2013
 -------------------------
  - Enable suffixes for temporary queues and topics to make them easier to identify
