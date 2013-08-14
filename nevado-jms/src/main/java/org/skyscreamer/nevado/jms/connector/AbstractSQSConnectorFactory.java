@@ -19,6 +19,10 @@ public abstract class AbstractSQSConnectorFactory implements SQSConnectorFactory
 
     @Override
     public abstract SQSConnector getInstance(String awsAccessKey, String awsSecretKey, String awsSQSEndpoint,
+                                             String awsSNSEndpoint, String proxyHost, String proxyPort) throws JMSException;
+    
+    @Override
+    public abstract SQSConnector getInstance(String awsAccessKey, String awsSecretKey, String awsSQSEndpoint,
                                              String awsSNSEndpoint) throws JMSException;
 
     @Override

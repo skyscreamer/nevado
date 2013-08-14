@@ -17,6 +17,7 @@ import java.io.Serializable;
  * User: Carter Page
  * Date: 3/18/12
  * Time: 8:49 PM
+ * 
  */
 public class NevadoConnectionFactory implements ConnectionFactory, QueueConnectionFactory, TopicConnectionFactory,
         Serializable, Referenceable
@@ -27,6 +28,11 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     public static final String JNDI_JMS_DELIVERY_MODE = "jmsDeliveryMode";
     public static final String JNDI_JMS_TTL = "jmsTTL";
     public static final String JNDI_JMS_PRIORITY = "jmsPriority";
+    public static final String JNDI_SNS_ENDPOINT = "awsSNSEndpoint";
+	public static final String JNDI_SQS_ENDPOINT = "awsSQSEndpoint";
+	public static final String JNDI_SQS_CONNECTOR_FACTORY_CLASS = "sqsConnectorFactoryClass";
+	public static final String JNDI_PROXY_HOST = "proxyHost";
+	public static final String JNDI_PROXY_PORT = "proxyPort";
 
     private SQSConnectorFactory _sqsConnectorFactory;
     private volatile String _awsAccessKey;
@@ -40,6 +46,8 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     private String _temporaryQueueSuffix = "";
     private String _temporaryTopicSuffix = "";
     private long _maxPollWaitMs = NevadoConnection.DEFAULT_MAX_POLL_WAIT_MS;
+    private volatile String _proxyHost;
+    private volatile String _proxyPort;
 
     public NevadoConnectionFactory() {}
 
@@ -49,43 +57,72 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
 
     public NevadoQueueConnection createQueueConnection() throws JMSException {
         checkSQSConnectorFactory();
-        NevadoQueueConnection connection = new NevadoQueueConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        NevadoQueueConnection connection;
+        if (_proxyHost != null && _proxyPort != null) {
+        	connection = new NevadoQueueConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint, _proxyHost, _proxyPort));
+        } else {
+        	connection = new NevadoQueueConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        }
         initializeConnection(connection);
         return connection;
     }
 
     public NevadoQueueConnection createQueueConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
         checkSQSConnectorFactory();
-        NevadoQueueConnection connection
-                = new NevadoQueueConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        NevadoQueueConnection connection;
+        if (_proxyHost != null && _proxyPort != null) {
+        	connection = new NevadoQueueConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint, _proxyHost, _proxyPort));
+        } else {
+        	connection = new NevadoQueueConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        }
         initializeConnection(connection);
         return connection;
     }
 
     public NevadoConnection createConnection() throws JMSException {
         checkSQSConnectorFactory();
-        NevadoConnection connection = new NevadoConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        NevadoConnection connection;
+        if (_proxyHost != null && _proxyPort != null) {
+        	connection = new NevadoConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint, _proxyHost, _proxyPort));
+        } else {
+        	connection = new NevadoConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        }
         initializeConnection(connection);
         return connection;
     }
 
     public NevadoConnection createConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
         checkSQSConnectorFactory();
-        NevadoConnection connection = new NevadoConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        NevadoConnection connection;
+        if (_proxyHost != null && _proxyPort != null) {
+        	connection = new NevadoConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint, _proxyHost, _proxyPort));
+        } else {
+        	connection = new NevadoConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        }
         initializeConnection(connection);
         return connection;
     }
 
     public NevadoTopicConnection createTopicConnection() throws JMSException {
         checkSQSConnectorFactory();
-        NevadoTopicConnection connection = new NevadoTopicConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        NevadoTopicConnection connection;
+        if (_proxyHost != null && _proxyPort != null) {
+        	connection = new NevadoTopicConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint, _proxyHost, _proxyPort));
+        } else {
+        	connection = new NevadoTopicConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        }
         initializeConnection(connection);
         return connection;
     }
 
     public TopicConnection createTopicConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
         checkSQSConnectorFactory();
-        NevadoTopicConnection connection = new NevadoTopicConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        NevadoTopicConnection connection;
+        if (_proxyHost != null && _proxyPort != null) {
+        	connection = new NevadoTopicConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint, _proxyHost, _proxyPort));
+        } else {
+        	connection = new NevadoTopicConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        }
         initializeConnection(connection);
         return connection;
     }
@@ -140,6 +177,13 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
         _jmsPriority = jmsPriority;
     }
 
+    public void setProxyHost(String proxyHost) {
+		_proxyHost = proxyHost;
+	}
+    
+	public void setProxyPort(String proxyPort) {
+		_proxyPort = proxyPort;
+	}
     public String getAwsAccessKey() {
         return _awsAccessKey;
     }
@@ -163,6 +207,14 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     public Integer getJMSPriority() {
         return _jmsPriority;
     }
+    
+    public String getProxyHost() {
+		return _proxyHost;
+	}
+
+	public String getProxyPort() {
+		return _proxyPort;
+	}
 
     public void setTemporaryQueueSuffix(String temporaryQueueSuffix) {
         _temporaryQueueSuffix = temporaryQueueSuffix;
@@ -197,6 +249,10 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
         {
             reference.add(new StringRefAddr(JNDI_JMS_PRIORITY, _jmsPriority.toString()));
         }
+        reference.add(new StringRefAddr(JNDI_SNS_ENDPOINT, _awsSNSEndpoint));
+        reference.add(new StringRefAddr(JNDI_SQS_ENDPOINT, _awsSQSEndpoint));
+        reference.add(new StringRefAddr(JNDI_SQS_CONNECTOR_FACTORY_CLASS, null));
+
         return reference;
     }
 
@@ -206,5 +262,6 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
             throw new IllegalStateException("SQSConnectorFactory is null, it must be set.");
         }
     }
+
 }
 

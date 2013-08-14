@@ -1,6 +1,7 @@
 package org.skyscreamer.nevado.jms.resource;
 
 import org.skyscreamer.nevado.jms.NevadoConnectionFactory;
+import org.skyscreamer.nevado.jms.connector.SQSConnectorFactory;
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoTopic;
@@ -16,6 +17,7 @@ import java.util.Hashtable;
  * This is the factory for JNDI referenceable objects.
  *
  * @author Carter Page <carter@skyscreamer.org>
+ * @author Andy Savin <andy.savin@vistair.com>
  */
 public class NevadoReferencableFactory implements ObjectFactory {
     public Object getObjectInstance(Object obj, Name name, Context ctx, Hashtable env) throws Exception
@@ -47,6 +49,31 @@ public class NevadoReferencableFactory implements ObjectFactory {
                 {
                     connectionFactory.setOverrideJMSTTL(Long.parseLong(jmsTtl));
                 }
+                String sqsEndpoint = getRefContent(ref, NevadoConnectionFactory.JNDI_SQS_ENDPOINT);
+                if (sqsEndpoint != null)
+                {
+                    connectionFactory.setAwsSQSEndpoint(sqsEndpoint);
+                }
+                String snsEndPoint = getRefContent(ref, NevadoConnectionFactory.JNDI_SNS_ENDPOINT);
+                if (snsEndPoint != null)
+                {
+                    connectionFactory.setAwsSNSEndpoint(snsEndPoint);
+                }
+                String proxyHost = getRefContent(ref, NevadoConnectionFactory.JNDI_PROXY_HOST);
+                if (proxyHost != null)
+                {
+                    connectionFactory.setProxyHost(proxyHost);
+                }
+                String proxyPort = getRefContent(ref, NevadoConnectionFactory.JNDI_PROXY_PORT);
+                if (proxyPort != null)
+                {
+                    connectionFactory.setProxyPort(proxyPort);
+                }
+                String sqsConnectorFactoryClass = getRefContent(ref, NevadoConnectionFactory.JNDI_SQS_CONNECTOR_FACTORY_CLASS);
+	            if (sqsConnectorFactoryClass != null) {
+	            	SQSConnectorFactory sqsConnectorFactory = (SQSConnectorFactory) Class.forName(sqsConnectorFactoryClass).newInstance();
+	                connectionFactory.setSqsConnectorFactory(sqsConnectorFactory);
+	            }
                 instance = connectionFactory;
             }
             else if (ref.getClassName().equals(NevadoQueue.class.getName())) {

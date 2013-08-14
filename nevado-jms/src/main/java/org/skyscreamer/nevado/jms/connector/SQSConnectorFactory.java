@@ -10,4 +10,5 @@ import javax.jms.JMSException;
 public interface SQSConnectorFactory {
     SQSConnector getInstance(String awsAccessKey, String awsSecretKey) throws JMSException;
     SQSConnector getInstance(String awsAccessKey, String awsSecretKey, String awsSQSEndpoint, String awsSNSEndpoint) throws JMSException;
+    SQSConnector getInstance(String awsAccessKey, String awsSecretKey, String awsSQSEndpoint, String awsSNSEndpoint, String proxyPort, String proxyHost) throws JMSException;
 }

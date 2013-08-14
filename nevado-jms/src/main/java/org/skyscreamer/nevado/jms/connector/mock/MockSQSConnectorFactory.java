@@ -26,4 +26,10 @@ public class MockSQSConnectorFactory implements SQSConnectorFactory {
         }
         return _mockSQSConnector;
     }
+    
+    @Override
+    public SQSConnector getInstance(String awsAccessKey, String awsSecretKey, 
+    								String awsSQSEndpoint, String awsSNSEndpoint, String proxyHost, String proxyPort) throws ResourceAllocationException {
+        return getInstance(awsAccessKey, awsSecretKey, null, null);
+    }
 }
