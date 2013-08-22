@@ -17,4 +17,12 @@ public class TypicaSQSConnectorFactory extends AbstractSQSConnectorFactory {
                 awsSNSEndpoint, _isSecure, _receiveCheckIntervalMs);
         return typicaSQSConnector;
     }
+
+    //Added to allow compilation
+	@Override
+	public TypicaSQSConnector getInstance(String awsAccessKey, String awsSecretKey,
+			String awsSQSEndpoint, String awsSNSEndpoint, String proxyHost,
+			String proxyPort) throws JMSException {
+		return getInstance(awsAccessKey, awsSecretKey, awsSQSEndpoint, awsSNSEndpoint);
+	}
 }
