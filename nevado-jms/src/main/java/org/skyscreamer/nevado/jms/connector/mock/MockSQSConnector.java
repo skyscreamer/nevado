@@ -12,7 +12,7 @@ import java.util.*;
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
-public class MockSQSConnector extends AbstractSQSConnector {
+public class MockSQSConnector extends AbstractSQSConnector implements ResettableMock {
     private final Map<NevadoQueue, MockSQSQueue> _mockQueueMap = new HashMap<NevadoQueue, MockSQSQueue>();
     private final Map<NevadoTopic, Collection<MockSQSQueue>> _mockTopicMap = new HashMap<NevadoTopic, Collection<MockSQSQueue>>();
 
@@ -111,6 +111,14 @@ public class MockSQSConnector extends AbstractSQSConnector {
         }
     }
 
+    @Override
+    public void reset() {
+        Collection<MockSQSQueue> mockSQSQueues = buildSetOfAllMockQueues();
+        for (MockSQSQueue mockSQSQueue : mockSQSQueues) {
+            mockSQSQueue.reset();
+        }
+    }
+
     protected void removeQueue(NevadoQueue queue) {
         _mockQueueMap.remove(queue);
         for(NevadoTopic topic : _mockTopicMap.keySet())
@@ -132,5 +140,18 @@ public class MockSQSConnector extends AbstractSQSConnector {
         {
             throw new JMSException("No such topic: " + topic);
         }
+    }
+
+    private Collection<MockSQSQueue> buildSetOfAllMockQueues(){
+        Collection<MockSQSQueue> mockSQSQueues = new HashSet<MockSQSQueue>();
+
+        mockSQSQueues.addAll(_mockQueueMap.values());
+
+        Collection<Collection<MockSQSQueue>> allTopicQueueCollections = _mockTopicMap.values();
+        for (Collection<MockSQSQueue> topicQueueCollection : allTopicQueueCollections) {
+            mockSQSQueues.addAll(topicQueueCollection);
+        }
+
+        return mockSQSQueues;
     }
 }

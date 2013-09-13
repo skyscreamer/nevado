@@ -10,7 +10,7 @@ import javax.jms.ResourceAllocationException;
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
-public class MockSQSConnectorFactory implements SQSConnectorFactory {
+public class MockSQSConnectorFactory implements SQSConnectorFactory, ResettableMock {
     public static final String BAD_ENDPOINT_URL = "http://badurl";
     private MockSQSConnector _mockSQSConnector = new MockSQSConnector();
 
@@ -25,5 +25,10 @@ public class MockSQSConnectorFactory implements SQSConnectorFactory {
             throw new ResourceAllocationException("Bad endpoint");
         }
         return _mockSQSConnector;
+    }
+
+    @Override
+    public void reset() {
+        _mockSQSConnector.reset();
     }
 }
