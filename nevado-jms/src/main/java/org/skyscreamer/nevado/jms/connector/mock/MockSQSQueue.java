@@ -13,7 +13,7 @@ import java.util.LinkedList;
  *
  * @author Carter Page <carter@skyscreamer.org>
  */
-public class MockSQSQueue implements SQSQueue {
+public class MockSQSQueue implements SQSQueue, ResettableMock {
     private static final long DEFAULT_MESSAGE_VISIBILITY = 120000;
     private final LinkedList<MockSQSMessage> _messageList = new LinkedList<MockSQSMessage>();
     private final String _queueARN = RandomData.readString();
@@ -103,6 +103,13 @@ public class MockSQSQueue implements SQSQueue {
             }
         }
         return nextMessage;
+    }
+
+    @Override
+    public synchronized void reset() {
+        if(!_isDeleted){
+            _messageList.clear();
+        }
     }
 
     private void checkIsDeleted() throws JMSException {
