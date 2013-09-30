@@ -2,6 +2,7 @@ package org.skyscreamer.nevado.jms.util;
 
 import com.caucho.hessian.io.Hessian2Input;
 import com.caucho.hessian.io.Hessian2Output;
+import com.caucho.hessian.io.SerializerFactory;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.ByteArrayInputStream;
@@ -26,6 +27,7 @@ public class SerializeUtil
         // Initialize buffer and converter
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         Hessian2Output hessian2Output = new Hessian2Output( byteArrayOutputStream );
+        hessian2Output.setSerializerFactory( new SerializerFactory( SerializeUtil.class.getClassLoader() ) );
 
         // Serialize objects
         hessian2Output.startMessage();
@@ -48,6 +50,7 @@ public class SerializeUtil
 
     public static Serializable deserialize(byte[] dataBytes) throws IOException {
         Hessian2Input hessian2Input = new Hessian2Input( new ByteArrayInputStream(  dataBytes ) );
+        hessian2Input.setSerializerFactory( new SerializerFactory( SerializeUtil.class.getClassLoader() ) );
 
         // Convert
         hessian2Input.startMessage();
