@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 1.2.5 - 10/24/2013
+--------------------------
+ - Fix issues with ClassLoader during de/serialization on OSGi
+ - ResettableMock interface implemented to improve repeatability on external unit tests
+
 Version 1.2.4 - 8/4/2013
 ------------------------
  - Fixed big where unfixed suffixes was causing queues ending with "null"
