@@ -53,6 +53,14 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
         super(receiveCheckIntervalMs, isAsync);
         AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
         ClientConfiguration clientConfiguration = new ClientConfiguration();
+        String proxyHost = System.getProperty("http.proxyHost");
+        String proxyPort = System.getProperty("http.proxyPort");
+        if(proxyHost != null){
+            clientConfiguration.setProxyHost(proxyHost);
+            if(proxyPort != null){
+              clientConfiguration.setProxyPort(Integer.parseInt(proxyPort));
+            }
+        }  
         clientConfiguration.setProtocol(isSecure ? Protocol.HTTPS : Protocol.HTTP);
         if (isAsync) {
             ExecutorService executorService = Executors.newSingleThreadExecutor();
