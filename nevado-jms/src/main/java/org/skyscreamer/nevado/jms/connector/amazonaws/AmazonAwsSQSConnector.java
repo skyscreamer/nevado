@@ -18,6 +18,7 @@ import com.amazonaws.services.sqs.model.CreateQueueRequest;
 import com.amazonaws.services.sqs.model.CreateQueueResult;
 import com.amazonaws.services.sqs.model.ListQueuesRequest;
 import com.amazonaws.services.sqs.model.ListQueuesResult;
+import org.apache.commons.lang.StringUtils;
 import org.skyscreamer.nevado.jms.connector.AbstractSQSConnector;
 import org.skyscreamer.nevado.jms.connector.SQSQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
@@ -45,13 +46,11 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
     private final AmazonSQS _amazonSQS;
     private final AmazonSNS _amazonSNS;
 
-    public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs) {
-        this(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, false);
-    }
-
-    public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, boolean isAsync) {
+    public AmazonAwsSQSConnector(AmazonAwsSQSCredentials credentials, boolean isSecure, long receiveCheckIntervalMs,
+                                  boolean isAsync) {
         super(receiveCheckIntervalMs, isAsync);
-        AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
+        AWSCredentials awsCredentials = new BasicAWSCredentials(credentials.getAwsAccessKey(),
+                                                                credentials.getAwsSecretKey());
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         String proxyHost = System.getProperty("http.proxyHost");
         String proxyPort = System.getProperty("http.proxyPort");
@@ -69,6 +68,14 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
         } else {
             _amazonSQS = new AmazonSQSClient(awsCredentials, clientConfiguration);
             _amazonSNS = new AmazonSNSClient(awsCredentials, clientConfiguration);
+        }
+
+        // Override endpoints if requested
+        if (StringUtils.isNotEmpty(credentials.getAwsSQSEndpoint())) {
+            _amazonSQS.setEndpoint(credentials.getAwsSQSEndpoint());
+        }
+        if (StringUtils.isNotEmpty(credentials.getAwsSNSEndpoint())) {
+            _amazonSNS.setEndpoint(credentials.getAwsSNSEndpoint());
         }
     }
 

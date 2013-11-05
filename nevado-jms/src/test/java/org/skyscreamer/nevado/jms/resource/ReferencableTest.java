@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
 import org.skyscreamer.nevado.jms.NevadoConnectionFactory;
+import org.skyscreamer.nevado.jms.connector.CloudCredentials;
+import org.skyscreamer.nevado.jms.connector.mock.MockCredentials;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 import org.skyscreamer.nevado.jms.util.RandomData;
@@ -24,8 +26,7 @@ import java.util.Random;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class ReferencableTest extends AbstractJMSTest {
-    private static final String TEST_ACCESS_KEY = RandomData.readString();
-    private static final String TEST_SECRET_KEY = RandomData.readString();
+    private static final String TEST_CREDENTIALS = RandomData.readString();
     private static final String TEST_CLIENT_ID = RandomData.readString();
     private static final Integer TEST_DELIVERY_MODE = (int)RandomData.readShort();
     private static final Integer TEST_PRIORITY = (new Random()).nextInt(10);
@@ -37,8 +38,7 @@ public class ReferencableTest extends AbstractJMSTest {
     @Test
     public void testConnectionFactory() throws NamingException, MalformedURLException {
         NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
-        connectionFactory.setAwsAccessKey(TEST_ACCESS_KEY);
-        connectionFactory.setAwsSecretKey(TEST_SECRET_KEY);
+        connectionFactory.setCloudCredentials(new MockCredentials(TEST_CREDENTIALS));
         connectionFactory.setClientID(TEST_CLIENT_ID);
         connectionFactory.setOverrideJMSDeliveryMode(TEST_DELIVERY_MODE);
         connectionFactory.setOverrideJMSPriority(TEST_PRIORITY);
@@ -46,12 +46,11 @@ public class ReferencableTest extends AbstractJMSTest {
         Context ctx = getContext();
         ctx.bind("testConnectionFactory", connectionFactory);
         NevadoConnectionFactory testConnectionFactory = (NevadoConnectionFactory)ctx.lookup("testConnectionFactory");
-        Assert.assertEquals(connectionFactory.getAwsAccessKey(), testConnectionFactory.getAwsAccessKey());
-        Assert.assertEquals(connectionFactory.getAwsSecretKey(), testConnectionFactory.getAwsSecretKey());
-        Assert.assertEquals(connectionFactory.getClientID(), testConnectionFactory.getClientID());
-        Assert.assertEquals(connectionFactory.getJMSDeliveryMode(), testConnectionFactory.getJMSDeliveryMode());
-        Assert.assertEquals(connectionFactory.getJMSPriority(), testConnectionFactory.getJMSPriority());
-        Assert.assertEquals(connectionFactory.getJMSTTL(), testConnectionFactory.getJMSTTL());
+        Assert.assertEquals(TEST_CREDENTIALS, ((MockCredentials)connectionFactory.getCloudCredentials()).getTestData());
+        Assert.assertEquals(TEST_CLIENT_ID, testConnectionFactory.getClientID());
+        Assert.assertEquals(TEST_DELIVERY_MODE, testConnectionFactory.getJMSDeliveryMode());
+        Assert.assertEquals(TEST_PRIORITY, testConnectionFactory.getJMSPriority());
+        Assert.assertEquals(TEST_TTL, testConnectionFactory.getJMSTTL());
         ctx.close();
     }
 

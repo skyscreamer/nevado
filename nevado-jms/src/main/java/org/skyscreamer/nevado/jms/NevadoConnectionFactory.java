@@ -1,15 +1,15 @@
 package org.skyscreamer.nevado.jms;
 
 import org.apache.commons.lang.StringUtils;
+import org.skyscreamer.nevado.jms.connector.CloudCredentials;
 import org.skyscreamer.nevado.jms.connector.SQSConnectorFactory;
 import org.skyscreamer.nevado.jms.resource.NevadoReferencableFactory;
+import org.skyscreamer.nevado.jms.util.SerializeUtil;
 
 import javax.jms.*;
 import javax.jms.IllegalStateException;
-import javax.naming.NamingException;
-import javax.naming.Reference;
-import javax.naming.Referenceable;
-import javax.naming.StringRefAddr;
+import javax.naming.*;
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -21,18 +21,14 @@ import java.io.Serializable;
 public class NevadoConnectionFactory implements ConnectionFactory, QueueConnectionFactory, TopicConnectionFactory,
         Serializable, Referenceable
 {
-    public static final String JNDI_AWS_ACCESS_KEY = "awsAccessKey";
-    public static final String JNDI_AWS_SECRET_KEY = "awsSecretKey";
+    public static final String JNDI_CLOUD_CREDENTIALS = "cloudCredentials";
     public static final String JNDI_CLIENT_ID = "clientID";
     public static final String JNDI_JMS_DELIVERY_MODE = "jmsDeliveryMode";
     public static final String JNDI_JMS_TTL = "jmsTTL";
     public static final String JNDI_JMS_PRIORITY = "jmsPriority";
 
     private SQSConnectorFactory _sqsConnectorFactory;
-    private volatile String _awsAccessKey;
-    private volatile String _awsSecretKey;
-    private volatile String _awsSQSEndpoint = null;
-    private volatile String _awsSNSEndpoint = null;
+    private CloudCredentials _cloudCredentials;
     private volatile String _clientID;
     private volatile Integer _jmsDeliveryMode;
     private volatile Long _jmsTTL;
@@ -49,45 +45,35 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
 
     public NevadoQueueConnection createQueueConnection() throws JMSException {
         checkSQSConnectorFactory();
-        NevadoQueueConnection connection = new NevadoQueueConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        NevadoQueueConnection connection = new NevadoQueueConnection(_sqsConnectorFactory.getInstance(_cloudCredentials));
         initializeConnection(connection);
         return connection;
     }
 
-    public NevadoQueueConnection createQueueConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
-        checkSQSConnectorFactory();
-        NevadoQueueConnection connection
-                = new NevadoQueueConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
-        initializeConnection(connection);
-        return connection;
+    public NevadoQueueConnection createQueueConnection(String s1, String s2) throws JMSException {
+        throw new UnsupportedOperationException("Credentials must be set directly in NevadoConnectionFactory.");
     }
 
     public NevadoConnection createConnection() throws JMSException {
         checkSQSConnectorFactory();
-        NevadoConnection connection = new NevadoConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        NevadoConnection connection = new NevadoConnection(_sqsConnectorFactory.getInstance(_cloudCredentials));
         initializeConnection(connection);
         return connection;
     }
 
-    public NevadoConnection createConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
-        checkSQSConnectorFactory();
-        NevadoConnection connection = new NevadoConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
-        initializeConnection(connection);
-        return connection;
+    public NevadoConnection createConnection(String s1, String s2) throws JMSException {
+        throw new UnsupportedOperationException("Credentials must be set directly in NevadoConnectionFactory.");
     }
 
     public NevadoTopicConnection createTopicConnection() throws JMSException {
         checkSQSConnectorFactory();
-        NevadoTopicConnection connection = new NevadoTopicConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        NevadoTopicConnection connection = new NevadoTopicConnection(_sqsConnectorFactory.getInstance(_cloudCredentials));
         initializeConnection(connection);
         return connection;
     }
 
-    public TopicConnection createTopicConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
-        checkSQSConnectorFactory();
-        NevadoTopicConnection connection = new NevadoTopicConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
-        initializeConnection(connection);
-        return connection;
+    public TopicConnection createTopicConnection(String s1, String s2) throws JMSException {
+        throw new UnsupportedOperationException("Credentials must be set directly in NevadoConnectionFactory.");
     }
 
     private void initializeConnection(NevadoConnection connection) throws JMSException {
@@ -108,20 +94,8 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
         _sqsConnectorFactory = sqsConnectorFactory;
     }
 
-    public void setAwsAccessKey(String awsAccessKey) {
-        _awsAccessKey = awsAccessKey;
-    }
-
-    public void setAwsSecretKey(String awsSecretKey) {
-        _awsSecretKey = awsSecretKey;
-    }
-
-    public void setAwsSQSEndpoint(String awsSQSEndpoint) {
-        _awsSQSEndpoint = awsSQSEndpoint;
-    }
-
-    public void setAwsSNSEndpoint(String awsSNSEndpoint) {
-        _awsSNSEndpoint = awsSNSEndpoint;
+    public void setCloudCredentials(CloudCredentials cloudCredentials) {
+        _cloudCredentials = cloudCredentials;
     }
 
     public void setClientID(String clientID) {
@@ -140,12 +114,8 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
         _jmsPriority = jmsPriority;
     }
 
-    public String getAwsAccessKey() {
-        return _awsAccessKey;
-    }
-
-    public String getAwsSecretKey() {
-        return _awsSecretKey;
+    public CloudCredentials getCloudCredentials() {
+        return _cloudCredentials;
     }
 
     public String getClientID() {
@@ -177,10 +147,14 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     }
 
     public Reference getReference() throws NamingException {
-        Reference reference = new Reference(NevadoConnectionFactory.class.getName(),
-                new StringRefAddr(JNDI_AWS_ACCESS_KEY, _awsAccessKey),
-                NevadoReferencableFactory.class.getName(), null);
-        reference.add(new StringRefAddr(JNDI_AWS_SECRET_KEY, _awsSecretKey));
+        Reference reference = null;
+        try {
+            reference = new Reference(NevadoConnectionFactory.class.getName(),
+                    new BinaryRefAddr(JNDI_CLOUD_CREDENTIALS, SerializeUtil.serialize(_cloudCredentials)),
+                    NevadoReferencableFactory.class.getName(), null);
+        } catch (IOException e) {
+            throw new NamingException("Unable to serialize cloud credentials: " + e.getMessage());
+        }
         if (_clientID != null)
         {
             reference.add(new StringRefAddr(JNDI_CLIENT_ID, _clientID));

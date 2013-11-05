@@ -26,7 +26,7 @@ public class MockSQSConnectorFactoryTest {
     @Before
     public void setUp() throws Exception {
         _mockSQSConnectorFactory = new MockSQSConnectorFactory();
-        _mockSQSConnector = (MockSQSConnector) _mockSQSConnectorFactory.getInstance(ACCESS_KEY, SECRET_KEY);
+        _mockSQSConnector = (MockSQSConnector) _mockSQSConnectorFactory.getInstance(new MockCredentials());
         _nevadoConnection = new NevadoConnection(_mockSQSConnector);
         _nevadoConnection.start();
 

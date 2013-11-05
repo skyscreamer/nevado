@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
 import org.skyscreamer.nevado.jms.NevadoConnectionFactory;
+import org.skyscreamer.nevado.jms.connector.mock.MockCredentials;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 import org.skyscreamer.nevado.jms.util.RandomData;
@@ -19,7 +20,7 @@ import java.util.Random;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class SerializableTest extends AbstractJMSTest {
-    private static final String TEST_ACCESS_KEY = RandomData.readString();
+    private static final String TEST_CREDENTIALS = RandomData.readString();
     private static final String TEST_SECRET_KEY = RandomData.readString();
     private static final String TEST_CLIENT_ID = RandomData.readString();
     private static final Integer TEST_DELIVERY_MODE = (int)RandomData.readShort();
@@ -29,16 +30,14 @@ public class SerializableTest extends AbstractJMSTest {
     @Test
     public void testConnectionFactory() throws IOException {
         NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory();
-        connectionFactory.setAwsAccessKey(TEST_ACCESS_KEY);
-        connectionFactory.setAwsSecretKey(TEST_SECRET_KEY);
+        connectionFactory.setCloudCredentials(new MockCredentials(TEST_CREDENTIALS));
         connectionFactory.setClientID(TEST_CLIENT_ID);
         connectionFactory.setOverrideJMSDeliveryMode(TEST_DELIVERY_MODE);
         connectionFactory.setOverrideJMSPriority(TEST_PRIORITY);
         connectionFactory.setOverrideJMSTTL(TEST_TTL);
         NevadoConnectionFactory testConnectionFactory =
                 (NevadoConnectionFactory) SerializeUtil.deserialize(SerializeUtil.serialize(connectionFactory));
-        Assert.assertEquals(connectionFactory.getAwsAccessKey(), testConnectionFactory.getAwsAccessKey());
-        Assert.assertEquals(connectionFactory.getAwsSecretKey(), testConnectionFactory.getAwsSecretKey());
+        Assert.assertEquals(TEST_CREDENTIALS, ((MockCredentials)testConnectionFactory.getCloudCredentials()).getTestData());
         Assert.assertEquals(connectionFactory.getClientID(), testConnectionFactory.getClientID());
         Assert.assertEquals(connectionFactory.getJMSDeliveryMode(), testConnectionFactory.getJMSDeliveryMode());
         Assert.assertEquals(connectionFactory.getJMSPriority(), testConnectionFactory.getJMSPriority());

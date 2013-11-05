@@ -1,9 +1,11 @@
 package org.skyscreamer.nevado.jms.resource;
 
 import org.skyscreamer.nevado.jms.NevadoConnectionFactory;
+import org.skyscreamer.nevado.jms.connector.CloudCredentials;
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoTopic;
+import org.skyscreamer.nevado.jms.util.SerializeUtil;
 
 import javax.naming.Context;
 import javax.naming.Name;
@@ -25,24 +27,24 @@ public class NevadoReferencableFactory implements ObjectFactory {
             Reference ref = (Reference)obj;
             if (ref.getClassName().equals(NevadoConnectionFactory.class.getName())) {
                 NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory();
-                connectionFactory.setAwsAccessKey(getRefContent(ref, NevadoConnectionFactory.JNDI_AWS_ACCESS_KEY));
-                connectionFactory.setAwsSecretKey(getRefContent(ref, NevadoConnectionFactory.JNDI_AWS_SECRET_KEY));
-                String clientId = getRefContent(ref, NevadoConnectionFactory.JNDI_CLIENT_ID);
+                byte[] serializedData = getBinaryRefContent(ref, NevadoConnectionFactory.JNDI_CLOUD_CREDENTIALS);
+                connectionFactory.setCloudCredentials((CloudCredentials)SerializeUtil.deserialize(serializedData));
+                String clientId = getStringRefContent(ref, NevadoConnectionFactory.JNDI_CLIENT_ID);
                 if (clientId != null)
                 {
                     connectionFactory.setClientID(clientId);
                 }
-                String jmsDeliveryMode = getRefContent(ref, NevadoConnectionFactory.JNDI_JMS_DELIVERY_MODE);
+                String jmsDeliveryMode = getStringRefContent(ref, NevadoConnectionFactory.JNDI_JMS_DELIVERY_MODE);
                 if (jmsDeliveryMode != null)
                 {
                     connectionFactory.setOverrideJMSDeliveryMode(Integer.parseInt(jmsDeliveryMode));
                 }
-                String jmsPriority = getRefContent(ref, NevadoConnectionFactory.JNDI_JMS_PRIORITY);
+                String jmsPriority = getStringRefContent(ref, NevadoConnectionFactory.JNDI_JMS_PRIORITY);
                 if (jmsPriority != null)
                 {
                     connectionFactory.setOverrideJMSPriority(Integer.parseInt(jmsPriority));
                 }
-                String jmsTtl = getRefContent(ref, NevadoConnectionFactory.JNDI_JMS_TTL);
+                String jmsTtl = getStringRefContent(ref, NevadoConnectionFactory.JNDI_JMS_TTL);
                 if (jmsTtl != null)
                 {
                     connectionFactory.setOverrideJMSTTL(Long.parseLong(jmsTtl));
@@ -50,10 +52,10 @@ public class NevadoReferencableFactory implements ObjectFactory {
                 instance = connectionFactory;
             }
             else if (ref.getClassName().equals(NevadoQueue.class.getName())) {
-                instance = new NevadoQueue(getRefContent(ref, NevadoDestination.JNDI_DESTINATION_NAME));
+                instance = new NevadoQueue(getStringRefContent(ref, NevadoDestination.JNDI_DESTINATION_NAME));
             }
             else if (ref.getClassName().equals(NevadoTopic.class.getName())) {
-                instance = new NevadoTopic(getRefContent(ref, NevadoDestination.JNDI_DESTINATION_NAME));
+                instance = new NevadoTopic(getStringRefContent(ref, NevadoDestination.JNDI_DESTINATION_NAME));
             }
             else {
                 throw new IllegalArgumentException("This factory does not support objects of type "
@@ -68,9 +70,15 @@ public class NevadoReferencableFactory implements ObjectFactory {
         return instance;
     }
 
-    private String getRefContent(Reference ref, String type) {
+    private String getStringRefContent(Reference ref, String type) {
         RefAddr addr = ref.get(type);
         String content = addr != null ? ((String)addr.getContent()) : null;
+        return content;
+    }
+
+    private byte[] getBinaryRefContent(Reference ref, String type) {
+        RefAddr addr = ref.get(type);
+        byte[] content = addr != null ? ((byte[])addr.getContent()) : null;
         return content;
     }
 }

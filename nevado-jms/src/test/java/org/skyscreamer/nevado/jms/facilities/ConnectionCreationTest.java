@@ -3,7 +3,10 @@ package org.skyscreamer.nevado.jms.facilities;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
-import org.skyscreamer.nevado.jms.connector.typica.TypicaSQSConnector;
+import org.skyscreamer.nevado.jms.NevadoConnectionFactory;
+import org.skyscreamer.nevado.jms.connector.CloudCredentials;
+import org.skyscreamer.nevado.jms.connector.amazonaws.AmazonAwsSQSConnector;
+import org.skyscreamer.nevado.jms.connector.amazonaws.AmazonAwsSQSCredentials;
 
 import javax.jms.JMSException;
 import javax.jms.JMSSecurityException;
@@ -16,11 +19,12 @@ import javax.jms.JMSSecurityException;
 public class ConnectionCreationTest extends AbstractJMSTest {
     @Test
     public void testBadConnection() throws JMSException {
-        if (getConnection().getSQSConnector() instanceof TypicaSQSConnector)
-        {
+        CloudCredentials credentials = ((NevadoConnectionFactory)getConnectionFactory()).getCloudCredentials();
+        if (credentials instanceof AmazonAwsSQSCredentials) {
+            ((AmazonAwsSQSCredentials) credentials).setAwsAccessKey("BADACCESSKEY");
             boolean exceptionThrown = false;
             try {
-                getConnectionFactory().createConnection("BADACCESSKEY", "BADSECRETKEY");
+                getConnectionFactory().createConnection();
             } catch (JMSSecurityException e) {
                 exceptionThrown = true;
             }
