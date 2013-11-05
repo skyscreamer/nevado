@@ -6,6 +6,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.runner.RunWith;
+import org.skyscreamer.nevado.jms.connector.CloudCredentials;
 import org.skyscreamer.nevado.jms.connector.SQSConnectorFactory;
 import org.skyscreamer.nevado.jms.connector.mock.MockSQSConnectorFactory;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
@@ -40,38 +41,17 @@ import java.util.Properties;
 public abstract class AbstractJMSTest {
     protected final Log _log = LogFactory.getLog(getClass());
 
-    private String _awsAccessKey;
-    private String _awsSecretKey;
-
-    @Autowired private ConnectionFactory _connectionFactory;
-    @Autowired protected SQSConnectorFactory _sqsConnectorFactory;
+    @Autowired private NevadoConnectionFactory _connectionFactory;
+    @Autowired private SQSConnectorFactory _sqsConnectorFactory;
+    @Autowired private CloudCredentials _cloudCredentials;
     private NevadoConnection _connection;
     private TestExceptionListener _exceptionListener = new TestExceptionListener();
 
     @Before
     public void setUp() throws JMSException, IOException {
-        if (!(_sqsConnectorFactory instanceof MockSQSConnectorFactory)) {
-            initializeAWSCredentials();
-        }
-        _connection = createConnection(_connectionFactory);
+        _connection = _connectionFactory.createConnection();
         _connection.setExceptionListener(_exceptionListener);
         _connection.start();
-    }
-
-    protected NevadoConnection createConnection(ConnectionFactory connectionFactory) throws JMSException {
-        return (NevadoConnection)connectionFactory.createConnection(_awsAccessKey, _awsSecretKey);
-    }
-
-    protected NevadoQueueConnection createQueueConnection(QueueConnectionFactory connectionFactory)
-            throws JMSException
-    {
-        return (NevadoQueueConnection)connectionFactory.createQueueConnection(_awsAccessKey, _awsSecretKey);
-    }
-
-    protected NevadoTopicConnection createTopicConnection(TopicConnectionFactory connectionFactory)
-            throws JMSException
-    {
-        return (NevadoTopicConnection)connectionFactory.createTopicConnection(_awsAccessKey, _awsSecretKey);
     }
 
     protected Message sendAndReceive(Message msg) throws JMSException {
@@ -82,29 +62,6 @@ public abstract class AbstractJMSTest {
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
         return msgOut;
-    }
-
-    private void initializeAWSCredentials() throws IOException {
-        Properties prop = new Properties();
-        InputStream in = getClass().getResourceAsStream("/aws.properties");
-        prop.load(in);
-        in.close();
-
-        _awsAccessKey = prop.getProperty("aws.accessKey");
-        _awsSecretKey = prop.getProperty("aws.secretKey");
-        if (_awsAccessKey == null || _awsAccessKey.trim().length() == 0
-            || _awsSecretKey == null || _awsSecretKey.trim().length() == 0) {
-                System.out.println("ATTENTION: You have not set up your AWS credentials.  Follow thes steps:\n" +
-                        "    1. Copy nevado-jms/src/test/resources/aws.properties.TEMPLATE to\n" +
-                        "       nevado-jms/src/test/resources/aws.properties\n" +
-                        "    2. Edit aws.properties with your access keys from\n" +
-                        "       https://aws-portal.amazon.com/gp/aws/securityCredentials\n" +
-                        "    3. Have git ignore the new file.  Add the following line to .git/info/exclude:\n\n" +
-                        "        aws.properties\n\n" +
-                        "*** Keep your keys in a safe place and don't commit them to source control. ***\n\n");
-            throw new MissingResourceException("Resource /aws.properties does not exist",
-                    null, null);
-        }
     }
 
     @After
@@ -118,6 +75,21 @@ public abstract class AbstractJMSTest {
 
     public ConnectionFactory getConnectionFactory() {
         return _connectionFactory;
+    }
+
+    public QueueConnectionFactory getQueueConnectionFactory() {
+        return _connectionFactory;
+    }
+
+    public TopicConnectionFactory getTopicConnectionFactory() {
+        return _connectionFactory;
+    }
+
+    public NevadoConnectionFactory createConnectionFactory() {
+        NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory();
+        connectionFactory.setCloudCredentials(_cloudCredentials);
+        connectionFactory.setSqsConnectorFactory(_sqsConnectorFactory);
+        return connectionFactory;
     }
 
     protected NevadoConnection getConnection() {

@@ -29,16 +29,16 @@ public class TopicSubscriberTest extends AbstractJMSTest {
         producer.close();
         consumer1.close();
         consumer2.close();
-        getConnection().deleteTopic(testTopic);
+        ((NevadoConnection)getConnection()).deleteTopic(testTopic);
     }
 
     @Test
     public void testNoLocal() throws JMSException
     {
         getConnection().close(); // Don't use the provided connection
-        NevadoConnection conn1 = createConnection(getConnectionFactory());
+        NevadoConnection conn1 = createConnectionFactory().createConnection();
         conn1.start();
-        NevadoConnection conn2 = createConnection(getConnectionFactory());
+        NevadoConnection conn2 = createConnectionFactory().createConnection();
         conn2.start();
         NevadoSession session1 = conn1.createSession(false, Session.AUTO_ACKNOWLEDGE);
         NevadoSession session2 = conn2.createSession(false, Session.AUTO_ACKNOWLEDGE);

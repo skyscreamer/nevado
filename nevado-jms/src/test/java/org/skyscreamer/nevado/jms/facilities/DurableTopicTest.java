@@ -33,7 +33,7 @@ public class DurableTopicTest extends AbstractJMSTest {
         producer.send(msg3);
         getConnection().close();
 
-        NevadoConnection conn = createConnection(getConnectionFactory());
+        NevadoConnection conn = (NevadoConnection)getConnectionFactory().createConnection();
         conn.start();
         session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
         subscriber = session.createDurableSubscriber(topic, durableTopicName);
@@ -70,7 +70,7 @@ public class DurableTopicTest extends AbstractJMSTest {
         String durableTopicName = "testTopicSub" + RandomData.readShort();
         String testTopicName = "testTopic" + RandomData.readShort();
 
-        NevadoConnection conn = createConnection(getConnectionFactory());
+        NevadoConnection conn = (NevadoConnection)getConnectionFactory().createConnection();
         conn.setClientID("abc");
         conn.start();
         NevadoSession session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -81,7 +81,7 @@ public class DurableTopicTest extends AbstractJMSTest {
         producer.send(msg1);
         conn.close();
 
-        conn = createConnection(getConnectionFactory());
+        conn = (NevadoConnection)getConnectionFactory().createConnection();
         conn.setClientID("def");
         conn.start();
         session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -92,7 +92,7 @@ public class DurableTopicTest extends AbstractJMSTest {
         session.unsubscribe(durableTopicName);
         conn.close();
 
-        conn = createConnection(getConnectionFactory());
+        conn = (NevadoConnection)getConnectionFactory().createConnection();
         conn.setClientID("abc");
         conn.start();
         session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -135,7 +135,7 @@ public class DurableTopicTest extends AbstractJMSTest {
     @Test
     public void testUnsubscribeWithUnackedMsg() throws JMSException {
         String durableTopicName = "testTopicSub" + RandomData.readShort();
-        NevadoSession session = getConnection().createSession(false, Session.CLIENT_ACKNOWLEDGE);
+        NevadoSession session = ((NevadoConnection)getConnection()).createSession(false, Session.CLIENT_ACKNOWLEDGE);
         NevadoTopic topic = createTempTopic(session);
         TopicSubscriber subscriber = session.createDurableSubscriber(topic, durableTopicName);
         session.createProducer(topic).send(session.createMessage());

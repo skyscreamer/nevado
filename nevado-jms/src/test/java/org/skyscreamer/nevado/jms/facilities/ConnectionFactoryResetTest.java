@@ -20,9 +20,7 @@ public class ConnectionFactoryResetTest extends AbstractJMSTest{
 
     @Test
     public void testResetWillEmptyQueue() throws Exception {
-
-        NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
-        Connection connection = createConnection(connectionFactory);
+        Connection connection = getConnection();
         connection.start();
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
@@ -39,6 +37,5 @@ public class ConnectionFactoryResetTest extends AbstractJMSTest{
         Message msgOut = consumer.receive(2000);
         Assert.assertNull(msgOut);
         connection.close();
-
     }
 }

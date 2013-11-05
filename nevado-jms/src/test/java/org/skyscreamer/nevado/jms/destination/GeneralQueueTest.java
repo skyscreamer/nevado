@@ -67,8 +67,7 @@ public class GeneralQueueTest extends AbstractJMSTest {
     @Test
     public void testQueueFacilities() throws JMSException
     {
-        QueueConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
-        QueueConnection connection = createQueueConnection(connectionFactory);
+        QueueConnection connection = ((QueueConnectionFactory)getConnectionFactory()).createQueueConnection();
         connection.start();
         QueueSession session = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         TemporaryQueue queue = session.createTemporaryQueue();

@@ -21,11 +21,12 @@ public class ConnectionFactoryEndpointTest extends AbstractJMSTest {
     @Test
     public void testChangedEndpoints() throws JMSException
     {
-        CloudCredentials credentials = ((NevadoConnectionFactory)getConnectionFactory()).getCloudCredentials();
+        NevadoConnectionFactory connectionFactory = createConnectionFactory();
+        CloudCredentials credentials = connectionFactory.getCloudCredentials();
         if (credentials instanceof AmazonAwsSQSCredentials) {
             ((AmazonAwsSQSCredentials) credentials).setAwsSQSEndpoint("http://sqs.us-east-1.amazonaws.com");
             ((AmazonAwsSQSCredentials) credentials).setAwsSNSEndpoint("http://sns.us-east-1.amazonaws.com");
-            Connection connection = getConnection();
+            Connection connection = connectionFactory.createConnection();
             connection.start();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             TemporaryQueue queue = session.createTemporaryQueue();
@@ -42,13 +43,12 @@ public class ConnectionFactoryEndpointTest extends AbstractJMSTest {
     }
 
     @Test(expected = ResourceAllocationException.class)
-    public void testBadSQSEndpoint() throws JMSException
-    {
-        CloudCredentials credentials = ((NevadoConnectionFactory)getConnectionFactory()).getCloudCredentials();
+    public void testBadSQSEndpoint() throws JMSException {
+        NevadoConnectionFactory connectionFactory = createConnectionFactory();
+        CloudCredentials credentials = connectionFactory.getCloudCredentials();
         if (credentials instanceof AmazonAwsSQSCredentials) {
-            NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
             ((AmazonAwsSQSCredentials) credentials).setAwsSQSEndpoint(MockSQSConnectorFactory.BAD_ENDPOINT_URL);
-            Connection connection = createConnection(connectionFactory);
+            Connection connection = connectionFactory.createConnection();
             connection.start();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             TemporaryQueue queue = session.createTemporaryQueue();
@@ -61,17 +61,19 @@ public class ConnectionFactoryEndpointTest extends AbstractJMSTest {
             Assert.assertTrue(msgOut instanceof TextMessage);
             Assert.assertEquals(testMessage, (TextMessage)msgOut);
             connection.close();
+        } else {
+            throw new ResourceAllocationException("Skip for non-aws connectors");
         }
     }
 
     @Test(expected = ResourceAllocationException.class)
     public void testBadSNSEndpoint() throws JMSException
     {
-        CloudCredentials credentials = ((NevadoConnectionFactory)getConnectionFactory()).getCloudCredentials();
+        NevadoConnectionFactory connectionFactory = createConnectionFactory();
+        CloudCredentials credentials = connectionFactory.getCloudCredentials();
         if (credentials instanceof AmazonAwsSQSCredentials) {
-            NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
             ((AmazonAwsSQSCredentials) credentials).setAwsSNSEndpoint(MockSQSConnectorFactory.BAD_ENDPOINT_URL);
-            Connection connection = createConnection(connectionFactory);
+            Connection connection = connectionFactory.createConnection();
             connection.start();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             TemporaryQueue queue = session.createTemporaryQueue();
@@ -84,6 +86,8 @@ public class ConnectionFactoryEndpointTest extends AbstractJMSTest {
             Assert.assertTrue(msgOut instanceof TextMessage);
             Assert.assertEquals(testMessage, (TextMessage)msgOut);
             connection.close();
+        } else {
+            throw new ResourceAllocationException("Skip for non-aws connectors");
         }
     }
 }

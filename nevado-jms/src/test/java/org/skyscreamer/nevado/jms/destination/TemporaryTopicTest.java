@@ -37,7 +37,7 @@ public class TemporaryTopicTest extends AbstractJMSTest {
     {
         NevadoSession session = createSession();
         TemporaryTopic temporaryTopic = session.createTemporaryTopic();
-        Connection theWrongConnection = createConnection(getConnectionFactory());
+        Connection theWrongConnection = getConnectionFactory().createConnection();
         Session theWrongSession = theWrongConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         theWrongSession.createConsumer(temporaryTopic);
     }
@@ -45,11 +45,11 @@ public class TemporaryTopicTest extends AbstractJMSTest {
     @Test
     public void testTemporaryTopicSuffix() throws Exception
     {
-        NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
+        NevadoConnectionFactory connectionFactory = (NevadoConnectionFactory)getConnectionFactory();
         String temporaryTopicSuffix = UUID.randomUUID().toString();
         Assert.assertTrue(temporaryTopicSuffix.length() > 0);
         connectionFactory.setTemporaryTopicSuffix(temporaryTopicSuffix);
-        Connection connection = createConnection(connectionFactory);
+        Connection connection = connectionFactory.createConnection();
         connection.start();
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         TemporaryTopic topic = session.createTemporaryTopic();
@@ -65,16 +65,16 @@ public class TemporaryTopicTest extends AbstractJMSTest {
         String suffix2;
 
         {
-            NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
+            NevadoConnectionFactory connectionFactory = createConnectionFactory();
             suffix1 = UUID.randomUUID().toString();
             connectionFactory.setTemporaryTopicSuffix(suffix1);
-            conn1 = createConnection(connectionFactory);
+            conn1 = connectionFactory.createConnection();
         }
         {
-            NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
+            NevadoConnectionFactory connectionFactory = createConnectionFactory();
             suffix2 = UUID.randomUUID().toString();
             connectionFactory.setTemporaryTopicSuffix(suffix2);
-            conn2 = createConnection(connectionFactory);
+            conn2 = connectionFactory.createConnection();
         }
 
         try {
@@ -114,10 +114,10 @@ public class TemporaryTopicTest extends AbstractJMSTest {
     public void testTemporaryTopicDeletion() throws Exception {
         NevadoSession session = createSession();
         TemporaryTopic temporaryTopic = session.createTemporaryTopic();
-        Collection<NevadoTemporaryTopic> allTemporaryTopics = getConnection().listAllTemporaryTopics();
+        Collection<NevadoTemporaryTopic> allTemporaryTopics = ((NevadoConnection)getConnection()).listAllTemporaryTopics();
         Assert.assertTrue("Temporary topic should exist", allTemporaryTopics.contains(temporaryTopic));
         getConnection().close();
-        allTemporaryTopics = getConnection().listAllTemporaryTopics();
+        allTemporaryTopics = ((NevadoConnection)getConnection()).listAllTemporaryTopics();
         Assert.assertFalse("Temporary topic should not exist", allTemporaryTopics.contains(temporaryTopic));
     }
 }

@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
 import org.skyscreamer.nevado.jms.NevadoConnection;
 
+import javax.jms.Connection;
 import java.util.Random;
 
 /**
@@ -44,13 +45,13 @@ public class ConnectionMultiThreadTest extends AbstractJMSTest {
 
     private class ConnectionOpenClose implements Runnable {
         private final int _id;
-        private final NevadoConnection _connection;
+        private final Connection _connection;
         private final int _iterations;
         private final Random _random = new Random();
         private volatile Exception _exception = null;
         private final StopWatch _stopWatch = new StopWatch();
 
-        public ConnectionOpenClose(int id, NevadoConnection connection, int iterations) {
+        public ConnectionOpenClose(int id, Connection connection, int iterations) {
             _id = id;
             _connection = connection;
             _iterations = iterations;

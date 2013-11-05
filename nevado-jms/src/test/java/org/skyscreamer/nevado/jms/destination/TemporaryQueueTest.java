@@ -36,7 +36,7 @@ public class TemporaryQueueTest extends AbstractJMSTest {
     {
         NevadoSession session = createSession();
         TemporaryQueue temporaryQueue = session.createTemporaryQueue();
-        Connection theWrongConnection = createConnection(getConnectionFactory());
+        Connection theWrongConnection = getConnectionFactory().createConnection();
         Session theWrongSession = theWrongConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         MessageConsumer consumer = theWrongSession.createConsumer(temporaryQueue);
     }
@@ -44,11 +44,11 @@ public class TemporaryQueueTest extends AbstractJMSTest {
     @Test
     public void testTemporaryQueueSuffix() throws Exception
     {
-        NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
+        NevadoConnectionFactory connectionFactory = createConnectionFactory();
         String temporaryQueueSuffix = "_" + new BigInteger(32, new Random()).toString(32);
         Assert.assertTrue(temporaryQueueSuffix.length() > 0);
         connectionFactory.setTemporaryQueueSuffix(temporaryQueueSuffix);
-        Connection connection = createConnection(connectionFactory);
+        Connection connection = connectionFactory.createConnection();
         connection.start();
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         TemporaryQueue queue = session.createTemporaryQueue();
@@ -63,10 +63,11 @@ public class TemporaryQueueTest extends AbstractJMSTest {
     public void testTemporaryQueueDeletion() throws Exception {
         NevadoSession session = createSession();
         TemporaryQueue temporaryQueue = session.createTemporaryQueue();
-        Collection<NevadoTemporaryQueue> allTemporaryQueues = getConnection().listAllTemporaryQueues();
+        NevadoConnection connection = (NevadoConnection)getConnection();
+        Collection<NevadoTemporaryQueue> allTemporaryQueues = connection.listAllTemporaryQueues();
         Assert.assertTrue("Temporary queue should exist", allTemporaryQueues.contains(temporaryQueue));
         getConnection().close();
-        allTemporaryQueues = getConnection().listAllTemporaryQueues();
+        allTemporaryQueues = connection.listAllTemporaryQueues();
         Assert.assertFalse("Temporary queue should not exist", allTemporaryQueues.contains(temporaryQueue));
     }
 
@@ -78,16 +79,16 @@ public class TemporaryQueueTest extends AbstractJMSTest {
         String suffix2;
 
         {
-            NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
+            NevadoConnectionFactory connectionFactory = createConnectionFactory();
             suffix1 = "_" + new BigInteger(32, new Random()).toString(32);
             connectionFactory.setTemporaryQueueSuffix(suffix1);
-            conn1 = createConnection(connectionFactory);
+            conn1 = connectionFactory.createConnection();
         }
         {
-            NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
+            NevadoConnectionFactory connectionFactory = createConnectionFactory();
             suffix2 = "_" + new BigInteger(32, new Random()).toString(32);
             connectionFactory.setTemporaryQueueSuffix(suffix2);
-            conn2 = createConnection(connectionFactory);
+            conn2 = connectionFactory.createConnection();
         }
 
         try {

@@ -17,7 +17,7 @@ public class ClientIDTest extends AbstractJMSTest {
 
     @Test
     public void testClientID1() throws JMSException {
-        Connection conn = createConnection(getConnectionFactory());
+        Connection conn = getConnectionFactory().createConnection();
         Assert.assertNull(conn.getClientID());
         conn.setClientID(TEST_CLIENT_ID);
         Assert.assertEquals(TEST_CLIENT_ID, conn.getClientID());
@@ -25,7 +25,7 @@ public class ClientIDTest extends AbstractJMSTest {
 
     @Test(expected = javax.jms.IllegalStateException.class)
     public void testClientID2() throws JMSException {
-        Connection conn = createConnection(getConnectionFactory());
+        Connection conn = getConnectionFactory().createConnection();
         Assert.assertNull(conn.getClientID());
         conn.setClientID(TEST_CLIENT_ID);
         conn.setClientID("somethingelse");
@@ -33,16 +33,16 @@ public class ClientIDTest extends AbstractJMSTest {
 
     @Test
     public void testClientID3() throws JMSException {
-        NevadoConnectionFactory connectionFactory = new NevadoConnectionFactory(_sqsConnectorFactory);
+        NevadoConnectionFactory connectionFactory = createConnectionFactory();
         connectionFactory.setClientID(TEST_CLIENT_ID);
-        Connection conn = createConnection(connectionFactory);
+        Connection conn = connectionFactory.createConnection();
         Assert.assertEquals(TEST_CLIENT_ID, conn.getClientID());
     }
 
     @Test
     public void testClientID4() throws JMSException {
-        Connection conn1 = createConnection(getConnectionFactory());
-        Connection conn2 = createConnection(getConnectionFactory());
+        Connection conn1 = getConnectionFactory().createConnection();
+        Connection conn2 = getConnectionFactory().createConnection();
         conn1.setClientID(TEST_CLIENT_ID);
         conn1.close();
         conn2.setClientID(TEST_CLIENT_ID);
@@ -50,7 +50,7 @@ public class ClientIDTest extends AbstractJMSTest {
 
     @Test(expected = javax.jms.IllegalStateException.class)
     public void testClientID5() throws JMSException {
-        Connection conn = createConnection(getConnectionFactory());
+        Connection conn = getConnectionFactory().createConnection();
         Assert.assertNull(conn.getClientID());
         conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
         conn.setClientID(TEST_CLIENT_ID);
@@ -58,7 +58,7 @@ public class ClientIDTest extends AbstractJMSTest {
 
     @Test(expected = InvalidClientIDException.class)
     public void testBadClientID() throws JMSException {
-        Connection conn = createConnection(getConnectionFactory());
+        Connection conn = getConnectionFactory().createConnection();
         conn.setClientID("[here's a bad id]");
     }
 }

@@ -2,6 +2,7 @@ package org.skyscreamer.nevado.jms.destination;
 
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
+import org.skyscreamer.nevado.jms.NevadoConnection;
 import org.skyscreamer.nevado.jms.NevadoSession;
 
 import javax.jms.InvalidDestinationException;
@@ -19,7 +20,7 @@ public class InvalidDestinationTest extends AbstractJMSTest {
         NevadoSession session = createSession();
         NevadoTemporaryQueue temporaryQueue = session.createTemporaryQueue();
         MessageProducer producer = session.createProducer(temporaryQueue);
-        getConnection().deleteTemporaryQueue(temporaryQueue);
+        ((NevadoConnection)getConnection()).deleteTemporaryQueue(temporaryQueue);
         producer.send(session.createMessage());
     }
 }

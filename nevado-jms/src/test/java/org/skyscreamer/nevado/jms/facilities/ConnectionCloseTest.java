@@ -55,7 +55,7 @@ public class ConnectionCloseTest extends AbstractJMSTest {
         NevadoQueue testQueue = new NevadoQueue("testQueue" + RandomData.readInt());
 
         // Do some stuff, roll it back
-        Connection testConnection = createConnection(getConnectionFactory());
+        Connection testConnection = getConnectionFactory().createConnection();
         testConnection.start();
         Session controlSession = createSession();
         TextMessage msg1 = controlSession.createTextMessage(RandomData.readString());

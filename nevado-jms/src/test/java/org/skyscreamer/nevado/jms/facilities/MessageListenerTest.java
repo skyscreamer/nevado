@@ -69,7 +69,7 @@ public class MessageListenerTest extends AbstractJMSTest {
     @Test
     public void testThrowRuntimeAutoAck() throws JMSException, InterruptedException {
         TestMessageListenerRuntimeException messageListener = new TestMessageListenerRuntimeException(false);
-        NevadoConnection connection = createConnection(getConnectionFactory());
+        NevadoConnection connection = (NevadoConnection)getConnectionFactory().createConnection();
         connection.start();
         NevadoSession session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Queue tempQueue = createTempQueue(session);
@@ -93,7 +93,7 @@ public class MessageListenerTest extends AbstractJMSTest {
     @Test
     public void testThrowRuntimeDupsOk() throws JMSException, InterruptedException {
         TestMessageListenerRuntimeException messageListener = new TestMessageListenerRuntimeException(true);
-        NevadoConnection connection = createConnection(getConnectionFactory());
+        NevadoConnection connection = (NevadoConnection)getConnectionFactory().createConnection();
         connection.start();
         NevadoSession session = connection.createSession(false, Session.DUPS_OK_ACKNOWLEDGE);
         Queue tempQueue = createTempQueue(session);
@@ -117,7 +117,7 @@ public class MessageListenerTest extends AbstractJMSTest {
     @Test
     public void testThrowRuntimeClientAck() throws JMSException, InterruptedException {
         TestMessageListenerRuntimeException messageListener = new TestMessageListenerRuntimeException(true);
-        NevadoConnection connection = createConnection(getConnectionFactory());
+        NevadoConnection connection = (NevadoConnection)getConnectionFactory().createConnection();
         connection.start();
         NevadoSession session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
         Queue tempQueue = createTempQueue(session);
@@ -141,7 +141,7 @@ public class MessageListenerTest extends AbstractJMSTest {
     @Test
     public void testThrowRuntimeTransacted() throws JMSException, InterruptedException {
         TestMessageListenerRuntimeException messageListener = new TestMessageListenerRuntimeException(true);
-        NevadoConnection connection = createConnection(getConnectionFactory());
+        NevadoConnection connection = (NevadoConnection)getConnectionFactory().createConnection();
         connection.start();
         NevadoSession session = connection.createSession(true, Session.SESSION_TRANSACTED);
         Queue tempQueue = createTempQueue(session);

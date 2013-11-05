@@ -19,7 +19,7 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
     @Test
     public void testClientStart() throws Exception {
         // Set up session for sync messages
-        NevadoConnection conn = createConnection(getConnectionFactory());
+        NevadoConnection conn = (NevadoConnection)getConnection();
         NevadoSession session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Queue tempQueue = createTempQueue(session);
         MessageProducer producer = session.createProducer(tempQueue);
@@ -42,7 +42,7 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
     @Test
     public void testAsyncClientStart() throws Exception {
         // Set up session for async messages
-        NevadoConnection conn = createConnection(getConnectionFactory());
+        NevadoConnection conn = (NevadoConnection)getConnection();
         NevadoSession asyncSession = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
         TestMessageListener messageListener = new TestMessageListener(false);
         Queue tempQueue = createTempQueue(asyncSession);
@@ -64,7 +64,7 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
     @Test
     public void testClientPause() throws Exception {
         // Set up and send two messages
-        NevadoConnection conn = getConnection();
+        NevadoConnection conn = (NevadoConnection)getConnection();
         NevadoSession session = createSession();
         String testBody1 = RandomData.readString();
         String testBody2 = RandomData.readString();
@@ -109,7 +109,7 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
     @Test(timeout = 10000)
     public void testAsyncClientPause() throws Exception {
         // Set up listener
-        NevadoConnection conn = getConnection();
+        NevadoConnection conn = (NevadoConnection)getConnection();
         NevadoSession session = createSession();
         TextMessage testMsg1 = session.createTextMessage(RandomData.readString());
         TextMessage testMsg2 = session.createTextMessage(RandomData.readString());

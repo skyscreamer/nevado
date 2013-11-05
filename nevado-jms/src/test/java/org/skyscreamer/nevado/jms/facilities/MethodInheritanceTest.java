@@ -17,15 +17,13 @@ import javax.jms.IllegalStateException;
 public class MethodInheritanceTest extends AbstractJMSTest {
     @Test(expected = IllegalStateException.class)
     public void testCreateDurableConnectionConsumer() throws JMSException {
-        QueueConnectionFactory connectionFactory = new NevadoConnectionFactory();
-        QueueConnection connection = createQueueConnection(connectionFactory);
+        QueueConnection connection = getQueueConnectionFactory().createQueueConnection();
         connection.createDurableConnectionConsumer(null, null, null, null, 0);
     }
 
     @Test(expected = IllegalStateException.class)
     public void testCreateDurableSubscriber1() throws JMSException {
-        QueueConnectionFactory connectionFactory = new NevadoConnectionFactory();
-        QueueConnection connection = createQueueConnection(connectionFactory);
+        QueueConnection connection = getQueueConnectionFactory().createQueueConnection();
         connection.start();
         QueueSession session = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         session.createDurableSubscriber(new NevadoTopic("unusedTopic"), null);
@@ -34,8 +32,7 @@ public class MethodInheritanceTest extends AbstractJMSTest {
 
     @Test(expected = IllegalStateException.class)
     public void testCreateDurableSubscriber2() throws JMSException {
-        QueueConnectionFactory connectionFactory = new NevadoConnectionFactory();
-        QueueConnection connection = createQueueConnection(connectionFactory);
+        QueueConnection connection = getQueueConnectionFactory().createQueueConnection();
         connection.start();
         QueueSession session = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         session.createDurableSubscriber(new NevadoTopic("unusedTopic"), null, null, false);
@@ -44,8 +41,7 @@ public class MethodInheritanceTest extends AbstractJMSTest {
 
     @Test(expected = IllegalStateException.class)
     public void testCreateTemporaryTopic() throws JMSException {
-        QueueConnectionFactory connectionFactory = new NevadoConnectionFactory();
-        QueueConnection connection = createQueueConnection(connectionFactory);
+        QueueConnection connection = getQueueConnectionFactory().createQueueConnection();
         connection.start();
         QueueSession session = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         session.createTemporaryTopic();
@@ -54,8 +50,7 @@ public class MethodInheritanceTest extends AbstractJMSTest {
 
     @Test(expected = IllegalStateException.class)
     public void testCreateTopic() throws JMSException {
-        QueueConnectionFactory connectionFactory = new NevadoConnectionFactory();
-        QueueConnection connection = createQueueConnection(connectionFactory);
+        QueueConnection connection = getQueueConnectionFactory().createQueueConnection();
         connection.start();
         QueueSession session = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         session.createTopic("unusedTopic");
@@ -64,8 +59,7 @@ public class MethodInheritanceTest extends AbstractJMSTest {
 
     @Test(expected = IllegalStateException.class)
     public void testUnsubscribe() throws JMSException {
-        QueueConnectionFactory connectionFactory = new NevadoConnectionFactory();
-        QueueConnection connection = createQueueConnection(connectionFactory);
+        QueueConnection connection = getQueueConnectionFactory().createQueueConnection();
         connection.start();
         QueueSession session = connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         session.unsubscribe("unusedTopic");
@@ -74,8 +68,7 @@ public class MethodInheritanceTest extends AbstractJMSTest {
 
     @Test(expected = IllegalStateException.class)
     public void testCreateQueueBrowser1() throws JMSException {
-        TopicConnectionFactory connectionFactory = new NevadoConnectionFactory();
-        TopicConnection connection = createTopicConnection(connectionFactory);
+        TopicConnection connection = getTopicConnectionFactory().createTopicConnection();
         connection.start();
         TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
         session.createBrowser(new NevadoQueue("unusedQueue"));
@@ -84,8 +77,7 @@ public class MethodInheritanceTest extends AbstractJMSTest {
 
     @Test(expected = IllegalStateException.class)
     public void testCreateQueueBrowser2() throws JMSException {
-        TopicConnectionFactory connectionFactory = new NevadoConnectionFactory();
-        TopicConnection connection = createTopicConnection(connectionFactory);
+        TopicConnection connection = getTopicConnectionFactory().createTopicConnection();
         connection.start();
         TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
         session.createBrowser(new NevadoQueue("unusedQueue"), null);
@@ -94,8 +86,7 @@ public class MethodInheritanceTest extends AbstractJMSTest {
 
     @Test(expected = IllegalStateException.class)
     public void testCreateQueue() throws JMSException {
-        TopicConnectionFactory connectionFactory = new NevadoConnectionFactory();
-        TopicConnection connection = createTopicConnection(connectionFactory);
+        TopicConnection connection = getTopicConnectionFactory().createTopicConnection();
         connection.start();
         TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
         session.createQueue("unusedQueue");
@@ -104,8 +95,7 @@ public class MethodInheritanceTest extends AbstractJMSTest {
 
     @Test(expected = IllegalStateException.class)
     public void testCreateTemporaryQueue() throws JMSException {
-        TopicConnectionFactory connectionFactory = new NevadoConnectionFactory();
-        TopicConnection connection = createTopicConnection(connectionFactory);
+        TopicConnection connection = getTopicConnectionFactory().createTopicConnection();
         connection.start();
         TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
         session.createTemporaryQueue();
