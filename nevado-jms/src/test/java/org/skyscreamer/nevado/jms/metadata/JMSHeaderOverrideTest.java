@@ -19,11 +19,11 @@ import java.io.IOException;
 public class JMSHeaderOverrideTest extends AbstractJMSTest {
     @Test
     public void testOverride() throws JMSException, IOException {
-        NevadoConnectionFactory _overriddenConnectionFactory = (NevadoConnectionFactory)getConnectionFactory();
-        _overriddenConnectionFactory.setOverrideJMSDeliveryMode(DeliveryMode.NON_PERSISTENT);
-        _overriddenConnectionFactory.setOverrideJMSPriority(9);
-        _overriddenConnectionFactory.setOverrideJMSTTL(60000L);
-        NevadoConnection conn = _overriddenConnectionFactory.createConnection();
+        NevadoConnectionFactory overriddenConnectionFactory = createConnectionFactory();
+        overriddenConnectionFactory.setOverrideJMSDeliveryMode(DeliveryMode.NON_PERSISTENT);
+        overriddenConnectionFactory.setOverrideJMSPriority(9);
+        overriddenConnectionFactory.setOverrideJMSTTL(60000L);
+        NevadoConnection conn = overriddenConnectionFactory.createConnection();
         conn.start();
         NevadoSession overriddenSession = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
