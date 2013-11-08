@@ -19,7 +19,7 @@ public class GeneralQueueTest extends AbstractJMSTest {
     public void testMixedMessages() throws JMSException
     {
         NevadoSession session = createSession();
-        Queue testQueue = createTempQueue(session);
+        Queue testQueue = session.createTemporaryQueue();
         MessageProducer producer = session.createProducer(testQueue);
         Set<Message> messagesIn = new HashSet<Message>();
         messagesIn.add(session.createBytesMessage());

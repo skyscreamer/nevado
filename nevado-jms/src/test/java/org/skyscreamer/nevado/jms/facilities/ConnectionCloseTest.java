@@ -23,7 +23,7 @@ public class ConnectionCloseTest extends AbstractJMSTest {
         NevadoSession session = createSession();
         connection.stop();
         TextMessage msg = session.createTextMessage(RandomData.readString());
-        Queue testQueue = createTempQueue(session);
+        Queue testQueue = session.createTemporaryQueue();
         session.createProducer(testQueue).send(msg);
         MessageConsumer consumer = session.createConsumer(testQueue);
         TestMessageListener listener = new TestMessageListener(false);
@@ -84,7 +84,7 @@ public class ConnectionCloseTest extends AbstractJMSTest {
     {
         NevadoConnection testConnection = getConnection();
         NevadoSession session = (NevadoSession)testConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        Queue testQueue = createTempQueue(session);
+        Queue testQueue = session.createTemporaryQueue();
         NevadoMessageConsumer consumer = session.createConsumer(testQueue);
         NevadoMessageProducer producer = session.createProducer(testQueue);
         testConnection.close();
@@ -99,7 +99,7 @@ public class ConnectionCloseTest extends AbstractJMSTest {
     public void testRecursiveSessionClose() throws JMSException
     {
         NevadoSession session = createSession();
-        Queue testQueue = createTempQueue(session);
+        Queue testQueue = session.createTemporaryQueue();
         NevadoMessageConsumer consumer = session.createConsumer(testQueue);
         NevadoMessageProducer producer = session.createProducer(testQueue);
         session.close();
@@ -113,7 +113,7 @@ public class ConnectionCloseTest extends AbstractJMSTest {
     {
         NevadoConnection testConnection = getConnection();
         NevadoSession session = (NevadoSession)testConnection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
-        Queue testQueue = createTempQueue(session);
+        Queue testQueue = session.createTemporaryQueue();
         session.createProducer(testQueue).send(session.createMessage());
         Message msg = session.createConsumer(testQueue).receive(1000);
         Assert.assertNotNull(msg);
@@ -151,7 +151,7 @@ public class ConnectionCloseTest extends AbstractJMSTest {
     {
         NevadoConnection testConnection = getConnection();
         NevadoSession session = (NevadoSession)testConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        MessageConsumer consumer = session.createConsumer(createTempQueue(session));
+        MessageConsumer consumer = session.createConsumer(session.createTemporaryQueue());
         testConnection.close();
         consumer.receiveNoWait();
     }
@@ -162,7 +162,7 @@ public class ConnectionCloseTest extends AbstractJMSTest {
         NevadoConnection testConnection = getConnection();
         NevadoSession session = (NevadoSession)testConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Message msg = session.createMessage();
-        MessageProducer producer = session.createProducer(createTempQueue(session));
+        MessageProducer producer = session.createProducer(session.createTemporaryQueue());
         testConnection.close();
         producer.send(msg);
     }

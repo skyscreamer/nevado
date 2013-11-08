@@ -22,7 +22,7 @@ public class JMSMessageIDTest extends AbstractJMSTest {
     public void testDisable() throws JMSException {
         NevadoSession session = createSession();
         Message msg = session.createMessage();
-        Queue tempQueue = createTempQueue(session);
+        Queue tempQueue = session.createTemporaryQueue();
         MessageProducer msgProducer = session.createProducer(tempQueue);
         msgProducer.setDisableMessageID(true);
         msgProducer.send(msg);

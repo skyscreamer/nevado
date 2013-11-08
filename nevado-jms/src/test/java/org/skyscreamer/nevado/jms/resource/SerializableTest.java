@@ -11,6 +11,9 @@ import org.skyscreamer.nevado.jms.util.RandomData;
 import org.skyscreamer.nevado.jms.util.SerializeUtil;
 
 import javax.jms.JMSException;
+import javax.jms.Queue;
+import javax.jms.Session;
+import javax.jms.Topic;
 import java.io.IOException;
 import java.util.Random;
 
@@ -46,14 +49,16 @@ public class SerializableTest extends AbstractJMSTest {
 
     @Test
     public void testQueue() throws IOException, JMSException {
-        NevadoQueue queue = createTempQueue(createSession());
-        NevadoQueue testQueue = (NevadoQueue) SerializeUtil.deserialize(SerializeUtil.serialize(queue));
-        Assert.assertEquals(queue, testQueue);
+        Session session = createSession();
+        NevadoQueue tempQueue = (NevadoQueue)session.createTemporaryQueue();
+        NevadoQueue testQueue = (NevadoQueue) SerializeUtil.deserialize(SerializeUtil.serialize(tempQueue));
+        Assert.assertEquals(tempQueue, testQueue);
     }
 
     @Test
     public void testTopic() throws IOException, JMSException {
-        NevadoTopic topic = createTempTopic(createSession());
+        Session session = createSession();
+        NevadoTopic topic = (NevadoTopic)session.createTemporaryTopic();
         NevadoTopic testTopic = (NevadoTopic) SerializeUtil.deserialize(SerializeUtil.serialize(topic));
         Assert.assertEquals(topic, testTopic);
     }

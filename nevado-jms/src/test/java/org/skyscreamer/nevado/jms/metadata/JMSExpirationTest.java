@@ -25,7 +25,7 @@ public class JMSExpirationTest extends AbstractJMSTest {
     public void testSetExpiration() throws JMSException {
         NevadoSession session = createSession();
         Message msg = session.createMessage();
-        Queue tempQueue = createTempQueue(session);
+        Queue tempQueue = session.createTemporaryQueue();
         MessageProducer msgProducer = session.createProducer(tempQueue);
         msgProducer.setDisableMessageID(true);
         long time = System.currentTimeMillis();
@@ -42,7 +42,7 @@ public class JMSExpirationTest extends AbstractJMSTest {
         NevadoSession session = createSession();
         Message msgToExpire = session.createMessage();
         Message msgWithoutExpire = session.createMessage();
-        Queue tempQueue = createTempQueue(session);
+        Queue tempQueue = session.createTemporaryQueue();
         MessageProducer msgProducer = session.createProducer(tempQueue);
         msgProducer.send(msgToExpire, Message.DEFAULT_DELIVERY_MODE, Message.DEFAULT_PRIORITY, 10);
         msgProducer.send(msgWithoutExpire);

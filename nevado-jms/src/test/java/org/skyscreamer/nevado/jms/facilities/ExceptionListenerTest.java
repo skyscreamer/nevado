@@ -21,7 +21,7 @@ public class ExceptionListenerTest extends AbstractJMSTest {
         getConnection().setExceptionListener(exceptionListener);
         TestMessageListener messageListener = new TestMessageListener(false);
         NevadoSession session = createSession();
-        Queue tempQueue = createTempQueue(session);
+        Queue tempQueue = session.createTemporaryQueue();
         MessageConsumer consumer = session.createConsumer(tempQueue);
         consumer.setMessageListener(messageListener);
         breakSession(session);

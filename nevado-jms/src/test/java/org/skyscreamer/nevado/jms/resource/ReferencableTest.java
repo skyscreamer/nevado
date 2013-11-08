@@ -85,14 +85,16 @@ public class ReferencableTest extends AbstractJMSTest {
 
     @Test(expected = NamingException.class)
     public void testTemporaryQueue() throws JMSException, NamingException, MalformedURLException {
-        TemporaryQueue temporaryQueue = createTempQueue(createSession());
+        Session session = createSession();
+        TemporaryQueue temporaryQueue = session.createTemporaryQueue();
         Context ctx = getContext();
         ctx.bind("tempQueue", temporaryQueue);
     }
 
     @Test(expected = NamingException.class)
     public void testTemporaryTopic() throws JMSException, NamingException, MalformedURLException {
-        TemporaryTopic temporaryTopic = createTempTopic(createSession());
+        Session session = createSession();
+        TemporaryTopic temporaryTopic = session.createTemporaryTopic();
         Context ctx = getContext();
         ctx.bind("tempTopic", temporaryTopic);
     }

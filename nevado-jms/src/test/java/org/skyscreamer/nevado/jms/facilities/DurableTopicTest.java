@@ -110,7 +110,7 @@ public class DurableTopicTest extends AbstractJMSTest {
     public void testUnsubscribeWithActiveSubscriber() throws JMSException {
         String durableTopicName = "testTopicSub" + RandomData.readShort();
         NevadoSession session = createSession();
-        NevadoTopic topic = createTempTopic(session);
+        NevadoTopic topic = session.createTemporaryTopic();
         TopicSubscriber subscriber = session.createDurableSubscriber(topic, durableTopicName);
         boolean throwsException = false;
         try {
@@ -136,7 +136,7 @@ public class DurableTopicTest extends AbstractJMSTest {
     public void testUnsubscribeWithUnackedMsg() throws JMSException {
         String durableTopicName = "testTopicSub" + RandomData.readShort();
         NevadoSession session = ((NevadoConnection)getConnection()).createSession(false, Session.CLIENT_ACKNOWLEDGE);
-        NevadoTopic topic = createTempTopic(session);
+        NevadoTopic topic = session.createTemporaryTopic();
         TopicSubscriber subscriber = session.createDurableSubscriber(topic, durableTopicName);
         session.createProducer(topic).send(session.createMessage());
         Message message = subscriber.receive(2000); // Don't acknowledge
@@ -165,7 +165,7 @@ public class DurableTopicTest extends AbstractJMSTest {
     public void testDoubleSubscribe() throws JMSException {
         String durableTopicName = "testTopicSub" + RandomData.readShort();
         NevadoSession session = createSession();
-        NevadoTopic topic = createTempTopic(session);
+        NevadoTopic topic = session.createTemporaryTopic();
         TopicSubscriber subscriber = session.createDurableSubscriber(topic, durableTopicName);
         boolean throwsException = false;
         try {

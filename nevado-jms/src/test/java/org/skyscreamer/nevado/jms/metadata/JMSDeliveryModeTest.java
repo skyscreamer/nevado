@@ -26,7 +26,7 @@ public class JMSDeliveryModeTest extends AbstractJMSTest {
     public void testAssign() throws JMSException {
         NevadoSession session = createSession();
         Message msg1 = session.createMessage();
-        Queue tempQueue = createTempQueue(session);
+        Queue tempQueue = session.createTemporaryQueue();
         MessageProducer msgProducer = session.createProducer(tempQueue);
         msgProducer.send(msg1, DeliveryMode.NON_PERSISTENT, Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE);
         Message msgOut = session.createConsumer(tempQueue).receive();

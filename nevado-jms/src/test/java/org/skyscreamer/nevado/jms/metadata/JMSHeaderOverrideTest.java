@@ -25,13 +25,13 @@ public class JMSHeaderOverrideTest extends AbstractJMSTest {
         _overriddenConnectionFactory.setOverrideJMSTTL(60000L);
         NevadoConnection conn = _overriddenConnectionFactory.createConnection();
         conn.start();
-        NevadoSession _overriddenSession = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        NevadoSession overriddenSession = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-        Message msg = _overriddenSession.createMessage();
+        Message msg = overriddenSession.createMessage();
 
-        Queue tempQueue = createTempQueue(_overriddenSession);
-        _overriddenSession.createProducer(tempQueue).send(msg);
-        Message msgOut = _overriddenSession.createConsumer(tempQueue).receive();
+        Queue tempQueue = overriddenSession.createTemporaryQueue();
+        overriddenSession.createProducer(tempQueue).send(msg);
+        Message msgOut = overriddenSession.createConsumer(tempQueue).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
 

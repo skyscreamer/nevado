@@ -56,7 +56,7 @@ public abstract class AbstractJMSTest {
 
     protected Message sendAndReceive(Message msg) throws JMSException {
         NevadoSession session = createSession();
-        Queue testQueue = createTempQueue(session);
+        Queue testQueue = session.createTemporaryQueue();
         session.createProducer(testQueue).send(msg);
         Message msgOut = createSession().createConsumer(testQueue).receive();
         Assert.assertNotNull("Got null message back", msgOut);
@@ -99,15 +99,6 @@ public abstract class AbstractJMSTest {
     protected NevadoSession createSession() throws JMSException
     {
         return (NevadoSession)_connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-    }
-
-    protected NevadoTemporaryQueue createTempQueue(NevadoSession session) throws JMSException
-    {
-        return session.createTemporaryQueue();
-    }
-
-    protected NevadoTemporaryTopic createTempTopic(NevadoSession session) throws JMSException {
-        return session.createTemporaryTopic();
     }
 
     protected void deleteQueue(NevadoQueue queue) throws JMSException

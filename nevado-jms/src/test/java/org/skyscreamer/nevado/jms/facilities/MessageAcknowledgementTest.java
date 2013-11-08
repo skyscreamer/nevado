@@ -24,7 +24,7 @@ public class MessageAcknowledgementTest extends AbstractJMSTest {
         NevadoConnection connection = getConnection();
         NevadoSession session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Message msg = session.createMessage();
-        Queue tempQueue = createTempQueue(session);
+        Queue tempQueue = session.createTemporaryQueue();
         session.createProducer(tempQueue).send(msg);
         NevadoMessage msgOut = (NevadoMessage)session.createConsumer(tempQueue).receive();
         Assert.assertTrue(msgOut.isAcknowledged());
@@ -35,7 +35,7 @@ public class MessageAcknowledgementTest extends AbstractJMSTest {
         NevadoConnection connection = getConnection();
         NevadoSession session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Message msg = session.createMessage();
-        Queue tempQueue = createTempQueue(session);
+        Queue tempQueue = session.createTemporaryQueue();
         session.createProducer(tempQueue).send(msg);
         TestMessageListener messageListener = new TestMessageListener(false);
         session.createConsumer(tempQueue).setMessageListener(messageListener);
@@ -52,7 +52,7 @@ public class MessageAcknowledgementTest extends AbstractJMSTest {
         NevadoConnection connection = getConnection();
         NevadoSession session = connection.createSession(false, Session.DUPS_OK_ACKNOWLEDGE);
         Message msg = session.createMessage();
-        Queue tempQueue = createTempQueue(session);
+        Queue tempQueue = session.createTemporaryQueue();
         session.createProducer(tempQueue).send(msg);
         NevadoMessage msgOut = (NevadoMessage)session.createConsumer(tempQueue).receive();
         Assert.assertFalse(msgOut.isAcknowledged());
@@ -67,7 +67,7 @@ public class MessageAcknowledgementTest extends AbstractJMSTest {
         TextMessage msg1 = session.createTextMessage(RandomData.readString());
         TextMessage msg2 = session.createTextMessage(RandomData.readString());
         TextMessage msg3 = session.createTextMessage(RandomData.readString());
-        Queue tempQueue = createTempQueue(session);
+        Queue tempQueue = session.createTemporaryQueue();
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(msg1);
         producer.send(msg2);
@@ -117,7 +117,7 @@ public class MessageAcknowledgementTest extends AbstractJMSTest {
         TextMessage msg1 = session.createTextMessage(RandomData.readString());
         TextMessage msg2 = session.createTextMessage(RandomData.readString());
         TextMessage msg3 = session.createTextMessage(RandomData.readString());
-        Queue tempQueue = createTempQueue(session);
+        Queue tempQueue = session.createTemporaryQueue();
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(msg1);
         producer.send(msg2);

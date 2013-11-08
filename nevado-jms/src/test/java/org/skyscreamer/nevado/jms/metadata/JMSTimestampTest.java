@@ -28,7 +28,7 @@ public class JMSTimestampTest extends AbstractJMSTest {
         NevadoSession session = createSession();
         Message msg = session.createMessage();
         Assert.assertEquals(0, msg.getJMSTimestamp());
-        Queue tempQueue = createTempQueue(session);
+        Queue tempQueue = session.createTemporaryQueue();
         MessageProducer msgProducer = session.createProducer(tempQueue);
         msgProducer.setDisableMessageTimestamp(true);
         msgProducer.send(msg);

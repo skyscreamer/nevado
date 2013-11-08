@@ -131,7 +131,7 @@ public class SessionTransactionTest extends AbstractJMSTest {
     {
         NevadoSession readerSession = createSession();
         NevadoSession session = getConnection().createSession(true, Session.SESSION_TRANSACTED);
-        Queue testQueue = createTempQueue(session);
+        Queue testQueue = session.createTemporaryQueue();
         NevadoMessage msg1 = session.createTextMessage(RandomData.readString());
         NevadoMessage msg2 = new TestBrokenMessage(session.createTextMessage(RandomData.readString()));
         MessageProducer producer = session.createProducer(testQueue);

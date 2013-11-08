@@ -17,7 +17,7 @@ public class JMSDestinationTest extends AbstractJMSTest {
         NevadoSession session = createSession();
         Message msg = session.createMessage();
         Assert.assertNull(msg.getJMSMessageID());
-        Queue tempQueue = createTempQueue(session);
+        Queue tempQueue = session.createTemporaryQueue();
         session.createProducer(tempQueue).send(msg);
         Message msgOut = session.createConsumer(tempQueue).receive(1000);
         Assert.assertNotNull("Got null message back", msgOut);
@@ -30,7 +30,7 @@ public class JMSDestinationTest extends AbstractJMSTest {
     public void testTopic() throws JMSException {
         NevadoSession session = createSession();
         Message msg = session.createMessage();
-        Topic tempTopic = createTempTopic(session);
+        Topic tempTopic = session.createTemporaryTopic();
         MessageProducer producer = session.createProducer(tempTopic);
         MessageConsumer consumer = session.createConsumer(tempTopic);
         producer.send(msg);

@@ -19,9 +19,9 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
     @Test
     public void testClientStart() throws Exception {
         // Set up session for sync messages
-        NevadoConnection conn = (NevadoConnection)getConnection();
+        NevadoConnection conn = (NevadoConnection)getConnectionFactory().createConnection();
         NevadoSession session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        Queue tempQueue = createTempQueue(session);
+        Queue tempQueue = session.createTemporaryQueue();
         MessageProducer producer = session.createProducer(tempQueue);
         String testBody = RandomData.readString();
         TextMessage testMessage = session.createTextMessage(testBody);
@@ -42,10 +42,10 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
     @Test
     public void testAsyncClientStart() throws Exception {
         // Set up session for async messages
-        NevadoConnection conn = (NevadoConnection)getConnection();
+        NevadoConnection conn = (NevadoConnection)getConnectionFactory().createConnection();
         NevadoSession asyncSession = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
         TestMessageListener messageListener = new TestMessageListener(false);
-        Queue tempQueue = createTempQueue(asyncSession);
+        Queue tempQueue = asyncSession.createTemporaryQueue();
         asyncSession.createConsumer(tempQueue).setMessageListener(messageListener);
         MessageProducer asyncProducer = asyncSession.createProducer(tempQueue);
         String asyncTestBody = RandomData.readString();
@@ -68,7 +68,7 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
         NevadoSession session = createSession();
         String testBody1 = RandomData.readString();
         String testBody2 = RandomData.readString();
-        Queue tempQueue = createTempQueue(session);
+        Queue tempQueue = session.createTemporaryQueue();
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(session.createTextMessage(testBody1));
         producer.send(session.createTextMessage(testBody2));
@@ -113,7 +113,7 @@ public class ConnectionStopStartTest extends AbstractJMSTest {
         NevadoSession session = createSession();
         TextMessage testMsg1 = session.createTextMessage(RandomData.readString());
         TextMessage testMsg2 = session.createTextMessage(RandomData.readString());
-        Queue tempQueue = createTempQueue(session);
+        Queue tempQueue = session.createTemporaryQueue();
         MessageProducer producer = session.createProducer(tempQueue);
         producer.send(testMsg1);
         producer.send(testMsg2);
