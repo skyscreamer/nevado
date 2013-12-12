@@ -1,16 +1,18 @@
 package org.skyscreamer.nevado.jms.resource;
 
-import org.skyscreamer.nevado.jms.NevadoConnectionFactory;
-import org.skyscreamer.nevado.jms.destination.NevadoDestination;
-import org.skyscreamer.nevado.jms.destination.NevadoQueue;
-import org.skyscreamer.nevado.jms.destination.NevadoTopic;
+import java.util.Hashtable;
 
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
-import java.util.Hashtable;
+
+import org.skyscreamer.nevado.jms.NevadoConnectionFactory;
+import org.skyscreamer.nevado.jms.connector.SQSConnectorFactory;
+import org.skyscreamer.nevado.jms.destination.NevadoDestination;
+import org.skyscreamer.nevado.jms.destination.NevadoQueue;
+import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 
 /**
  * This is the factory for JNDI referenceable objects.
@@ -46,6 +48,32 @@ public class NevadoReferencableFactory implements ObjectFactory {
                 if (jmsTtl != null)
                 {
                     connectionFactory.setOverrideJMSTTL(Long.parseLong(jmsTtl));
+                }
+                String sqsEndpoint = getRefContent(ref, NevadoConnectionFactory.JNDI_SQS_ENDPOINT);
+                if (sqsEndpoint != null)
+                {
+                    connectionFactory.setAwsSQSEndpoint(sqsEndpoint);
+                }
+                String snsEndPoint = getRefContent(ref, NevadoConnectionFactory.JNDI_SNS_ENDPOINT);
+                if (snsEndPoint != null)
+                {
+                    connectionFactory.setAwsSNSEndpoint(snsEndPoint);
+                }
+                String maxPollWaitMs = getRefContent(ref, NevadoConnectionFactory.JNDI_MAX_POLL_WAIT_MS);
+                if (maxPollWaitMs != null)
+                {
+                    connectionFactory.setMaxPollWaitMs(Long.valueOf(maxPollWaitMs));
+                }
+                String durableSubscriberPrefixOverride = getRefContent(ref, NevadoConnectionFactory.JNDI_DURABLE_SUBSCRIBER_PREFIX_OVERRIDE);
+                if (durableSubscriberPrefixOverride != null)
+                {
+                    connectionFactory.setDurableSubscriberPrefixOverride(durableSubscriberPrefixOverride);
+                }
+                String sqsConnectorFactoryClass = getRefContent(ref, NevadoConnectionFactory.JNDI_SQS_CONNECTOR_FACTORY_CLASS);
+                if (sqsConnectorFactoryClass != null) 
+                {
+                    SQSConnectorFactory sqsConnectorFactory = (SQSConnectorFactory) Class.forName(sqsConnectorFactoryClass).newInstance();
+                    connectionFactory.setSqsConnectorFactory(sqsConnectorFactory);
                 }
                 instance = connectionFactory;
             }
