@@ -39,6 +39,7 @@ public class NevadoConnection implements Connection {
     private String _temporaryQueueSuffix = "";
     private String _temporaryTopicSuffix = "";
     private long _maxPollWaitMs = DEFAULT_MAX_POLL_WAIT_MS;
+    private String _durableSubcriptionPrefixOveride;
 
     public NevadoConnection(SQSConnector sqsConnector) throws JMSException {
         _sqsConnector = sqsConnector;
@@ -363,5 +364,13 @@ public class NevadoConnection implements Connection {
 
     public String getConnectionID() {
         return _connectionID;
+    }
+    
+    public void setDurableSubcriptionPrefixOveride(String durableSubcriptionPrefixOveride) {
+        _durableSubcriptionPrefixOveride = durableSubcriptionPrefixOveride;
+    }
+    
+    public String getDurableSubcriptionPrefixOveride() {
+        return _durableSubcriptionPrefixOveride;
     }
 }

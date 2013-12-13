@@ -343,7 +343,16 @@ public class NevadoSession implements Session {
     }
 
     protected String getDurableEndpointQueueName(String durableSubscriptionName) {
-        String queueName = NevadoProviderQueuePrefix.DURABLE_SUBSCRIPTION_PREFIX + durableSubscriptionName;
+        String queueName;
+        if (_connection.getDurableSubcriptionPrefixOveride() != null) 
+        {
+            queueName = _connection.getDurableSubcriptionPrefixOveride() + durableSubscriptionName;
+        } 
+        else 
+        {
+            queueName = NevadoProviderQueuePrefix.DURABLE_SUBSCRIPTION_PREFIX + durableSubscriptionName;
+        }
+        
         if (_connection.getClientID() != null)
         {
             queueName += "_client-" + _connection.getClientID() + "";
