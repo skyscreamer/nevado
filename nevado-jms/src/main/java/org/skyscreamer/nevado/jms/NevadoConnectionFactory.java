@@ -45,7 +45,7 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     private String _temporaryQueueSuffix = "";
     private String _temporaryTopicSuffix = "";
     private long _maxPollWaitMs = NevadoConnection.DEFAULT_MAX_POLL_WAIT_MS;
-    private String _durableSubscriberPrefixOverride = null;
+    private volatile String _durableSubscriberPrefixOverride = null;
 
     public NevadoConnectionFactory() {}
 
@@ -113,6 +113,10 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     // Getters & Setters
     public void setSqsConnectorFactory(SQSConnectorFactory sqsConnectorFactory) {
         _sqsConnectorFactory = sqsConnectorFactory;
+    }
+    
+    public SQSConnectorFactory getSqsConnectorFactory() {
+        return _sqsConnectorFactory;
     }
 
     public void setAwsAccessKey(String awsAccessKey) {
@@ -186,6 +190,23 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     public void setDurableSubscriberPrefixOverride(String durableSubscriberPrefixOverride) {
         _durableSubscriberPrefixOverride = durableSubscriberPrefixOverride;
     }
+    
+    public String getAwsSQSEndpoint() {
+       return _awsSQSEndpoint;
+    }
+
+    public String getAwsSNSEndpoint() {
+        return _awsSNSEndpoint;
+    }
+    
+    public long getMaxPollWaitMs() {
+         return _maxPollWaitMs;
+    }
+    
+    public String getDurableSubscriberPrefixOverride() {
+        return _durableSubscriberPrefixOverride;
+    }
+
 
     public Reference getReference() throws NamingException {
         Reference reference = new Reference(NevadoConnectionFactory.class.getName(),
@@ -208,6 +229,24 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
         {
             reference.add(new StringRefAddr(JNDI_JMS_PRIORITY, _jmsPriority.toString()));
         }
+        if (_awsSNSEndpoint != null)
+        {
+            reference.add(new StringRefAddr(JNDI_SNS_ENDPOINT, _awsSNSEndpoint.toString()));
+        }
+        if (_awsSQSEndpoint != null)
+        {
+            reference.add(new StringRefAddr(JNDI_SQS_ENDPOINT, _awsSQSEndpoint.toString()));
+        }
+        reference.add(new StringRefAddr(JNDI_MAX_POLL_WAIT_MS, String.valueOf(_maxPollWaitMs)));
+        if (_durableSubscriberPrefixOverride != null)
+        {
+            reference.add(new StringRefAddr(JNDI_DURABLE_SUBSCRIBER_PREFIX_OVERRIDE, _durableSubscriberPrefixOverride.toString()));
+        }
+        String sqsConnectorFactoryClass = null;
+        if (_sqsConnectorFactory != null) {
+            sqsConnectorFactoryClass = _sqsConnectorFactory.getClass().getName();
+        }
+        reference.add(new StringRefAddr(JNDI_SQS_CONNECTOR_FACTORY_CLASS, sqsConnectorFactoryClass));
         return reference;
     }
 

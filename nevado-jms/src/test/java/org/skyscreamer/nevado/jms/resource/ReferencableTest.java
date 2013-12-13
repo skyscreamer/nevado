@@ -30,7 +30,10 @@ public class ReferencableTest extends AbstractJMSTest {
     private static final Integer TEST_DELIVERY_MODE = (int)RandomData.readShort();
     private static final Integer TEST_PRIORITY = (new Random()).nextInt(10);
     private static final Long TEST_TTL = (long)RandomData.readInt();
-
+    private static final String TEST_SQS_ENDPOINT = RandomData.readString();
+    private static final String TEST_SNS_ENDPOINT = RandomData.readString();
+    private static final Long TEST_MAX_POLL_WAIT = (long) RandomData.readInt();
+    private static final String TEST_DURABLE_SUBSCRIBER_PREFIX = RandomData.readString();
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
@@ -43,6 +46,10 @@ public class ReferencableTest extends AbstractJMSTest {
         connectionFactory.setOverrideJMSDeliveryMode(TEST_DELIVERY_MODE);
         connectionFactory.setOverrideJMSPriority(TEST_PRIORITY);
         connectionFactory.setOverrideJMSTTL(TEST_TTL);
+        connectionFactory.setAwsSQSEndpoint(TEST_SQS_ENDPOINT);
+        connectionFactory.setAwsSNSEndpoint(TEST_SNS_ENDPOINT);
+        connectionFactory.setDurableSubscriberPrefixOverride(TEST_DURABLE_SUBSCRIBER_PREFIX);
+        connectionFactory.setMaxPollWaitMs(TEST_MAX_POLL_WAIT);
         Context ctx = getContext();
         ctx.bind("testConnectionFactory", connectionFactory);
         NevadoConnectionFactory testConnectionFactory = (NevadoConnectionFactory)ctx.lookup("testConnectionFactory");
@@ -52,6 +59,11 @@ public class ReferencableTest extends AbstractJMSTest {
         Assert.assertEquals(connectionFactory.getJMSDeliveryMode(), testConnectionFactory.getJMSDeliveryMode());
         Assert.assertEquals(connectionFactory.getJMSPriority(), testConnectionFactory.getJMSPriority());
         Assert.assertEquals(connectionFactory.getJMSTTL(), testConnectionFactory.getJMSTTL());
+        Assert.assertEquals(connectionFactory.getAwsSQSEndpoint(), testConnectionFactory.getAwsSQSEndpoint());
+        Assert.assertEquals(connectionFactory.getAwsSNSEndpoint(), testConnectionFactory.getAwsSNSEndpoint());
+        Assert.assertEquals(connectionFactory.getDurableSubscriberPrefixOverride(), testConnectionFactory.getDurableSubscriberPrefixOverride());
+        Assert.assertEquals(connectionFactory.getMaxPollWaitMs(), testConnectionFactory.getMaxPollWaitMs());
+        Assert.assertEquals(connectionFactory.getSqsConnectorFactory().getClass().getName(), testConnectionFactory.getSqsConnectorFactory().getClass().getName());
         ctx.close();
     }
 
