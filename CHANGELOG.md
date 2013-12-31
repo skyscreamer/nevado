@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 1.2.6 - 12/31/2013
+--------------------------
+ - Fixed bug where network errors were sometimes killing Nevado
+ - Added JNDI for: SNS/SQS endpoints, SQS connector factory class, polling time,
+   durable subscriber prefix
+
 Version 1.2.5 - 10/24/2013
 --------------------------
  - Fix issues with ClassLoader during de/serialization on OSGi
