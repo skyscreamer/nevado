@@ -1,5 +1,7 @@
 package org.skyscreamer.nevado.jms.connector;
 
+import java.util.Map;
+
 /**
  * Abstraction of an SQS message.
  *
@@ -11,4 +13,6 @@ public interface SQSMessage {
     String getMessageBody();
 
     String getMessageId();
+
+    Map<String, String> getAttributes();
 }

@@ -27,6 +27,7 @@ public abstract class NevadoMessage extends AbstractMessage<NevadoMessage> imple
     private transient boolean _disableMessageID = false;
     private transient boolean _disableTimestamp = false;
     private transient boolean _readOnly = false;
+    private transient int _localDeliveryCount = 0;
 
     public NevadoMessage() {}
 
@@ -169,5 +170,13 @@ public abstract class NevadoMessage extends AbstractMessage<NevadoMessage> imple
 
     public void setReadOnly(boolean readOnly) {
         _readOnly = readOnly;
+    }
+
+    public int getLocalDeliveryCount() {
+        return _localDeliveryCount;
+    }
+
+    public void incrementLocalDeliveryCount() {
+        ++_localDeliveryCount;
     }
 }

@@ -3,6 +3,8 @@ package org.skyscreamer.nevado.jms.connector.amazonaws;
 import com.amazonaws.services.sqs.model.Message;
 import org.skyscreamer.nevado.jms.connector.SQSMessage;
 
+import java.util.Map;
+
 /**
  * Amazon AWS version of an SQSMessage
  *
@@ -28,5 +30,10 @@ public class AmazonAwsSQSMessage implements SQSMessage {
     @Override
     public String getMessageId() {
         return _message.getMessageId();
+    }
+
+    @Override
+    public Map<String, String> getAttributes() {
+        return _message.getAttributes();
     }
 }

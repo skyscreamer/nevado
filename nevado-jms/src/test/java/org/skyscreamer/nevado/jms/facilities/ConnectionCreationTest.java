@@ -3,7 +3,7 @@ package org.skyscreamer.nevado.jms.facilities;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.skyscreamer.nevado.jms.AbstractJMSTest;
-import org.skyscreamer.nevado.jms.connector.typica.TypicaSQSConnector;
+import org.skyscreamer.nevado.jms.connector.amazonaws.AmazonAwsSQSConnector;
 
 import javax.jms.JMSException;
 import javax.jms.JMSSecurityException;
@@ -16,7 +16,7 @@ import javax.jms.JMSSecurityException;
 public class ConnectionCreationTest extends AbstractJMSTest {
     @Test
     public void testBadConnection() throws JMSException {
-        if (getConnection().getSQSConnector() instanceof TypicaSQSConnector)
+        if (getConnection().getSQSConnector() instanceof AmazonAwsSQSConnector)
         {
             boolean exceptionThrown = false;
             try {

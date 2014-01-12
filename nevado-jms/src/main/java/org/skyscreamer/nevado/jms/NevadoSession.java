@@ -481,14 +481,13 @@ public class NevadoSession implements Session {
         if (message != null) {
             message.setNevadoSession(this);
             message.setNevadoDestination(destination);
-            if (message.propertyExists(JMSXProperty.JMSXDeliveryCount + "")) {
-                int redeliveryCount = (Integer)message.getJMSXProperty(JMSXProperty.JMSXDeliveryCount);
-                ++redeliveryCount;
-                message.setJMSXProperty(JMSXProperty.JMSXDeliveryCount, redeliveryCount);
+            int deliveryCount = message.propertyExists(JMSXProperty.JMSXDeliveryCount + "")
+                ? (Integer)message.getJMSXProperty(JMSXProperty.JMSXDeliveryCount) : 1;
+            deliveryCount += message.getLocalDeliveryCount();
+            message.incrementLocalDeliveryCount();  // Do this after adding to redelivery count
+            message.setJMSXProperty(JMSXProperty.JMSXDeliveryCount, deliveryCount);
+            if (deliveryCount > 1) {
                 message.setJMSRedelivered(true);
-            }
-            else {
-                message.setJMSXProperty(JMSXProperty.JMSXDeliveryCount, 1);
             }
         }
 
