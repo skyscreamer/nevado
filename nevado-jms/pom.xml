@@ -144,6 +144,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.11</version>
                 <configuration>
+                    <parallel>classes</parallel>
+                    <threadCount>5</threadCount>
                     <excludes>
                         <exclude>**/TestMessageListener.java</exclude>
                         <exclude>**/TestMessageListenerRuntimeException.java</exclude>
