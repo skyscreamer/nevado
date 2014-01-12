@@ -19,10 +19,13 @@ import com.amazonaws.services.sqs.model.CreateQueueResult;
 import com.amazonaws.services.sqs.model.ListQueuesRequest;
 import com.amazonaws.services.sqs.model.ListQueuesResult;
 import org.skyscreamer.nevado.jms.connector.AbstractSQSConnector;
+import org.skyscreamer.nevado.jms.connector.SQSMessage;
 import org.skyscreamer.nevado.jms.connector.SQSQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoTopic;
+import org.skyscreamer.nevado.jms.message.JMSXProperty;
+import org.skyscreamer.nevado.jms.message.NevadoMessage;
 
 import javax.jms.JMSException;
 import javax.jms.JMSSecurityException;
@@ -42,6 +45,8 @@ import java.util.concurrent.Executors;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class AmazonAwsSQSConnector extends AbstractSQSConnector {
+    public static final String MESSAGE_ATTRIBUTE_APPROXIMATE_RECEIVE_COUNT = "ApproximateReceiveCount";
+
     private final AmazonSQS _amazonSQS;
     private final AmazonSNS _amazonSNS;
 
@@ -197,6 +202,28 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
             throw handleAWSException("Unable to subscribe topic " + topic + " with sub ARN "
                     + topic.getSubscriptionArn(), e);
         }
+    }
+
+    @Override
+    protected NevadoMessage convertSqsMessage(NevadoDestination destination, SQSMessage sqsMessage, boolean readOnly) throws JMSException {
+        NevadoMessage message = super.convertSqsMessage(destination, sqsMessage, false);
+        if (sqsMessage.getAttributes() != null) {
+            Integer count = null;
+            String countAttr = sqsMessage.getAttributes().get(MESSAGE_ATTRIBUTE_APPROXIMATE_RECEIVE_COUNT);
+            if (countAttr != null) {
+                try {
+                    count = Integer.parseInt(countAttr);
+                } catch (NumberFormatException e) {
+                    _log.warn("Unable to parse " + MESSAGE_ATTRIBUTE_APPROXIMATE_RECEIVE_COUNT + ": " + countAttr);
+                }
+            }
+
+            if (count != null) {
+                message.setObjectPropertyIgnoreReadOnly(JMSXProperty.JMSXDeliveryCount + "", count);
+            }
+        }
+        message.setReadOnly(readOnly);
+        return message;
     }
 
     public AmazonSQS getAmazonSQS() {

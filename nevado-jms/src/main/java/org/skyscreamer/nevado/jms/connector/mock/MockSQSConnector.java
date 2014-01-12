@@ -1,8 +1,12 @@
 package org.skyscreamer.nevado.jms.connector.mock;
 
 import org.skyscreamer.nevado.jms.connector.AbstractSQSConnector;
+import org.skyscreamer.nevado.jms.connector.SQSMessage;
+import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoTopic;
+import org.skyscreamer.nevado.jms.message.JMSXProperty;
+import org.skyscreamer.nevado.jms.message.NevadoMessage;
 
 import javax.jms.JMSException;
 import java.util.*;
@@ -13,6 +17,8 @@ import java.util.*;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class MockSQSConnector extends AbstractSQSConnector implements ResettableMock {
+    public static final String MESSAGE_ATTRIBUTE_RECEIVE_COUNT = "NevadoMockMessageReceiveCount";
+
     private final Map<NevadoQueue, MockSQSQueue> _mockQueueMap = new HashMap<NevadoQueue, MockSQSQueue>();
     private final Map<NevadoTopic, Collection<MockSQSQueue>> _mockTopicMap = new HashMap<NevadoTopic, Collection<MockSQSQueue>>();
 
@@ -117,6 +123,28 @@ public class MockSQSConnector extends AbstractSQSConnector implements Resettable
         for (MockSQSQueue mockSQSQueue : mockSQSQueues) {
             mockSQSQueue.reset();
         }
+    }
+
+    @Override
+    protected NevadoMessage convertSqsMessage(NevadoDestination destination, SQSMessage sqsMessage, boolean readOnly) throws JMSException {
+        NevadoMessage message = super.convertSqsMessage(destination, sqsMessage, false);
+        if (sqsMessage.getAttributes() != null) {
+            Integer count = null;
+            String countAttr = sqsMessage.getAttributes().get(MESSAGE_ATTRIBUTE_RECEIVE_COUNT);
+            if (countAttr != null) {
+                try {
+                    count = Integer.parseInt(countAttr);
+                } catch (NumberFormatException e) {
+                    _log.warn("Unable to parse " + MESSAGE_ATTRIBUTE_RECEIVE_COUNT + ": " + countAttr);
+                }
+            }
+
+            if (count != null) {
+                message.setObjectPropertyIgnoreReadOnly(JMSXProperty.JMSXDeliveryCount + "", count);
+            }
+        }
+        message.setReadOnly(readOnly);
+        return message;
     }
 
     protected void removeQueue(NevadoQueue queue) {
