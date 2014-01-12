@@ -5,12 +5,12 @@
     <parent>
         <groupId>org.skyscreamer</groupId>
         <artifactId>nevado</artifactId>
-        <version>1.3.0</version>
+        <version>1.3.0-SNAPSHOT</version>
     </parent>
 
     <groupId>org.skyscreamer</groupId>
     <artifactId>nevado-jms</artifactId>
-    <version>1.3.0</version>
+    <version>1.3.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Nevado JMS</name>
