@@ -57,7 +57,7 @@
   <td class="src"><pre class="src">&nbsp;<span class="comment"> * Time: 8:49 PM</span></pre></td></tr>
 <tr>  <td class="numLine">&nbsp;20</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;<span class="comment"> */</span></pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;21</td>  <td class="nbHitsCovered">&nbsp;372</td>  <td class="src"><pre class="src">&nbsp;<span class="keyword">public</span> <span class="keyword">class</span> NevadoConnectionFactory <span class="keyword">implements</span> ConnectionFactory, QueueConnectionFactory, TopicConnectionFactory,</pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;21</td>  <td class="nbHitsCovered">&nbsp;374</td>  <td class="src"><pre class="src">&nbsp;<span class="keyword">public</span> <span class="keyword">class</span> NevadoConnectionFactory <span class="keyword">implements</span> ConnectionFactory, QueueConnectionFactory, TopicConnectionFactory,</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;22</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;        Serializable, Referenceable</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;23</td>  <td class="nbHits">&nbsp;</td>
@@ -150,10 +150,10 @@
   <td class="src"><pre class="src">&nbsp;</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;78</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> NevadoConnection createConnection(String awsAccessKey, String awsSecretKey) <span class="keyword">throws</span> JMSException {</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;79</td>  <td class="nbHitsCovered">&nbsp;365</td>  <td class="src"><pre class="src">&nbsp;        checkSQSConnectorFactory();</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;80</td>  <td class="nbHitsCovered">&nbsp;365</td>  <td class="src"><pre class="src">&nbsp;        NevadoConnection connection = <span class="keyword">new</span> NevadoConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;81</td>  <td class="nbHitsCovered">&nbsp;363</td>  <td class="src"><pre class="src">&nbsp;        initializeConnection(connection);</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;82</td>  <td class="nbHitsCovered">&nbsp;363</td>  <td class="src"><pre class="src">&nbsp;        <span class="keyword">return</span> connection;</pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;79</td>  <td class="nbHitsCovered">&nbsp;367</td>  <td class="src"><pre class="src">&nbsp;        checkSQSConnectorFactory();</pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;80</td>  <td class="nbHitsCovered">&nbsp;367</td>  <td class="src"><pre class="src">&nbsp;        NevadoConnection connection = <span class="keyword">new</span> NevadoConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));</pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;81</td>  <td class="nbHitsCovered">&nbsp;365</td>  <td class="src"><pre class="src">&nbsp;        initializeConnection(connection);</pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;82</td>  <td class="nbHitsCovered">&nbsp;365</td>  <td class="src"><pre class="src">&nbsp;        <span class="keyword">return</span> connection;</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;83</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;    }</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;84</td>  <td class="nbHits">&nbsp;</td>
@@ -180,20 +180,20 @@
   <td class="src"><pre class="src">&nbsp;</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;99</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;    <span class="keyword">private</span> <span class="keyword">void</span> initializeConnection(NevadoConnection connection) <span class="keyword">throws</span> JMSException {</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;100</td>  <td class="nbHitsCovered"><a title="Line 100: Conditional coverage 100% (2/2).">&nbsp;366</a></td>  <td class="src"><pre class="src">&nbsp;<a title="Line 100: Conditional coverage 100% (2/2).">        <span class="keyword">if</span> (StringUtils.isNotEmpty(_clientID))</a></pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;100</td>  <td class="nbHitsCovered"><a title="Line 100: Conditional coverage 100% (2/2).">&nbsp;368</a></td>  <td class="src"><pre class="src">&nbsp;<a title="Line 100: Conditional coverage 100% (2/2).">        <span class="keyword">if</span> (StringUtils.isNotEmpty(_clientID))</a></pre></td></tr>
 <tr>  <td class="numLine">&nbsp;101</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;        {</pre></td></tr>
 <tr>  <td class="numLineCover">&nbsp;102</td>  <td class="nbHitsCovered">&nbsp;1</td>  <td class="src"><pre class="src">&nbsp;            connection.setClientID(_clientID);</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;103</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;        }</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;104</td>  <td class="nbHitsCovered">&nbsp;366</td>  <td class="src"><pre class="src">&nbsp;        connection.setOverrideJMSDeliveryMode(_jmsDeliveryMode);</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;105</td>  <td class="nbHitsCovered">&nbsp;366</td>  <td class="src"><pre class="src">&nbsp;        connection.setOverrideJMSPriority(_jmsPriority);</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;106</td>  <td class="nbHitsCovered">&nbsp;366</td>  <td class="src"><pre class="src">&nbsp;        connection.setOverrideJMSTTL(_jmsTTL);</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;107</td>  <td class="nbHitsCovered">&nbsp;366</td>  <td class="src"><pre class="src">&nbsp;        connection.setTemporaryQueueSuffix(_temporaryQueueSuffix);</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;108</td>  <td class="nbHitsCovered">&nbsp;366</td>  <td class="src"><pre class="src">&nbsp;        connection.setTemporaryTopicSuffix(_temporaryTopicSuffix);</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;109</td>  <td class="nbHitsCovered">&nbsp;366</td>  <td class="src"><pre class="src">&nbsp;        connection.setMaxPollWaitMs(_maxPollWaitMs);</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;110</td>  <td class="nbHitsCovered">&nbsp;366</td>  <td class="src"><pre class="src">&nbsp;        connection.setDurableSubcriptionPrefixOveride(_durableSubscriberPrefixOverride);</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;111</td>  <td class="nbHitsCovered">&nbsp;366</td>  <td class="src"><pre class="src">&nbsp;    }</pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;104</td>  <td class="nbHitsCovered">&nbsp;368</td>  <td class="src"><pre class="src">&nbsp;        connection.setOverrideJMSDeliveryMode(_jmsDeliveryMode);</pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;105</td>  <td class="nbHitsCovered">&nbsp;368</td>  <td class="src"><pre class="src">&nbsp;        connection.setOverrideJMSPriority(_jmsPriority);</pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;106</td>  <td class="nbHitsCovered">&nbsp;368</td>  <td class="src"><pre class="src">&nbsp;        connection.setOverrideJMSTTL(_jmsTTL);</pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;107</td>  <td class="nbHitsCovered">&nbsp;368</td>  <td class="src"><pre class="src">&nbsp;        connection.setTemporaryQueueSuffix(_temporaryQueueSuffix);</pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;108</td>  <td class="nbHitsCovered">&nbsp;368</td>  <td class="src"><pre class="src">&nbsp;        connection.setTemporaryTopicSuffix(_temporaryTopicSuffix);</pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;109</td>  <td class="nbHitsCovered">&nbsp;368</td>  <td class="src"><pre class="src">&nbsp;        connection.setMaxPollWaitMs(_maxPollWaitMs);</pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;110</td>  <td class="nbHitsCovered">&nbsp;368</td>  <td class="src"><pre class="src">&nbsp;        connection.setDurableSubcriptionPrefixOveride(_durableSubscriberPrefixOverride);</pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;111</td>  <td class="nbHitsCovered">&nbsp;368</td>  <td class="src"><pre class="src">&nbsp;    }</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;112</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;113</td>  <td class="nbHits">&nbsp;</td>
@@ -419,19 +419,19 @@
   <td class="src"><pre class="src">&nbsp;</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;253</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;    <span class="keyword">private</span> <span class="keyword">void</span> checkSQSConnectorFactory() <span class="keyword">throws</span> IllegalStateException {</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;254</td>  <td class="nbHitsCovered"><a title="Line 254: Conditional coverage 100% (2/2).">&nbsp;378</a></td>  <td class="src"><pre class="src">&nbsp;<a title="Line 254: Conditional coverage 100% (2/2).">        <span class="keyword">if</span> (_sqsConnectorFactory == <span class="keyword">null</span>)</a></pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;254</td>  <td class="nbHitsCovered"><a title="Line 254: Conditional coverage 100% (2/2).">&nbsp;380</a></td>  <td class="src"><pre class="src">&nbsp;<a title="Line 254: Conditional coverage 100% (2/2).">        <span class="keyword">if</span> (_sqsConnectorFactory == <span class="keyword">null</span>)</a></pre></td></tr>
 <tr>  <td class="numLine">&nbsp;255</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;        {</pre></td></tr>
 <tr>  <td class="numLineCover">&nbsp;256</td>  <td class="nbHitsCovered">&nbsp;10</td>  <td class="src"><pre class="src">&nbsp;            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"SQSConnectorFactory is null, it must be set."</span>);</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;257</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;        }</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;258</td>  <td class="nbHitsCovered">&nbsp;368</td>  <td class="src"><pre class="src">&nbsp;    }</pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;258</td>  <td class="nbHitsCovered">&nbsp;370</td>  <td class="src"><pre class="src">&nbsp;    }</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;259</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;}</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;260</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;</pre></td></tr>
 </table>
 
-<div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 1.9.4.1 on 12/31/13 12:04 PM.</div>
+<div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 1.9.4.1 on 1/12/14 1:48 PM.</div>
 </body>
 </html>
