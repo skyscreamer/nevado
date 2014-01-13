@@ -13,7 +13,6 @@ Getting started is easy.  Download the jar or add the following to your pom.xml:
 
 Initializing Spring is a piece of cake.
 
-    <!-- Pick your AWS SDK.  Typica is pretty fast. -->
     <bean id="sqsConnectorFactory" class="org.skyscreamer.nevado.jms.connector.amazonaws.AmazonAwsSQSConnectorFactory" />
 
     <!-- And this is an implementation of javax.jms.ConnectionFactory -->
