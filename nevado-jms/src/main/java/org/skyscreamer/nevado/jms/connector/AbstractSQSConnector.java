@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Abstract connector that handles handling of messages and queues independent of the actual implementation.
@@ -49,7 +50,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
         return _isAsync;
     }
 
-    public final void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException
+    public void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException
     {
         if (destination == null)
         {
@@ -94,15 +95,15 @@ public abstract class AbstractSQSConnector implements SQSConnector {
         }
     }
 
-    // TODO - Typica 1.7 doesn't support batch send.  When we get a connector that does, update this to allow implementation-specific bulk handler.
-    public final void sendMessages(NevadoDestination destination, List<NevadoMessage> outgoingMessages) throws JMSException {
+    // TODO - Update this to allow implementation-specific bulk handler.
+    public void sendMessages(NevadoDestination destination, List<NevadoMessage> outgoingMessages) throws JMSException {
         for(NevadoMessage message : outgoingMessages)
         {
             sendMessage(destination, message);
         }
     }
 
-    public final NevadoMessage receiveMessage(NevadoConnection connection, NevadoDestination destination, long timeoutMs) throws JMSException, InterruptedException {
+    public NevadoMessage receiveMessage(NevadoConnection connection, NevadoDestination destination, long timeoutMs) throws JMSException, InterruptedException {
         long startTimeMs = new Date().getTime();
         SQSQueue sqsQueue = getSQSQueue(destination);
         SQSMessage sqsMessage = receiveSQSMessage(connection, destination, timeoutMs, startTimeMs, sqsQueue);
@@ -112,13 +113,13 @@ public abstract class AbstractSQSConnector implements SQSConnector {
         return sqsMessage != null ? convertSqsMessage(destination, sqsMessage, false) : null;
     }
 
-    public final void deleteMessage(NevadoMessage message) throws JMSException {
+    public void deleteMessage(NevadoMessage message) throws JMSException {
         SQSQueue sqsQueue = getSQSQueue(message.getNevadoDestination());
         String sqsReceiptHandle = getSQSReceiptHandle(message);
         sqsQueue.deleteMessage(sqsReceiptHandle);
     }
 
-    public final void resetMessage(NevadoMessage message) throws JMSException {
+    public void resetMessage(NevadoMessage message) throws JMSException {
         String sqsReceiptHandle = (String)message.getNevadoProperty(NevadoProperty.SQSReceiptHandle);
         if (sqsReceiptHandle == null)
         {
@@ -134,7 +135,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
      *
      * @param queueName Name of queue to create
      */
-    public final NevadoQueue createQueue(String queueName) throws JMSException {
+    public NevadoQueue createQueue(String queueName) throws JMSException {
         NevadoQueue queue = new NevadoQueue(queueName);
         getSQSQueue(queue);
         return queue;
@@ -148,7 +149,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
 
     protected abstract void sendSNSMessage(NevadoTopic topic, String serializedMessage) throws JMSException;
 
-    protected final SQSQueue getSQSQueue(NevadoDestination destination) throws JMSException
+    protected SQSQueue getSQSQueue(NevadoDestination destination) throws JMSException
     {
         if (destination == null)
         {
@@ -168,7 +169,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
     protected abstract SQSQueue getSQSQueueImpl(NevadoQueue queue) throws JMSException;
 
 
-    protected final SQSMessage receiveSQSMessage(NevadoConnection connection, NevadoDestination destination, long timeoutMs,
+    protected SQSMessage receiveSQSMessage(NevadoConnection connection, NevadoDestination destination, long timeoutMs,
                                            long startTimeMs, SQSQueue sqsQueue)
             throws JMSException, InterruptedException {
         SQSMessage sqsMessage;
@@ -205,7 +206,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
         return sqsMessage;
     }
 
-    protected final String sendSQSMessage(NevadoQueue queue, String serializedMessage) throws JMSException
+    protected String sendSQSMessage(NevadoQueue queue, String serializedMessage) throws JMSException
     {
         SQSQueue sqsQueue = getSQSQueue(queue);
         if (_log.isDebugEnabled())
@@ -215,7 +216,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
         return sqsQueue.sendMessage(serializedMessage);
     }
 
-    protected final NevadoMessage convertSqsMessage(NevadoDestination destination, SQSMessage sqsMessage, boolean readOnly)
+    protected NevadoMessage convertSqsMessage(NevadoDestination destination, SQSMessage sqsMessage, boolean readOnly)
             throws JMSException
     {
         // Get the message
@@ -269,7 +270,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
      * @return A string-serialized encoding of the message
      * @throws JMSException Unable to serialize the message
      */
-    protected final String serializeMessage(NevadoMessage message) throws JMSException {
+    protected String serializeMessage(NevadoMessage message) throws JMSException {
         String serializedMessage;
         try {
             serializedMessage = SerializeUtil.serializeToString(message);
@@ -288,7 +289,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
      * @return A deserialized NevadoMessage object
      * @throws JMSException Unable to deserializeFromString a single NevadoMessage object from the source
      */
-    protected final NevadoMessage deserializeMessage(String serializedMessage) throws JMSException {
+    protected NevadoMessage deserializeMessage(String serializedMessage) throws JMSException {
         Serializable deserializedObject;
         try {
             deserializedObject = SerializeUtil.deserializeFromString(serializedMessage);
@@ -314,7 +315,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
      * @param sqsArn ARN of SQS queue subscriber
      * @return Policy rule to create
      */
-    protected final String getPolicy(String snsArn, String sqsArn) {
+    protected String getPolicy(String snsArn, String sqsArn) {
         return "{ \n" +
                 "    \"Version\":\"2008-10-17\", \n" +
                 "    \"Id\":\"" + sqsArn + "\", \n" +

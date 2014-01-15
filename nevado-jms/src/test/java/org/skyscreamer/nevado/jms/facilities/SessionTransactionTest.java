@@ -23,28 +23,31 @@ public class SessionTransactionTest extends AbstractJMSTest {
         Session controlSession = createSession();
 
         // Create a couple of temporary queues for the test
-        Queue testConsumeQueue = controlSession.createTemporaryQueue();
-        Queue testProduceQueue = controlSession.createTemporaryQueue();
+        Queue queue1 = controlSession.createTemporaryQueue();
+        Queue queue2 = controlSession.createTemporaryQueue();
 
-        // Put some messages in a queue and set up the listener to monitor production
+        // Put some messages in a queue
         TextMessage ctlMsg1 = controlSession.createTextMessage(RandomData.readString());
         TextMessage ctlMsg2 = controlSession.createTextMessage(RandomData.readString());
         TextMessage ctlMsg3 = controlSession.createTextMessage(RandomData.readString());
-        MessageProducer producer = controlSession.createProducer(testConsumeQueue);
-        producer.send(ctlMsg1);
-        producer.send(ctlMsg2);
-        producer.send(ctlMsg3);
-        MessageConsumer consumer = controlSession.createConsumer(testProduceQueue);
 
-        // Read some messages, send some messages
+        // Send some messages non-transactionally to queue #1
+        MessageProducer nonTxProducer = controlSession.createProducer(queue1);
+        nonTxProducer.send(ctlMsg1);
+        nonTxProducer.send(ctlMsg2);
+        nonTxProducer.send(ctlMsg3);
+
+        // Read some messages with a transactional session from queue #1
         Session txSession = getConnection().createSession(true, Session.SESSION_TRANSACTED);
-        MessageConsumer txConsumer = txSession.createConsumer(testConsumeQueue);
+        MessageConsumer txConsumer = txSession.createConsumer(queue1);
         TextMessage msg1 = (NevadoTextMessage) txConsumer.receive();
         TextMessage msg2 = (NevadoTextMessage) txConsumer.receive();
         TextMessage msg3 = (NevadoTextMessage) txConsumer.receive();
         compareTextMessages(new TextMessage[] {ctlMsg1, ctlMsg2, ctlMsg3}, new TextMessage[] {msg1, msg2, msg3});
         Assert.assertNull(txConsumer.receive(100));
-        MessageProducer txProducer = txSession.createProducer(testProduceQueue);
+
+        // Send some messages transactionally to queue #2, don't commit, rollback
+        MessageProducer txProducer = txSession.createProducer(queue2);
         TextMessage rollbackMsg1 = txSession.createTextMessage(RandomData.readString());
         TextMessage rollbackMsg2 = txSession.createTextMessage(RandomData.readString());
         _log.info("These messages are going to be rolled back, so should never be seen again: "
@@ -52,31 +55,41 @@ public class SessionTransactionTest extends AbstractJMSTest {
         txProducer.send(rollbackMsg1);
         txProducer.send(rollbackMsg2);
 
-        // Test that nothing has been sent yet
-        Assert.assertNull("Messages sent in a transaction were transmitted before they were committed", consumer.receive(100));
+        // Read message with non-transactional consumer
+        MessageConsumer nonTxConsumer = controlSession.createConsumer(queue2);
+        Assert.assertNull("Messages sent in a transaction were transmitted before they were committed",
+                nonTxConsumer.receive(100));
 
-        // Rollback, re-read and re-send
+        // Rollback transaction.  This should rollback the messages we read, and the messages we sent.
         txSession.rollback();
+
+        // Re-receive the messages produces non-transactionally, and received transactionally (but rolled back)
         msg1 = (NevadoTextMessage) txConsumer.receive();
         msg2 = (NevadoTextMessage) txConsumer.receive();
         msg3 = (NevadoTextMessage) txConsumer.receive();
         compareTextMessages(new TextMessage[] {ctlMsg1, ctlMsg2, ctlMsg3}, new TextMessage[] {msg1, msg2, msg3});
         Assert.assertNull(txConsumer.receive(100));
+
+        // Re-send transactionally sent messages
         TextMessage commitMsg1 = txSession.createTextMessage(RandomData.readString());
         TextMessage commitMsg2 = txSession.createTextMessage(RandomData.readString());
         txProducer.send(commitMsg1);
+        _log.info("Sent message without committing: " + commitMsg1);
         txProducer.send(commitMsg2);
+        _log.info("Sent message without committing: " + commitMsg2);
 
         // Test that nothing has been sent yet
-        Assert.assertNull(consumer.receive(100));
+        Message msg = nonTxConsumer.receive(500);
+        Assert.assertNull("We still haven't committed.  Should be no messages yet.", msg);
 
-        // Commit and check the results
+        // Commit.  This should send the messages.  Check the results.  Give it a little time for async connectors.
         txSession.commit();
-        Thread.sleep(100);
-        Assert.assertNull(txConsumer.receiveNoWait());
-        TextMessage msgOut1 = (TextMessage)consumer.receiveNoWait();
-        TextMessage msgOut2 = (TextMessage)consumer.receiveNoWait();
-        Assert.assertNull(consumer.receiveNoWait());
+        Assert.assertNull(txConsumer.receive(100));
+        TextMessage msgOut1 = (TextMessage)nonTxConsumer.receive(1000);
+        _log.info("Got msg: " + msgOut1);
+        TextMessage msgOut2 = (TextMessage)nonTxConsumer.receive(1000);
+        _log.info("Got msg: " + msgOut2);
+        Assert.assertNull(nonTxConsumer.receive(500));
         compareTextMessages(new TextMessage[] {commitMsg1, commitMsg2}, new TextMessage[] {msgOut1, msgOut2});
     }
 

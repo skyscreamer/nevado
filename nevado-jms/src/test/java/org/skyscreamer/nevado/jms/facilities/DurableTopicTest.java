@@ -49,6 +49,7 @@ public class DurableTopicTest extends AbstractJMSTest {
         boolean exceptionThrown = false;
         Message msgAfterUnsubscribe = null;
         try {
+            _log.warn("EXPECTING EXCEPTION HERE:");
             subscriber = session.createDurableSubscriber(topic, durableTopicName);
             msgAfterUnsubscribe = subscriber.receive(500);
         }

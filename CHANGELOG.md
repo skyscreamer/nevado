@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 1.3.0 - 1/12/2014
+-------------------------
+ - Removed Typica connector.
+ - Updated AWS SDK dependency to 1.6.12.
+ - Expose SQS delivery count in JMSXDeliveryCount message property for better poison message handling.
+
 Version 1.2.6 - 12/31/2013
 --------------------------
  - Fixed bug where network errors were sometimes killing Nevado

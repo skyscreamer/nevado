@@ -98,7 +98,10 @@ public class MockSQSQueue implements SQSQueue, ResettableMock {
             if (message.isVisible())
             {
                 message.setVisibleAfter(System.currentTimeMillis() + DEFAULT_MESSAGE_VISIBILITY);
+                message.incrementDeliveryCount();
                 nextMessage = message;
+                nextMessage.getAttributes().put(MockSQSConnector.MESSAGE_ATTRIBUTE_RECEIVE_COUNT,
+                                                message.getDeliveryCount() + "");
                 break;
             }
         }

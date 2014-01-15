@@ -97,7 +97,9 @@ public class AmazonAwsSQSQueue implements SQSQueue {
     public AmazonAwsSQSMessage receiveMessage() throws JMSException {
         AmazonAwsSQSMessage sqsMessage;
         try {
-            ReceiveMessageResult result = _amazonAwsSQSConnector.getAmazonSQS().receiveMessage(new ReceiveMessageRequest(_queueUrl));
+            ReceiveMessageRequest request = new ReceiveMessageRequest(_queueUrl)
+                    .withAttributeNames(AmazonAwsSQSConnector.MESSAGE_ATTRIBUTE_APPROXIMATE_RECEIVE_COUNT);
+            ReceiveMessageResult result = _amazonAwsSQSConnector.getAmazonSQS().receiveMessage(request);
             List<Message> messages = result.getMessages();
             sqsMessage = (messages != null && messages.size() > 0) ? new AmazonAwsSQSMessage(messages.get(0)) : null;
         } catch (AmazonClientException e) {
