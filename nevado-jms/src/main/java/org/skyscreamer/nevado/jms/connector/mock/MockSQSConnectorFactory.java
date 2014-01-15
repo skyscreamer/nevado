@@ -15,12 +15,12 @@ public class MockSQSConnectorFactory implements SQSConnectorFactory, ResettableM
     private MockSQSConnector _mockSQSConnector = new MockSQSConnector();
 
     @Override
-    public SQSConnector getInstance(String awsAccessKey, String awsSecretKey) throws ResourceAllocationException {
-        return getInstance(awsAccessKey, awsSecretKey, null, null);
+    public SQSConnector getInstance(String awsAccessKey, String awsSecretKey, String awsSessionToken) throws ResourceAllocationException {
+        return getInstance(awsAccessKey, awsSecretKey, awsSessionToken, null, null);
     }
 
     @Override
-    public SQSConnector getInstance(String awsAccessKey, String awsSecretKey, String awsSQSEndpoint, String awsSNSEndpoint) throws ResourceAllocationException {
+    public SQSConnector getInstance(String awsAccessKey, String awsSecretKey, String awsSessionToken, String awsSQSEndpoint, String awsSNSEndpoint) throws ResourceAllocationException {
         if (BAD_ENDPOINT_URL.equals(awsSQSEndpoint) || BAD_ENDPOINT_URL.equals(awsSNSEndpoint)) {
             throw new ResourceAllocationException("Bad endpoint");
         }

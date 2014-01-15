@@ -36,6 +36,7 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     private SQSConnectorFactory _sqsConnectorFactory;
     private volatile String _awsAccessKey;
     private volatile String _awsSecretKey;
+    private volatile String _awsSessionToken;
     private volatile String _awsSQSEndpoint = null;
     private volatile String _awsSNSEndpoint = null;
     private volatile String _clientID;
@@ -55,7 +56,7 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
 
     public NevadoQueueConnection createQueueConnection() throws JMSException {
         checkSQSConnectorFactory();
-        NevadoQueueConnection connection = new NevadoQueueConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        NevadoQueueConnection connection = new NevadoQueueConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey, _awsSessionToken, _awsSQSEndpoint, _awsSNSEndpoint));
         initializeConnection(connection);
         return connection;
     }
@@ -63,35 +64,35 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
     public NevadoQueueConnection createQueueConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
         checkSQSConnectorFactory();
         NevadoQueueConnection connection
-                = new NevadoQueueConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+                = new NevadoQueueConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSessionToken, _awsSQSEndpoint, _awsSNSEndpoint));
         initializeConnection(connection);
         return connection;
     }
 
     public NevadoConnection createConnection() throws JMSException {
         checkSQSConnectorFactory();
-        NevadoConnection connection = new NevadoConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        NevadoConnection connection = new NevadoConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey, _awsSessionToken, _awsSQSEndpoint, _awsSNSEndpoint));
         initializeConnection(connection);
         return connection;
     }
 
     public NevadoConnection createConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
         checkSQSConnectorFactory();
-        NevadoConnection connection = new NevadoConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        NevadoConnection connection = new NevadoConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSessionToken, _awsSQSEndpoint, _awsSNSEndpoint));
         initializeConnection(connection);
         return connection;
     }
 
     public NevadoTopicConnection createTopicConnection() throws JMSException {
         checkSQSConnectorFactory();
-        NevadoTopicConnection connection = new NevadoTopicConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        NevadoTopicConnection connection = new NevadoTopicConnection(_sqsConnectorFactory.getInstance(_awsAccessKey, _awsSecretKey, _awsSessionToken, _awsSQSEndpoint, _awsSNSEndpoint));
         initializeConnection(connection);
         return connection;
     }
 
     public TopicConnection createTopicConnection(String awsAccessKey, String awsSecretKey) throws JMSException {
         checkSQSConnectorFactory();
-        NevadoTopicConnection connection = new NevadoTopicConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSQSEndpoint, _awsSNSEndpoint));
+        NevadoTopicConnection connection = new NevadoTopicConnection(_sqsConnectorFactory.getInstance(awsAccessKey, awsSecretKey, _awsSessionToken, _awsSQSEndpoint, _awsSNSEndpoint));
         initializeConnection(connection);
         return connection;
     }
@@ -127,6 +128,10 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
         _awsSecretKey = awsSecretKey;
     }
 
+    public void setAwsSessionToken(String awsSessionToken) {
+      this._awsSessionToken = awsSessionToken;
+    }
+
     public void setAwsSQSEndpoint(String awsSQSEndpoint) {
         _awsSQSEndpoint = awsSQSEndpoint;
     }
@@ -157,6 +162,10 @@ public class NevadoConnectionFactory implements ConnectionFactory, QueueConnecti
 
     public String getAwsSecretKey() {
         return _awsSecretKey;
+    }
+
+    public String get_awsSessionToken() {
+      return _awsSessionToken;
     }
 
     public String getClientID() {

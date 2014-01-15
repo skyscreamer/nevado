@@ -18,12 +18,12 @@ public abstract class AbstractSQSConnectorFactory implements SQSConnectorFactory
     protected long _receiveCheckIntervalMs = DEFAULT_RECEIVE_CHECK_INTERVAL_MS;
 
     @Override
-    public abstract SQSConnector getInstance(String awsAccessKey, String awsSecretKey, String awsSQSEndpoint,
+    public abstract SQSConnector getInstance(String awsAccessKey, String awsSecretKey, String awsSessionToken, String awsSQSEndpoint,
                                              String awsSNSEndpoint) throws JMSException;
 
     @Override
-    public SQSConnector getInstance(String awsAccessKey, String awsSecretKey) throws JMSException {
-        return getInstance(awsAccessKey, awsSecretKey, null, null);
+    public SQSConnector getInstance(String awsAccessKey, String awsSecretKey, String awsSessionToken) throws JMSException {
+        return getInstance(awsAccessKey, awsSecretKey, awsSessionToken, null, null);
     }
 
     public void setSecure(boolean secure) {
