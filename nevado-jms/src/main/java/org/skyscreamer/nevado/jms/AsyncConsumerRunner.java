@@ -110,8 +110,10 @@ public class  AsyncConsumerRunner implements Runnable {
     synchronized void stop() throws InterruptedException {
         if (_running) {
             _running = false;
-            _sleeper.stopSleeping();
-            runner.join();
+            if (runner != Thread.currentThread()) {
+                _sleeper.stopSleeping();
+                runner.join();
+            }
         }
     }
 }
