@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 1.3.1 - 3/25/2014
+-------------------------
+ - Fix for bug where the consumer thread calls join() on itself causing it to be hung forever.
+
 Version 1.3.0 - 1/12/2014
 -------------------------
  - Removed Typica connector.
