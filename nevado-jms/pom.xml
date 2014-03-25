@@ -58,6 +58,11 @@
             <artifactId>jackson-core-asl</artifactId>
             <version>1.9.12</version>
         </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.2</version>
+        </dependency>
 
         <dependency>
             <groupId>log4j</groupId>
@@ -128,8 +133,8 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Implementation-Title>${name}</Implementation-Title>
-                            <Implementation-Version>${version}</Implementation-Version>
+                            <Implementation-Title>${project.name}</Implementation-Title>
+                            <Implementation-Version>${project.version}</Implementation-Version>
                         </manifestEntries>
                     </archive>
                 </configuration>
