@@ -19,6 +19,12 @@ import java.util.zip.InflaterInputStream;
 
 public class SerializeUtil
 {
+	
+    public static Serializable copyOOS( Serializable serializable ) throws IOException
+    {
+        return deserializeOOS(serializeOOS(serializable));
+    }
+    
     public static Serializable copy( Serializable serializable ) throws IOException
     {
         return deserialize(serialize(serializable));
@@ -27,6 +33,12 @@ public class SerializeUtil
     public static String serializeToString( Serializable serializable ) throws IOException
     {
         byte[] data = serialize(serializable);
+        return new String( Base64.encodeBase64(data) );
+    }
+    
+    public static String serializeToStringOOS( Serializable serializable ) throws IOException
+    {
+        byte[] data = serializeOOS(serializable);
         return new String( Base64.encodeBase64(data) );
     }
 
@@ -48,6 +60,9 @@ public class SerializeUtil
         return byteArrayOutputStream.toByteArray();
     }
     
+    /**
+     *  @see https://github.com/skyscreamer/nevado/issues/81
+     */
     public static byte[] serializeOOS(Serializable serializable, boolean compress) throws IOException {
   
 	ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
@@ -74,6 +89,7 @@ public class SerializeUtil
         return deserialize(dataBytes);
     }
     
+    
     public static Serializable deserializeFromStringOOS(String s) throws IOException
     {
         // Initialize buffer and converter
@@ -98,6 +114,9 @@ public class SerializeUtil
         return serializable;
     }
     
+    /**
+     *  @see https://github.com/skyscreamer/nevado/issues/81
+     */
     public static Serializable deserializeOOS(byte[] dataBytes, boolean isCompressed) throws IOException {
 
 	InputStream is = new ByteArrayInputStream(dataBytes);
