@@ -273,6 +273,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
     protected String serializeMessage(NevadoMessage message) throws JMSException {
         String serializedMessage;
         try {
+            // TODO: should this use the OOS version @ // for https://github.com/skyscreamer/nevado/issues/81
             serializedMessage = SerializeUtil.serializeToString(message);
         } catch (IOException e) {
             String exMessage = "Unable to serialize message of type " + message.getClass().getName() + ": " + e.getMessage();
@@ -292,6 +293,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
     protected NevadoMessage deserializeMessage(String serializedMessage) throws JMSException {
         Serializable deserializedObject;
         try {
+            // TODO: should this use the OOS version @ // for https://github.com/skyscreamer/nevado/issues/81
             deserializedObject = SerializeUtil.deserializeFromString(serializedMessage);
         } catch (IOException e) {
             String exMessage = "Unable to deserialized message: " + e.getMessage();
