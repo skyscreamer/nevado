@@ -69,7 +69,7 @@ public class SerializeUtil
 	OutputStream os = bytesOut;
 	
 	if (compress) {
-		os = new DeflaterOutputStream(os);
+	    os = new DeflaterOutputStream(os);
 	}
 	
 	DataOutputStream dataOut = new DataOutputStream(os);
@@ -126,14 +126,14 @@ public class SerializeUtil
 	DataInputStream dataIn = new DataInputStream(is);
 	ClassLoadingAwareObjectInputStream objIn = new ClassLoadingAwareObjectInputStream(dataIn);
 	try {
-	 	return (Serializable) objIn.readObject();
+	     return (Serializable) objIn.readObject();
 	 	
 	} catch (ClassNotFoundException ce) {
-		throw new IOException(ce.getMessage());
+	     throw new IOException(ce.getMessage());
 		
 	} finally {
-		objIn.close();
-		dataIn.close();
+	     objIn.close();
+    	     dataIn.close();
 	}
 
     }
