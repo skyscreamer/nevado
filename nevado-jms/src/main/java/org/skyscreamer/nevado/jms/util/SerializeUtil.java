@@ -7,8 +7,15 @@ import org.apache.commons.codec.binary.Base64;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 
 public class SerializeUtil
 {
@@ -40,6 +47,25 @@ public class SerializeUtil
         hessian2Output.close();
         return byteArrayOutputStream.toByteArray();
     }
+    
+    public static byte[] serializeOOS(Serializable serializable, boolean compress) throws IOException {
+  
+		ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
+		OutputStream os = bytesOut;
+		
+		if (compress) {
+			os = new DeflaterOutputStream(os);
+		}
+		
+		DataOutputStream dataOut = new DataOutputStream(os);
+		ObjectOutputStream objOut = new ObjectOutputStream(dataOut);
+		objOut.writeObject(serializable);
+		objOut.flush();
+		objOut.reset();
+		objOut.close();
+		return bytesOut.toByteArray();
+
+    }
 
     public static Serializable deserializeFromString(String s) throws IOException
     {
@@ -63,5 +89,26 @@ public class SerializeUtil
 
         // Return strings
         return serializable;
+    }
+    
+    public static Serializable deserializeOOS(byte[] dataBytes, boolean isCompressed) throws IOException {
+
+		InputStream is = new ByteArrayInputStream(dataBytes);
+		if(isCompressed) {
+			is = new InflaterInputStream(is);
+		}
+		DataInputStream dataIn = new DataInputStream(is);
+		ClassLoadingAwareObjectInputStream objIn = new ClassLoadingAwareObjectInputStream(dataIn);
+		try {
+		 	return (Serializable) objIn.readObject();
+		 	
+		} catch (ClassNotFoundException ce) {
+			throw new IOException(ce.getMessage());
+			
+		} finally {
+			objIn.close();
+			dataIn.close();
+		}
+
     }
 }
