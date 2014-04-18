@@ -73,6 +73,13 @@ public class SerializeUtil
         byte [] dataBytes = Base64.decodeBase64(s.getBytes("UTF-8"));
         return deserialize(dataBytes);
     }
+    
+    public static Serializable deserializeFromStringOOS(String s) throws IOException
+    {
+        // Initialize buffer and converter
+        byte [] dataBytes = Base64.decodeBase64(s.getBytes("UTF-8"));
+        return deserializeOOS(dataBytes);
+    }
 
     public static Serializable deserialize(byte[] dataBytes) throws IOException {
         Hessian2Input hessian2Input = new Hessian2Input( new ByteArrayInputStream(  dataBytes ) );
