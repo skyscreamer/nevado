@@ -50,20 +50,20 @@ public class SerializeUtil
     
     public static byte[] serializeOOS(Serializable serializable, boolean compress) throws IOException {
   
-		ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
-		OutputStream os = bytesOut;
-		
-		if (compress) {
-			os = new DeflaterOutputStream(os);
-		}
-		
-		DataOutputStream dataOut = new DataOutputStream(os);
-		ObjectOutputStream objOut = new ObjectOutputStream(dataOut);
-		objOut.writeObject(serializable);
-		objOut.flush();
-		objOut.reset();
-		objOut.close();
-		return bytesOut.toByteArray();
+	ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
+	OutputStream os = bytesOut;
+	
+	if (compress) {
+		os = new DeflaterOutputStream(os);
+	}
+	
+	DataOutputStream dataOut = new DataOutputStream(os);
+	ObjectOutputStream objOut = new ObjectOutputStream(dataOut);
+	objOut.writeObject(serializable);
+	objOut.flush();
+	objOut.reset();
+	objOut.close();
+	return bytesOut.toByteArray();
 
     }
 
@@ -93,22 +93,22 @@ public class SerializeUtil
     
     public static Serializable deserializeOOS(byte[] dataBytes, boolean isCompressed) throws IOException {
 
-		InputStream is = new ByteArrayInputStream(dataBytes);
-		if(isCompressed) {
-			is = new InflaterInputStream(is);
-		}
-		DataInputStream dataIn = new DataInputStream(is);
-		ClassLoadingAwareObjectInputStream objIn = new ClassLoadingAwareObjectInputStream(dataIn);
-		try {
-		 	return (Serializable) objIn.readObject();
-		 	
-		} catch (ClassNotFoundException ce) {
-			throw new IOException(ce.getMessage());
-			
-		} finally {
-			objIn.close();
-			dataIn.close();
-		}
+	InputStream is = new ByteArrayInputStream(dataBytes);
+	if(isCompressed) {
+		is = new InflaterInputStream(is);
+	}
+	DataInputStream dataIn = new DataInputStream(is);
+	ClassLoadingAwareObjectInputStream objIn = new ClassLoadingAwareObjectInputStream(dataIn);
+	try {
+	 	return (Serializable) objIn.readObject();
+	 	
+	} catch (ClassNotFoundException ce) {
+		throw new IOException(ce.getMessage());
+		
+	} finally {
+		objIn.close();
+		dataIn.close();
+	}
 
     }
 }
