@@ -50,7 +50,11 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
     private final AmazonSQS _amazonSQS;
     private final AmazonSNS _amazonSNS;
 
-    public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, , int visibilityTimeoutOnReset) {
+    public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs) {
+        this(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, false, 0);
+    }
+    
+    public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, int visibilityTimeoutOnReset) {
         this(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, false, visibilityTimeoutOnReset);
     }
 
