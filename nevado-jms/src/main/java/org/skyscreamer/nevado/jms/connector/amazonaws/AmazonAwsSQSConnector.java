@@ -53,10 +53,6 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs) {
         this(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, false, 0);
     }
-    
-    public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, int visibilityTimeoutOnReset) {
-        this(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, false, visibilityTimeoutOnReset);
-    }
 
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, boolean isAsync, int visibilityTimeoutOnReset) {
         super(receiveCheckIntervalMs, isAsync, visibilityTimeoutOnReset);
