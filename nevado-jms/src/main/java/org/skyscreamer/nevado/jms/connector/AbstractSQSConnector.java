@@ -29,8 +29,7 @@ import java.util.Map;
  */
 public abstract class AbstractSQSConnector implements SQSConnector {
     protected static final String AWS_ERROR_CODE_AUTHENTICATION = "InvalidClientTokenId";
-    protected static final String BLANK_STRING = "";
-
+   
     protected final Log _log = LogFactory.getLog(getClass());
 
     private final long _receiveCheckIntervalMs;
@@ -59,8 +58,8 @@ public abstract class AbstractSQSConnector implements SQSConnector {
     }
     
     public int getVisibilityTimeoutOnReset() {
-		return _visibilityTimeoutOnReset;
-	}
+	return _visibilityTimeoutOnReset;
+    }
 
     public void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException
     {
@@ -139,7 +138,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
                     "Did this come from an SQS queue?");
         }
         SQSQueue sqsQueue = getSQSQueue(message.getNevadoDestination());
-        if (sqsReceiptHandle != null && !BLANK_STRING.equals(sqsReceiptHandle)){
+        if (sqsReceiptHandle != null && StringUtils.isEmpty(sqsReceiptHandle) && sqsReceiptHandle.trim().length() == 0) {
         	sqsQueue.setMessageVisibilityTimeout(sqsReceiptHandle, _visibilityTimeoutOnReset); // Customize message visibility timeout
         }
     }
@@ -193,7 +192,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
                 if (sqsMessage != null && !connection.isRunning()) {
                     // Connection was stopped while the REST call to SQS was being made
                     try {
-                        if (sqsMessage.getReceiptHandle() != null && !BLANK_STRING.equals(sqsMessage.getReceiptHandle())) {
+                        if (sqsMessage.getReceiptHandle() != null && StringUtils.isEmpty(sqsMessage.getReceiptHandle()) && sqsMessage.getReceiptHandle().trim().length() == 0) {
                     		sqsQueue.setMessageVisibilityTimeout(sqsMessage.getReceiptHandle(), _visibilityTimeoutOnReset); // Customize message visibility timeout
                     	}
                     } catch (JMSException e) {
