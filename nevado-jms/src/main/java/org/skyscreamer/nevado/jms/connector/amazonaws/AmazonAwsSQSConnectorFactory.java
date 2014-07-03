@@ -33,11 +33,11 @@ public class AmazonAwsSQSConnectorFactory extends AbstractSQSConnectorFactory {
         return _useAsyncSend;
     }
     
-   public int get_visibilityTimeoutOnReset() {
-		return _visibilityTimeoutOnReset;
-	}
+   public int getVisibilityTimeoutOnReset() {
+	return _visibilityTimeoutOnReset;
+    }
 
-	public void set_visibilityTimeoutOnReset(int visibilityTimeoutOnReset) {
-		_visibilityTimeoutOnReset = visibilityTimeoutOnReset;
-	}
+   public void setVisibilityTimeoutOnReset(int visibilityTimeoutOnReset) {
+	_visibilityTimeoutOnReset = visibilityTimeoutOnReset;
+   }
 }
