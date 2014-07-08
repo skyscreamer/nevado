@@ -34,23 +34,23 @@ public abstract class AbstractSQSConnector implements SQSConnector {
 
     private final long _receiveCheckIntervalMs;
     private final boolean _isAsync;
-    private int _visibilityTimeoutOnReset;
+    private final int _visibilityTimeoutOnReset;
 
     protected AbstractSQSConnector(long receiveCheckIntervalMs)
     {
         this(receiveCheckIntervalMs, false);
     }
 
-    protected AbstractSQSConnector(long receiveCheckIntervalMs, boolean isAsync)
+    protected AbstractSQSConnector(long receiveCheckIntervalMs, boolean isAsync, int visibilityTimeoutOnReset)
     {
         _receiveCheckIntervalMs = receiveCheckIntervalMs;
         _isAsync = isAsync;
+        _visibilityTimeoutOnReset = visibilityTimeoutOnReset;
     }
     
-    protected AbstractSQSConnector(long receiveCheckIntervalMs, boolean isAsync, int visibilityTimeoutOnReset)
+    protected AbstractSQSConnector(long receiveCheckIntervalMs, boolean isAsync)
     {
-    	this(receiveCheckIntervalMs, isAsync);
-        _visibilityTimeoutOnReset = visibilityTimeoutOnReset;
+    	this(receiveCheckIntervalMs, isAsync, 0);
     }
 
     public boolean isAsync() {
@@ -138,9 +138,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
                     "Did this come from an SQS queue?");
         }
         SQSQueue sqsQueue = getSQSQueue(message.getNevadoDestination());
-        if (sqsReceiptHandle != null && StringUtils.isNotEmpty(sqsReceiptHandle) && sqsReceiptHandle.trim().length() != 0){
-        	sqsQueue.setMessageVisibilityTimeout(sqsReceiptHandle, _visibilityTimeoutOnReset); // Customize message visibility timeout
-        }
+        sqsQueue.setMessageVisibilityTimeout(sqsReceiptHandle, _visibilityTimeoutOnReset); // Customize message visibility timeout
     }
 
     /**
@@ -192,7 +190,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
                 if (sqsMessage != null && !connection.isRunning()) {
                     // Connection was stopped while the REST call to SQS was being made
                     try {
-                        if (sqsMessage.getReceiptHandle() != null && StringUtils.isNotEmpty(sqsMessage.getReceiptHandle()) && sqsMessage.getReceiptHandle().trim().length() != 0) {
+                        if(sqsMessage.getReceiptHandle() != null && StringUtils.isNotEmpty(sqsMessage.getReceiptHandle()) && sqsMessage.getReceiptHandle().trim().length() > 0) {
                     		sqsQueue.setMessageVisibilityTimeout(sqsMessage.getReceiptHandle(), _visibilityTimeoutOnReset); // Customize message visibility timeout
                     	}
                     } catch (JMSException e) {
