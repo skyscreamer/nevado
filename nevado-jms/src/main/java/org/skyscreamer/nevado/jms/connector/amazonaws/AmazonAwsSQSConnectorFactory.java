@@ -10,11 +10,12 @@ import org.skyscreamer.nevado.jms.connector.AbstractSQSConnectorFactory;
  */
 public class AmazonAwsSQSConnectorFactory extends AbstractSQSConnectorFactory {
     protected boolean _useAsyncSend = false;
+    protected int _visibilityTimeoutOnReset = 0;
     
     @Override
     public AmazonAwsSQSConnector getInstance(String awsAccessKey, String awsSecretKey, String awsSQSEndpoint, String awsSNSEndpoint) {
         AmazonAwsSQSConnector amazonAwsSQSConnector = new AmazonAwsSQSConnector(awsAccessKey, awsSecretKey, _isSecure,
-                _receiveCheckIntervalMs, _useAsyncSend);
+                _receiveCheckIntervalMs, _useAsyncSend, _visibilityTimeoutOnReset);
         if (StringUtils.isNotEmpty(awsSQSEndpoint)) {
             amazonAwsSQSConnector.getAmazonSQS().setEndpoint(awsSQSEndpoint);
         }
@@ -30,5 +31,13 @@ public class AmazonAwsSQSConnectorFactory extends AbstractSQSConnectorFactory {
     
     public boolean isUseAsyncSend() {
         return _useAsyncSend;
+    }
+    
+   public int getVisibilityTimeoutOnReset() {
+	return _visibilityTimeoutOnReset;
+    }
+
+   public void setVisibilityTimeoutOnReset(int visibilityTimeoutOnReset) {
+	_visibilityTimeoutOnReset = visibilityTimeoutOnReset;
     }
 }
