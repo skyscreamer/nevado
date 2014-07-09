@@ -190,9 +190,7 @@ public abstract class AbstractSQSConnector implements SQSConnector {
                 if (sqsMessage != null && !connection.isRunning()) {
                     // Connection was stopped while the REST call to SQS was being made
                     try {
-                        if(sqsMessage.getReceiptHandle() != null && StringUtils.isNotEmpty(sqsMessage.getReceiptHandle()) && sqsMessage.getReceiptHandle().trim().length() > 0) {
-                    		sqsQueue.setMessageVisibilityTimeout(sqsMessage.getReceiptHandle(), _visibilityTimeoutOnReset); // Customize message visibility timeout
-                    	}
+                        sqsQueue.setMessageVisibilityTimeout(sqsMessage.getReceiptHandle(), _visibilityTimeoutOnReset); // Customize visibility timeout
                     } catch (JMSException e) {
                         String exMessage = "Unable to reset visibility timeout for message: " + e.getMessage();
                         _log.warn(exMessage, e); // Non-fatal.  Just means the message will disappear until the visibility timeout expires.
