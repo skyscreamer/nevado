@@ -29,12 +29,12 @@ import java.util.Map;
  */
 public abstract class AbstractSQSConnector implements SQSConnector {
     protected static final String AWS_ERROR_CODE_AUTHENTICATION = "InvalidClientTokenId";
-   
+
     protected final Log _log = LogFactory.getLog(getClass());
 
     private final long _receiveCheckIntervalMs;
     private final boolean _isAsync;
-    private final int _visibilityTimeoutOnReset;
+    private final int _visibilityTimeoutOnReset; 
 
     protected AbstractSQSConnector(long receiveCheckIntervalMs)
     {
@@ -50,15 +50,15 @@ public abstract class AbstractSQSConnector implements SQSConnector {
     
     protected AbstractSQSConnector(long receiveCheckIntervalMs, boolean isAsync)
     {
-    	this(receiveCheckIntervalMs, isAsync, 0);
+        this(receiveCheckIntervalMs, false, 0);
     }
 
     public boolean isAsync() {
         return _isAsync;
     }
-    
+
     public int getVisibilityTimeoutOnReset() {
-	return _visibilityTimeoutOnReset;
+        return _visibilityTimeoutOnReset;
     }
 
     public void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException
