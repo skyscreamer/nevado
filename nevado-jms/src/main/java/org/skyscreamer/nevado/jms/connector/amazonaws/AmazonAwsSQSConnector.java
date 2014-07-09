@@ -47,25 +47,20 @@ import java.util.concurrent.Executors;
 public class AmazonAwsSQSConnector extends AbstractSQSConnector {
     public static final String MESSAGE_ATTRIBUTE_APPROXIMATE_RECEIVE_COUNT = "ApproximateReceiveCount";
 
-    private AmazonSQS _amazonSQS;
-    private AmazonSNS _amazonSNS;
+    private final AmazonSQS _amazonSQS;
+    private final AmazonSNS _amazonSNS;
 
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs) {
         this(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, false);
     }
 
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, boolean isAsync) {
-        super(receiveCheckIntervalMs, isAsync);
-        initializeConnection(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, isAsync);
+    	this(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, isAsync, 0);
     }
-    
+
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, boolean isAsync, int visibilityTimeoutOnReset) {
         super(receiveCheckIntervalMs, isAsync, visibilityTimeoutOnReset);
-        initializeConnection(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, isAsync);
-    }
-    
-    private void initializeConnection(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, boolean isAsync){
-    	AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
+        AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         String proxyHost = System.getProperty("http.proxyHost");
         String proxyPort = System.getProperty("http.proxyPort");
