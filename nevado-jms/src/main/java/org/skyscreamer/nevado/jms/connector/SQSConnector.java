@@ -24,8 +24,6 @@ public interface SQSConnector {
     void deleteMessage(NevadoMessage message) throws JMSException;
     void resetMessage(NevadoMessage message) throws JMSException;
 
-    void test() throws JMSException;
-
     NevadoQueue createQueue(String queueName) throws JMSException;
     Collection<NevadoQueue> listQueues(String temporaryQueuePrefix) throws JMSException;
     void deleteQueue(NevadoQueue queue) throws JMSException;

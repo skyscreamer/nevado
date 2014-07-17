@@ -56,11 +56,6 @@ public class MockSQSConnector extends AbstractSQSConnector implements Resettable
     }
 
     @Override
-    public void test() throws JMSException {
-        // nop
-    }
-
-    @Override
     public Collection<NevadoQueue> listQueues(String temporaryQueuePrefix) throws JMSException {
         Collection<NevadoQueue> queues = new ArrayList<NevadoQueue>();
         for(NevadoQueue queue : _mockQueueMap.keySet())

@@ -43,7 +43,6 @@ public class NevadoConnection implements Connection {
 
     public NevadoConnection(SQSConnector sqsConnector) throws JMSException {
         _sqsConnector = sqsConnector;
-        _sqsConnector.test();
     }
 
     @Override
@@ -365,11 +364,11 @@ public class NevadoConnection implements Connection {
     public String getConnectionID() {
         return _connectionID;
     }
-    
+
     public void setDurableSubcriptionPrefixOveride(String durableSubcriptionPrefixOveride) {
         _durableSubcriptionPrefixOveride = durableSubcriptionPrefixOveride;
     }
-    
+
     public String getDurableSubcriptionPrefixOveride() {
         return _durableSubcriptionPrefixOveride;
     }
