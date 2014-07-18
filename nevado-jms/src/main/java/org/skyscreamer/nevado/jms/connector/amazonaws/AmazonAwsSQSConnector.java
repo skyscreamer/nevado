@@ -110,12 +110,7 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
 
     @Override
     public void test() throws JMSException {
-        try {
-            _amazonSQS.listQueues();
-            _amazonSNS.listTopics();
-        } catch (AmazonClientException e) {
-            throw handleAWSException("Connection test failed", e);
-        }
+        return;
     }
 
     @Override
