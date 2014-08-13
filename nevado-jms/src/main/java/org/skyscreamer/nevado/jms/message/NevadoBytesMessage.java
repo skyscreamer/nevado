@@ -754,6 +754,14 @@ public class NevadoBytesMessage extends NevadoMessage implements BytesMessage {
         if (this.dataIn == null) {
             ByteArrayInputStream bytesIn = new ByteArrayInputStream(_body.toByteArray());
             this.dataIn = new DataInputStream(bytesIn);
+        } else {
+            try {
+                this.dataIn.reset();
+            } catch (IOException ioe) {
+                MessageNotReadableException initializeReadingException = new MessageNotReadableException("InputStream reset error: " + ioe.getMessage());
+                initializeReadingException.setLinkedException(ioe);
+                throw initializeReadingException;
+            }
         }
     }
 
