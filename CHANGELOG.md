@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 1.3.2 - 9/6/2014
+------------------------
+ - Support for a plain text connector to be compatible with non-JMS clients.
+
 Version 1.3.1 - 3/25/2014
 -------------------------
  - Fix for bug where the consumer thread calls join() on itself causing it to be hung forever.
