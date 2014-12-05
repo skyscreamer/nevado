@@ -34,20 +34,26 @@ public abstract class AbstractSQSConnector implements SQSConnector {
 
     private final long _receiveCheckIntervalMs;
     private final boolean _isAsync;
+    private final boolean _skipTest;
 
     protected AbstractSQSConnector(long receiveCheckIntervalMs)
     {
-        this(receiveCheckIntervalMs, false);
+        this(receiveCheckIntervalMs, false, false);
     }
 
-    protected AbstractSQSConnector(long receiveCheckIntervalMs, boolean isAsync)
+    protected AbstractSQSConnector(long receiveCheckIntervalMs, boolean isAsync, boolean skipTest)
     {
         _receiveCheckIntervalMs = receiveCheckIntervalMs;
         _isAsync = isAsync;
+        _skipTest = skipTest;
     }
 
     public boolean isAsync() {
         return _isAsync;
+    }
+
+    public boolean isSkipTest() {
+        return _skipTest;
     }
 
     public void sendMessage(NevadoDestination destination, NevadoMessage message) throws JMSException

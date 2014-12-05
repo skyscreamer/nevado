@@ -50,12 +50,13 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
     private final AmazonSQS _amazonSQS;
     private final AmazonSNS _amazonSNS;
 
+
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs) {
-        this(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, false);
+        this(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, false, false);
     }
 
-    public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, boolean isAsync) {
-        super(receiveCheckIntervalMs, isAsync);
+    public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, boolean isAsync, boolean skipConnectionTest) {
+        super(receiveCheckIntervalMs, isAsync, skipConnectionTest);
         AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         String proxyHost = System.getProperty("http.proxyHost");
@@ -65,7 +66,7 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
             if(proxyPort != null){
               clientConfiguration.setProxyPort(Integer.parseInt(proxyPort));
             }
-        }  
+        }
         clientConfiguration.setProtocol(isSecure ? Protocol.HTTPS : Protocol.HTTP);
         if (isAsync) {
             ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -110,7 +111,15 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
 
     @Override
     public void test() throws JMSException {
-        return;
+        if (isSkipTest()) {
+            return;
+        }
+        try {
+            _amazonSQS.listQueues();
+            _amazonSNS.listTopics();
+        } catch (AmazonClientException e) {
+            throw handleAWSException("Connection test failed", e);
+        }
     }
 
     @Override
