@@ -50,13 +50,15 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
     private final AmazonSQS _amazonSQS;
     private final AmazonSNS _amazonSNS;
 
+    private boolean _testAlwaysPasses = false;
+
 
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs) {
-        this(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, false, false);
+        this(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, false);
     }
 
-    public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, boolean isAsync, boolean skipConnectionTest) {
-        super(receiveCheckIntervalMs, isAsync, skipConnectionTest);
+    public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, boolean isAsync) {
+        super(receiveCheckIntervalMs, isAsync);
         AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         String proxyHost = System.getProperty("http.proxyHost");
@@ -76,6 +78,14 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
             _amazonSQS = new AmazonSQSClient(awsCredentials, clientConfiguration);
             _amazonSNS = new AmazonSNSClient(awsCredentials, clientConfiguration);
         }
+    }
+
+    public boolean isTestAlwaysPasses() {
+        return _testAlwaysPasses;
+    }
+
+    public void setTestAlwaysPasses(boolean _testAlwaysPasses) {
+        this._testAlwaysPasses = _testAlwaysPasses;
     }
 
     @Override
@@ -111,7 +121,7 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
 
     @Override
     public void test() throws JMSException {
-        if (isSkipTest()) {
+        if (isTestAlwaysPasses()) {
             return;
         }
         try {
