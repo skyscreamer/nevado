@@ -14,8 +14,7 @@ public class AmazonAwsSQSConnectorFactory extends AbstractSQSConnectorFactory {
 
     @Override
     public AmazonAwsSQSConnector getInstance(String awsAccessKey, String awsSecretKey, String awsSQSEndpoint, String awsSNSEndpoint) {
-        AmazonAwsSQSConnector amazonAwsSQSConnector = new AmazonAwsSQSConnector(awsAccessKey, awsSecretKey, _isSecure,
-                _receiveCheckIntervalMs, _useAsyncSend, _skipConnectionTest);
+        AmazonAwsSQSConnector amazonAwsSQSConnector = createConnector(awsAccessKey, awsSecretKey);
         if (StringUtils.isNotEmpty(awsSQSEndpoint)) {
             amazonAwsSQSConnector.getAmazonSQS().setEndpoint(awsSQSEndpoint);
         }
@@ -23,6 +22,10 @@ public class AmazonAwsSQSConnectorFactory extends AbstractSQSConnectorFactory {
             amazonAwsSQSConnector.getAmazonSNS().setEndpoint(awsSNSEndpoint);
         }
         return amazonAwsSQSConnector;
+    }
+
+    protected AmazonAwsSQSConnector createConnector(String awsAccessKey, String awsSecretKey) {
+        return new AmazonAwsSQSConnector(awsAccessKey, awsSecretKey, _isSecure, _receiveCheckIntervalMs, _useAsyncSend, _skipConnectionTest);
     }
 
     public void setUseAsyncSend(boolean useAsyncSend) {
