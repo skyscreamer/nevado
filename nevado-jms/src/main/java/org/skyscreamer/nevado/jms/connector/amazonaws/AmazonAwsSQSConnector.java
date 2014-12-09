@@ -50,6 +50,9 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
     private final AmazonSQS _amazonSQS;
     private final AmazonSNS _amazonSNS;
 
+    private boolean _testAlwaysPasses = false;
+
+
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs) {
         this(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, false);
     }
@@ -65,7 +68,7 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
             if(proxyPort != null){
               clientConfiguration.setProxyPort(Integer.parseInt(proxyPort));
             }
-        }  
+        }
         clientConfiguration.setProtocol(isSecure ? Protocol.HTTPS : Protocol.HTTP);
         if (isAsync) {
             ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -75,6 +78,14 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
             _amazonSQS = new AmazonSQSClient(awsCredentials, clientConfiguration);
             _amazonSNS = new AmazonSNSClient(awsCredentials, clientConfiguration);
         }
+    }
+
+    public boolean isTestAlwaysPasses() {
+        return _testAlwaysPasses;
+    }
+
+    public void setTestAlwaysPasses(boolean _testAlwaysPasses) {
+        this._testAlwaysPasses = _testAlwaysPasses;
     }
 
     @Override
@@ -110,6 +121,9 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
 
     @Override
     public void test() throws JMSException {
+        if (isTestAlwaysPasses()) {
+            return;
+        }
         try {
             _amazonSQS.listQueues();
             _amazonSNS.listTopics();
