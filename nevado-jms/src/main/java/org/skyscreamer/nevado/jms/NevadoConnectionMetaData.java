@@ -1,6 +1,6 @@
 package org.skyscreamer.nevado.jms;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.skyscreamer.nevado.jms.message.JMSXProperty;
 
 import javax.jms.ConnectionMetaData;
