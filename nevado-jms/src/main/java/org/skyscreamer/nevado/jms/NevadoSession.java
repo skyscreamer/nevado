@@ -618,4 +618,8 @@ public class NevadoSession implements Session {
             throw new JMSException("SESSION DELIBERATELY THROWING EXCEPTION - EXPECTED BEHAVIOR - FOR TESTING MODE ONLY");
         }
     }
+
+    AsyncConsumerRunner getAsyncConsumerRunner(){
+      return _asyncConsumerRunner;
+    }
 }

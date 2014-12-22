@@ -67,6 +67,9 @@ public class NevadoMessageConsumer implements MessageConsumer, QueueReceiver, To
     public void setMessageListener(MessageListener messageListener) throws JMSException {
         checkClosed();
         _messageListener = messageListener;
+
+        //lazy start of AsyncConsumerRunner only when at least one MessageListener registered for consumer
+        _session.getAsyncConsumerRunner().start();
     }
 
     @Override

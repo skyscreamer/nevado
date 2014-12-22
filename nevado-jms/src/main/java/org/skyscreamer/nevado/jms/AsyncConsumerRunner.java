@@ -9,6 +9,7 @@ import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Asynchronous processor for consumers with registered message listeners
@@ -16,6 +17,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class  AsyncConsumerRunner implements Runnable {
+
+    private static final AtomicInteger THREAD_NUM_COUNTER = new AtomicInteger(1);
+
     private final Log _log = LogFactory.getLog(getClass());
     private final Connection _connection;
     private final Set<NevadoMessageConsumer> _asyncConsumers = new CopyOnWriteArraySet<NevadoMessageConsumer>();
@@ -38,7 +42,7 @@ public class  AsyncConsumerRunner implements Runnable {
                 messageProcessed = processMessage(consumer) || messageProcessed;
                 if (!_running) { break RUN_LOOP; }
             }
-            if (messageProcessed == true)
+            if (messageProcessed)
             {
                 // If we're getting messages tell the back-off sleeper
                 _sleeper.reset();
@@ -97,14 +101,45 @@ public class  AsyncConsumerRunner implements Runnable {
         return messageProcessed;
     }
 
+    /**
+     * Checks that consumers actually have active message listeners
+     *
+     * When no one async message listener is registered - no need to create separate tread
+     * which will create redundant requests to SQS
+     *
+     * Once async listener will be registered - AsyncConsumerRunner will be started
+     *
+     * {@link NevadoMessageConsumer#setMessageListener(javax.jms.MessageListener)}
+     */
+    private boolean consumersHaveAsyncMessageListeners(){
+
+      for(NevadoMessageConsumer consumer : _asyncConsumers)
+      {
+        if(consumer.getMessageListener()!=null){
+          return true;
+        }
+      }
+
+      return false;
+    }
+
     synchronized void start() {
+
+        if(!consumersHaveAsyncMessageListeners()){
+          return;
+        }
+
         if (!_running) {
             runner = new Thread(this);
+            //set more meaningful thread name
+            int threadNum = THREAD_NUM_COUNTER.getAndIncrement();
+            runner.setName("AsyncConsumerRunner Thread ["+threadNum+"]");
             //runner.setPriority(Thread.MAX_PRIORITY);
             //runner.setDaemon(true);
             runner.start();
             _running = true;
         }
+
     }
 
     synchronized void stop() throws InterruptedException {
