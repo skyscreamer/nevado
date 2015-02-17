@@ -19,6 +19,7 @@ import com.amazonaws.services.sqs.model.CreateQueueRequest;
 import com.amazonaws.services.sqs.model.CreateQueueResult;
 import com.amazonaws.services.sqs.model.ListQueuesRequest;
 import com.amazonaws.services.sqs.model.ListQueuesResult;
+import org.apache.commons.lang.StringUtils;
 import org.skyscreamer.nevado.jms.connector.AbstractSQSConnector;
 import org.skyscreamer.nevado.jms.connector.SQSMessage;
 import org.skyscreamer.nevado.jms.connector.SQSQueue;
@@ -61,7 +62,7 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, boolean isAsync) {
         super(receiveCheckIntervalMs, isAsync);
         AWSCredentials awsCredentials;
-        if(awsAccessKey != null && awsSecretKey != null) {
+        if(StringUtils.isNotEmpty(awsAccessKey) && StringUtils.isNotEmpty(awsSecretKey)) {
             awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
         } else {
             awsCredentials = new InstanceProfileCredentialsProvider().getCredentials();
