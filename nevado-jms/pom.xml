@@ -10,7 +10,7 @@
 
     <groupId>org.skyscreamer</groupId>
     <artifactId>nevado-jms</artifactId>
-    <version>1.3.2-SNAPSHOT</version>
+    <version>1.3.2-OA</version>
     <packaging>jar</packaging>
 
     <name>Nevado JMS</name>
