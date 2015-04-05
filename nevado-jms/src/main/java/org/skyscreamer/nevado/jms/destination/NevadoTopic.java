@@ -1,10 +1,11 @@
 package org.skyscreamer.nevado.jms.destination;
 
-import javax.jms.*;
 import javax.jms.IllegalStateException;
-import java.io.Serializable;
-import java.net.URL;
-import java.util.*;
+import javax.jms.JMSException;
+import javax.jms.TemporaryTopic;
+import javax.jms.Topic;
+import javax.naming.Reference;
+import javax.naming.StringRefAddr;
 
 /**
  * Nevado implementation of a topic
@@ -12,6 +13,12 @@ import java.util.*;
  * @author Carter Page <carter@skyscreamer.org>
  */
 public class NevadoTopic extends NevadoDestination implements Topic {
+    public static final String JNDI_TOPIC_ARN = "arn";
+    public static final String JDNI_TOPIC_SUBSCRIPTION_ARN = "subscriptionArn";
+    public static final String JNDI_TOPIC_DURABLE = "durable";
+    public static final String JNDI_TOPIC_ENDPOINT_NAME = "endpointName";
+    public static final String JNDI_TOPIC_ENDPOINT_URL = "endpointUrl";
+
     private volatile String _arn;
     private final NevadoQueue _topicEndpoint;
     private final String _subscriptionArn;
@@ -56,6 +63,25 @@ public class NevadoTopic extends NevadoDestination implements Topic {
         }
 
         return nevadoTopic;
+    }
+
+    @Override
+    protected void addStringRefAddrs(Reference reference) {
+        if (_arn != null) {
+            reference.add(new StringRefAddr(JNDI_TOPIC_ARN, _arn));
+        }
+        if (_subscriptionArn != null) {
+            reference.add(new StringRefAddr(JDNI_TOPIC_SUBSCRIPTION_ARN, _subscriptionArn));
+        }
+        reference.add(new StringRefAddr(JNDI_TOPIC_DURABLE, Boolean.toString(_durable)));
+        if (_topicEndpoint != null) {
+            reference.add(new StringRefAddr(JNDI_TOPIC_ENDPOINT_NAME, _topicEndpoint.getQueueName()));
+            _topicEndpoint.getQueueName();
+            String queueUrl = _topicEndpoint.getQueueUrl();
+            if (queueUrl != null) {
+                reference.add(new StringRefAddr(JNDI_TOPIC_ENDPOINT_URL, queueUrl));
+            }
+        }
     }
 
     public String getTopicName() {

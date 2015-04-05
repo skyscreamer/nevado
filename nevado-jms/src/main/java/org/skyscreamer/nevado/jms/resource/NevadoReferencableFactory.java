@@ -1,18 +1,17 @@
 package org.skyscreamer.nevado.jms.resource;
 
-import java.util.Hashtable;
+import org.skyscreamer.nevado.jms.NevadoConnectionFactory;
+import org.skyscreamer.nevado.jms.connector.SQSConnectorFactory;
+import org.skyscreamer.nevado.jms.destination.NevadoDestination;
+import org.skyscreamer.nevado.jms.destination.NevadoQueue;
+import org.skyscreamer.nevado.jms.destination.NevadoTopic;
 
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
-
-import org.skyscreamer.nevado.jms.NevadoConnectionFactory;
-import org.skyscreamer.nevado.jms.connector.SQSConnectorFactory;
-import org.skyscreamer.nevado.jms.destination.NevadoDestination;
-import org.skyscreamer.nevado.jms.destination.NevadoQueue;
-import org.skyscreamer.nevado.jms.destination.NevadoTopic;
+import java.util.Hashtable;
 
 /**
  * This is the factory for JNDI referenceable objects.
@@ -70,7 +69,7 @@ public class NevadoReferencableFactory implements ObjectFactory {
                     connectionFactory.setDurableSubscriberPrefixOverride(durableSubscriberPrefixOverride);
                 }
                 String sqsConnectorFactoryClass = getRefContent(ref, NevadoConnectionFactory.JNDI_SQS_CONNECTOR_FACTORY_CLASS);
-                if (sqsConnectorFactoryClass != null) 
+                if (sqsConnectorFactoryClass != null)
                 {
                     SQSConnectorFactory sqsConnectorFactory = (SQSConnectorFactory) Class.forName(sqsConnectorFactoryClass).newInstance();
                     connectionFactory.setSqsConnectorFactory(sqsConnectorFactory);
@@ -78,10 +77,36 @@ public class NevadoReferencableFactory implements ObjectFactory {
                 instance = connectionFactory;
             }
             else if (ref.getClassName().equals(NevadoQueue.class.getName())) {
-                instance = new NevadoQueue(getRefContent(ref, NevadoDestination.JNDI_DESTINATION_NAME));
+                NevadoQueue queue = new NevadoQueue(getRefContent(ref, NevadoDestination.JNDI_DESTINATION_NAME));
+                String queueUrl = getRefContent(ref, NevadoQueue.JNDI_QUEUE_URL);
+                if (queueUrl != null) {
+                    queue.setQueueUrl(queueUrl);
+                }
+                instance = queue;
             }
             else if (ref.getClassName().equals(NevadoTopic.class.getName())) {
-                instance = new NevadoTopic(getRefContent(ref, NevadoDestination.JNDI_DESTINATION_NAME));
+                NevadoTopic topic = new NevadoTopic(getRefContent(ref, NevadoDestination.JNDI_DESTINATION_NAME));
+                String arn = getRefContent(ref, NevadoTopic.JNDI_TOPIC_ARN);
+                if (arn != null) {
+                    topic.setArn(arn);
+                }
+                String subscriptionArn = getRefContent(ref, NevadoTopic.JDNI_TOPIC_SUBSCRIPTION_ARN);
+                NevadoQueue endpoint = null;
+                String durableString = getRefContent(ref, NevadoTopic.JNDI_TOPIC_DURABLE);
+                boolean durable = false;
+                if (durableString != null) {
+                    durable = Boolean.parseBoolean(durableString);
+                }
+                String endpointName = getRefContent(ref, NevadoTopic.JNDI_TOPIC_ENDPOINT_NAME);
+                if (endpointName != null) {
+                    endpoint = new NevadoQueue(endpointName);
+                    String endpointUrl = getRefContent(ref, NevadoTopic.JNDI_TOPIC_ENDPOINT_URL);
+                    if (endpointUrl != null) {
+                        endpoint.setQueueUrl(endpointUrl);
+                    }
+                }
+                topic = new NevadoTopic(topic, endpoint, subscriptionArn, durable);
+                instance = topic;
             }
             else {
                 throw new IllegalArgumentException("This factory does not support objects of type "

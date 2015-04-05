@@ -90,8 +90,11 @@ public abstract class NevadoDestination implements Destination, Serializable, Re
         Reference reference = new Reference(getClass().getName(),
                 new StringRefAddr(JNDI_DESTINATION_NAME, _name),
                 NevadoReferencableFactory.class.getName(), null);
+        addStringRefAddrs(reference);
         return reference;
     }
+
+    protected abstract void addStringRefAddrs(Reference reference);
 
     @Override
     public String toString() {
