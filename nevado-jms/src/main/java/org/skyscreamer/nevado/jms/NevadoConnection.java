@@ -52,6 +52,7 @@ public class NevadoConnection implements Connection {
         _inUse = true;
         NevadoSession nevadoSession = new NevadoSession(this, transacted, acknowledgeMode);
         initializeSession(nevadoSession);
+        cleanUpClosedSessions();
         return nevadoSession;
     }
 
@@ -65,6 +66,18 @@ public class NevadoConnection implements Connection {
             {
                 nevadoSession.start();
             }
+        }
+    }
+
+    private void cleanUpClosedSessions() {
+        List<NevadoSession> closedSessions = new ArrayList<NevadoSession>();
+        for (NevadoSession session : _sessions) {
+            if(session.isClosed()) {
+                closedSessions.add(session);
+            }
+        }
+        if(!closedSessions.isEmpty()) {
+            _sessions.removeAll(closedSessions);
         }
     }
 
