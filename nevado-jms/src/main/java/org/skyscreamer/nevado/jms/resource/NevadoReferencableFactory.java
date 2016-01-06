@@ -78,10 +78,18 @@ public class NevadoReferencableFactory implements ObjectFactory {
                 instance = connectionFactory;
             }
             else if (ref.getClassName().equals(NevadoQueue.class.getName())) {
-                instance = new NevadoQueue(getRefContent(ref, NevadoDestination.JNDI_DESTINATION_NAME));
+            	String destinationName = getRefContent(ref, NevadoDestination.JNDI_DESTINATION_NAME);
+            	if (destinationName == null) {
+            		destinationName = name.toString();
+            	}
+                instance = new NevadoQueue(destinationName);
             }
             else if (ref.getClassName().equals(NevadoTopic.class.getName())) {
-                instance = new NevadoTopic(getRefContent(ref, NevadoDestination.JNDI_DESTINATION_NAME));
+            	String destinationName = getRefContent(ref, NevadoDestination.JNDI_DESTINATION_NAME);
+            	if (destinationName == null) {
+            		destinationName = name.toString();
+            	}
+                instance = new NevadoTopic(destinationName);
             }
             else {
                 throw new IllegalArgumentException("This factory does not support objects of type "
