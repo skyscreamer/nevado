@@ -45,7 +45,8 @@ public class NevadoObjectMessage extends NevadoMessage implements ObjectMessage 
         }
         else {
             try {
-                _bodyBytes = SerializeUtil.serialize(serializable);
+                // for https://github.com/skyscreamer/nevado/issues/81
+                _bodyBytes = SerializeUtil.serializeOOS(serializable,false);
             } catch (IOException e) {
                 throw new JMSException("Unable to serialize body object");
             }
@@ -58,7 +59,8 @@ public class NevadoObjectMessage extends NevadoMessage implements ObjectMessage 
         }
         else {
             try {
-                return SerializeUtil.deserialize(_bodyBytes);
+                // for https://github.com/skyscreamer/nevado/issues/81
+                return SerializeUtil.deserializeOOS(_bodyBytes,false);
             } catch (IOException e) {
                 throw new JMSException("Unable to deserialize body object");
             }

@@ -9,6 +9,8 @@ import org.skyscreamer.nevado.jms.util.RandomData;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.ObjectMessage;
+
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
@@ -32,7 +34,7 @@ public class ObjectMessageTest extends AbstractJMSTest {
     }
 
     private void testObjectMessage(ObjectMessage msg) throws JMSException {
-        TestObject testObject = new TestObject();
+        TestObject testObject = new TestObject(false);
         msg.setObject(testObject);
         Message msgOut = sendAndReceive(msg);
         Assert.assertTrue("Should be an object message", msgOut instanceof ObjectMessage);
@@ -41,16 +43,28 @@ public class ObjectMessageTest extends AbstractJMSTest {
 
     @Test
     public void testObjectMessage2() throws JMSException {
-        TestObject testObject = new TestObject();
+        TestObject testObject = new TestObject(false);
         ObjectMessage msg = createSession().createObjectMessage(testObject);
         Message msgOut = sendAndReceive(msg);
         Assert.assertTrue("Should be an object message", msgOut instanceof ObjectMessage);
         Assert.assertEquals("Object should be equal", testObject, ((ObjectMessage)msgOut).getObject());
     }
+    
+    @Test
+    public void testObjectMessageTransientRef() throws JMSException {
+        TestObject testObject = new TestObject(true);
+        ObjectMessage msg = createSession().createObjectMessage(testObject);
+        Message msgOut = sendAndReceive(msg);
+        Assert.assertTrue("Should be an object message", msgOut instanceof ObjectMessage);
+        Assert.assertEquals("Object should be equal", testObject, ((ObjectMessage)msgOut).getObject());
+        Assert.assertEquals("testTransientRef Object should exist", 
+        				testObject.testTransientRef, 
+        				((TestObject)((ObjectMessage)msgOut).getObject()).testTransientRef);
+    }
 
     @Test
     public void testBadObjectMessage() throws JMSException {
-        TestObject testObject = new TestObject();
+        TestObject testObject = new TestObject(false);
         ObjectMessage msg = createSession().createObjectMessage();
         msg.setObject(testObject);
         Message msgOut = sendAndReceive(msg);
@@ -65,8 +79,9 @@ public class ObjectMessageTest extends AbstractJMSTest {
         private final int _int = (new Random()).nextInt();
         private final Map<String, Object> _map = new HashMap<String, Object>();
         private final List<Object> _list = new ArrayList<Object>();
+        private transient TestObject testTransientRef = null;
 
-        private TestObject() {
+        private TestObject(boolean includeTransientRef) {
             _map.put("a", RandomData.readString());
             _map.put("b", RandomData.readString());
             Map<String, Object> subMap = new HashMap<String, Object>();
@@ -80,6 +95,10 @@ public class ObjectMessageTest extends AbstractJMSTest {
             subList.add(RandomData.readInt());
             subList.add(RandomData.readString());
             _list.add(subList);
+            
+            if (includeTransientRef) {
+            	testTransientRef = new TestObject(false); // avoid circular loop
+            }
         }
 
         @Override
@@ -95,6 +114,16 @@ public class ObjectMessageTest extends AbstractJMSTest {
             if (_string != null ? !_string.equals(that._string) : that._string != null) return false;
 
             return true;
+        }
+        
+        private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+            out.defaultWriteObject();
+            out.writeObject(testTransientRef);
+        }
+    
+        private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+            in.defaultReadObject();
+            this.testTransientRef = (TestObject) in.readObject();
         }
     }
 }
