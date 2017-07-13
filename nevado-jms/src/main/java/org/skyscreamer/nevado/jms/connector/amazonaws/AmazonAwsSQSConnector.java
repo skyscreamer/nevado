@@ -58,7 +58,11 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
     }
 
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, boolean isAsync) {
-        super(receiveCheckIntervalMs, isAsync);
+    	this(awsAccessKey, awsSecretKey, isSecure, receiveCheckIntervalMs, isAsync, 0);
+    }
+
+    public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, boolean isAsync, int visibilityTimeoutOnReset) {
+        super(receiveCheckIntervalMs, isAsync, visibilityTimeoutOnReset);
         AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         String proxyHost = System.getProperty("http.proxyHost");

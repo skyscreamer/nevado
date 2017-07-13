@@ -45,7 +45,7 @@ public class  AsyncConsumerRunner implements Runnable {
             }
             _log.debug("Sleeping async loop");
             try {
-                _sleeper.sleep();
+                if (_running) { _sleeper.sleep(); }
             } catch (InterruptedException e) {
                 _log.info("Loop interrupted");
                 _running = false;
@@ -111,6 +111,7 @@ public class  AsyncConsumerRunner implements Runnable {
         if (_running) {
             _running = false;
             if (runner != Thread.currentThread()) {
+                _sleeper.reset();
                 _sleeper.stopSleeping();
                 runner.join();
             }
