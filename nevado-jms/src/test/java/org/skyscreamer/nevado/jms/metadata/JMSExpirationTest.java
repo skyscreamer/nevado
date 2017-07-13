@@ -46,7 +46,7 @@ public class JMSExpirationTest extends AbstractJMSTest {
         MessageProducer msgProducer = session.createProducer(tempQueue);
         msgProducer.send(msgToExpire, Message.DEFAULT_DELIVERY_MODE, Message.DEFAULT_PRIORITY, 10);
         msgProducer.send(msgWithoutExpire);
-        Thread.sleep(10);
+        Thread.sleep(20);
         Message msgOut = session.createConsumer(tempQueue).receive();
         Assert.assertNotNull("Got null message back", msgOut);
         msgOut.acknowledge();
