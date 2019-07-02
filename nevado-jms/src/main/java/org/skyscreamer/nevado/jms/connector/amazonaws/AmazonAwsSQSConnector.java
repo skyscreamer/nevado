@@ -5,6 +5,7 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.Protocol;
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.sns.AmazonSNS;
@@ -61,12 +62,6 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
 
     public AmazonAwsSQSConnector(String awsAccessKey, String awsSecretKey, boolean isSecure, long receiveCheckIntervalMs, boolean isAsync) {
         super(receiveCheckIntervalMs, isAsync);
-        AWSCredentials awsCredentials;
-        if(StringUtils.isNotEmpty(awsAccessKey) && StringUtils.isNotEmpty(awsSecretKey)) {
-            awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
-        } else {
-            awsCredentials = new InstanceProfileCredentialsProvider().getCredentials();
-        }
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         String proxyHost = System.getProperty("http.proxyHost");
         String proxyPort = System.getProperty("http.proxyPort");
@@ -79,11 +74,27 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
         clientConfiguration.setProtocol(isSecure ? Protocol.HTTPS : Protocol.HTTP);
         if (isAsync) {
             ExecutorService executorService = Executors.newSingleThreadExecutor();
-            _amazonSQS = new AmazonSQSAsyncClient(awsCredentials, clientConfiguration, executorService);
-            _amazonSNS = new AmazonSNSAsyncClient(awsCredentials, clientConfiguration, executorService);
+            if(StringUtils.isNotEmpty(awsAccessKey) && StringUtils.isNotEmpty(awsSecretKey)) {
+                AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
+                _amazonSQS = new AmazonSQSAsyncClient(awsCredentials, clientConfiguration, executorService);
+                _amazonSNS = new AmazonSNSAsyncClient(awsCredentials, clientConfiguration, executorService);
+            }
+            else {
+                AWSCredentialsProvider awsCredentialsProvider = new InstanceProfileCredentialsProvider();
+                _amazonSQS = new AmazonSQSAsyncClient(awsCredentialsProvider, clientConfiguration, executorService);
+                _amazonSNS = new AmazonSNSAsyncClient(awsCredentialsProvider, clientConfiguration, executorService);
+            }
         } else {
-            _amazonSQS = new AmazonSQSClient(awsCredentials, clientConfiguration);
-            _amazonSNS = new AmazonSNSClient(awsCredentials, clientConfiguration);
+            if(StringUtils.isNotEmpty(awsAccessKey) && StringUtils.isNotEmpty(awsSecretKey)) {
+                AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
+                _amazonSQS = new AmazonSQSClient(awsCredentials, clientConfiguration);
+                _amazonSNS = new AmazonSNSClient(awsCredentials, clientConfiguration);
+            }
+            else {
+                AWSCredentialsProvider awsCredentialsProvider = new InstanceProfileCredentialsProvider();
+                _amazonSQS = new AmazonSQSClient(awsCredentialsProvider, clientConfiguration);
+                _amazonSNS = new AmazonSNSClient(awsCredentialsProvider, clientConfiguration);
+            }
         }
     }
 
