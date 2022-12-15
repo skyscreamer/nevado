@@ -122,7 +122,7 @@
     </dependencies>
 
     <properties>
-        <spring.version>3.0.5.RELEASE</spring.version>
+        <spring.version>5.2.20.RELEASE</spring.version>
     </properties>
 
     <build>
