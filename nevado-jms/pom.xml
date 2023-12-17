@@ -212,7 +212,7 @@
         <repository>
             <id>joda</id>
             <name>joda repo</name>
-            <url>http://oss.sonatype.org/content/repositories/joda-releases/</url>
+            <url>https://oss.sonatype.org/content/repositories/joda-releases/</url>
         </repository>
     </repositories>
 </project>
